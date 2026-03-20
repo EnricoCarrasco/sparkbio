@@ -43,11 +43,14 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
     // Optimistic update (instant UI)
     set({ theme: { ...theme, ...updates } });
 
-    // Debounced save (500ms)
+    // Debounced save — reads latest state from store so all accumulated changes are saved
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(async () => {
+      const current = get().theme;
+      if (!current) return;
       const supabase = createClient();
-      await supabase.from("themes").update(updates).eq("id", theme.id);
+      const { id, user_id, ...fields } = current;
+      await supabase.from("themes").update(fields).eq("id", id);
     }, 500);
   },
 }));
