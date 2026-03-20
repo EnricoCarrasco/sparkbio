@@ -1,31 +1,30 @@
 "use client";
 
 import React from "react";
-import { User } from "lucide-react";
 import { useProfileStore } from "@/lib/stores/profile-store";
 import { useLinkStore } from "@/lib/stores/link-store";
 import { useThemeStore } from "@/lib/stores/theme-store";
+import { useSocialStore } from "@/lib/stores/social-store";
+import { getIconForPlatform } from "@/lib/social-icon-map";
 import type { ButtonStyle } from "@/types";
 
-/** Compute border-radius token for a given button style */
 function buttonRadius(style: ButtonStyle): string {
   switch (style) {
     case "pill":
       return "9999px";
     case "rounded":
-      return "0.5rem";
+      return "12px";
     case "sharp":
       return "0";
     case "outline":
-      return "0.5rem";
+      return "12px";
     case "shadow":
-      return "0.5rem";
+      return "12px";
     default:
-      return "0.5rem";
+      return "12px";
   }
 }
 
-/** Extra styles specific to button style variant */
 function buttonExtraStyle(
   style: ButtonStyle,
   buttonColor: string
@@ -38,8 +37,7 @@ function buttonExtraStyle(
   }
   if (style === "shadow") {
     return {
-      boxShadow: `4px 4px 0px ${buttonColor}`,
-      border: `2px solid ${buttonColor}`,
+      boxShadow: `rgba(0,0,0,0.2) 0px 4px 8px`,
     };
   }
   return {};
@@ -49,8 +47,8 @@ export function PreviewPanel() {
   const profile = useProfileStore((s) => s.profile);
   const links = useLinkStore((s) => s.links);
   const theme = useThemeStore((s) => s.theme);
+  const socialIcons = useSocialStore((s) => s.socialIcons);
 
-  // Resolved theme values with sensible defaults
   const bgColor = theme?.bg_color ?? "#FAFAFA";
   const textColor = theme?.text_color ?? "#1E1E2E";
   const buttonColor = theme?.button_color ?? "#FF6B35";
@@ -59,6 +57,9 @@ export function PreviewPanel() {
   const fontFamily = theme?.font_family ?? "Inter";
 
   const activeLinks = links.filter((l) => l.is_active);
+  const activeSocialIcons = socialIcons
+    .filter((s) => s.is_active)
+    .sort((a, b) => a.position - b.position);
 
   const pageBackground: React.CSSProperties =
     theme?.bg_gradient_from && theme?.bg_gradient_to
@@ -73,6 +74,11 @@ export function PreviewPanel() {
     .slice(0, 2)
     .toUpperCase();
 
+  // Google Fonts link for the preview
+  const fontUrl = fontFamily !== "Inter"
+    ? `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontFamily)}:wght@400;600;700&display=swap`
+    : null;
+
   return (
     <div className="flex flex-col h-full">
       {/* Panel header */}
@@ -82,9 +88,14 @@ export function PreviewPanel() {
         </p>
       </div>
 
+      {/* Load custom font if not Inter */}
+      {fontUrl && (
+        // eslint-disable-next-line @next/next/no-css-tags
+        <link rel="stylesheet" href={fontUrl} />
+      )}
+
       {/* Phone frame wrapper */}
       <div className="flex-1 flex items-start justify-center py-6 px-4 overflow-y-auto">
-        {/* Outer phone chrome */}
         <div className="relative w-[220px] shrink-0">
           {/* Phone bezel */}
           <div className="rounded-[2.5rem] border-[6px] border-[#1E1E2E] shadow-xl overflow-hidden">
@@ -96,12 +107,11 @@ export function PreviewPanel() {
               className="overflow-y-auto"
               style={{
                 ...pageBackground,
-                fontFamily,
+                fontFamily: `'${fontFamily}', sans-serif`,
                 minHeight: "420px",
                 maxHeight: "420px",
               }}
             >
-              {/* Scrollable inner content */}
               <div className="flex flex-col items-center px-4 pb-6 pt-8">
                 {/* Avatar */}
                 <div className="mt-2 mb-3">
@@ -127,7 +137,7 @@ export function PreviewPanel() {
                 {/* Display name */}
                 {(profile?.display_name || profile?.username) && (
                   <p
-                    className="text-sm font-semibold text-center leading-tight"
+                    className="text-sm font-bold text-center leading-tight"
                     style={{ color: textColor }}
                   >
                     {profile?.display_name || profile?.username}
@@ -137,11 +147,29 @@ export function PreviewPanel() {
                 {/* Bio */}
                 {profile?.bio && (
                   <p
-                    className="text-[10px] text-center mt-1 mb-1 leading-relaxed opacity-80 line-clamp-3"
+                    className="text-[10px] text-center mt-1 mb-1 leading-relaxed opacity-70 line-clamp-3 max-w-[180px]"
                     style={{ color: textColor }}
                   >
                     {profile.bio}
                   </p>
+                )}
+
+                {/* Social Icons */}
+                {activeSocialIcons.length > 0 && (
+                  <div className="flex items-center gap-2.5 mt-2 mb-1">
+                    {activeSocialIcons.map((icon) => {
+                      const Icon = getIconForPlatform(icon.platform);
+                      return (
+                        <div
+                          key={icon.id}
+                          className="opacity-70 hover:opacity-100 transition-opacity"
+                          style={{ color: textColor }}
+                        >
+                          <Icon className="size-3.5" />
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
 
                 {/* Links */}
@@ -159,7 +187,7 @@ export function PreviewPanel() {
                     return (
                       <div
                         key={link.id}
-                        className="w-full px-3 py-2 text-center cursor-default select-none"
+                        className="w-full px-3 py-2.5 text-center cursor-default select-none transition-all"
                         style={{
                           backgroundColor:
                             buttonStyle === "outline"
@@ -179,6 +207,13 @@ export function PreviewPanel() {
                       </div>
                     );
                   })}
+                </div>
+
+                {/* Sparkbio branding */}
+                <div className="mt-4 opacity-30">
+                  <p className="text-[8px] font-medium" style={{ color: textColor }}>
+                    sparkbio
+                  </p>
                 </div>
               </div>
             </div>
