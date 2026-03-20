@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { useProfileStore } from "@/lib/stores/profile-store";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
@@ -104,6 +105,11 @@ export function Sidebar({ onNavigate }: SidebarProps) {
             {t("viewProfile")}
           </a>
         )}
+
+        {/* Language switcher */}
+        <div className="px-1 py-1">
+          <LanguageSwitcher />
+        </div>
 
         {/* Sign out */}
         <button

@@ -96,7 +96,7 @@ export function ProfileEditor() {
       <h2 className="text-base font-semibold text-foreground">{t("title")}</h2>
 
       {/* Avatar */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <div className="relative">
           <Avatar
             className="size-20"

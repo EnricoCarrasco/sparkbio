@@ -78,10 +78,10 @@ function ActiveIconRow({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
-      className="flex items-center gap-3 p-3 rounded-xl border border-border bg-white"
+      className="flex flex-col gap-2 p-3 rounded-xl border border-border bg-white sm:flex-row sm:items-center sm:gap-3"
     >
-      {/* Platform icon + label */}
-      <div className="flex items-center gap-2.5 w-32 shrink-0">
+      {/* Top row on mobile: icon + label + toggle + delete */}
+      <div className="flex items-center gap-2.5 sm:w-32 sm:shrink-0">
         <div
           className={cn(
             "flex items-center justify-center size-8 rounded-lg shrink-0",
@@ -92,39 +92,57 @@ function ActiveIconRow({
         >
           <IconComponent size={16} strokeWidth={1.75} />
         </div>
-        <span className="text-sm font-medium text-foreground truncate">
+        <span className="text-sm font-medium text-foreground truncate flex-1">
           {label}
         </span>
+
+        {/* On mobile, show toggle + delete inline with the label */}
+        <div className="flex items-center gap-2 sm:hidden ml-auto shrink-0">
+          <Switch
+            checked={icon.is_active}
+            onCheckedChange={() => onToggle(icon.id)}
+            aria-label={`Toggle ${label}`}
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-8 shrink-0 text-muted-foreground hover:text-destructive"
+            onClick={() => onDelete(icon.id)}
+            aria-label={`Remove ${label}`}
+          >
+            <Trash2 size={15} />
+          </Button>
+        </div>
       </div>
 
-      {/* URL input */}
+      {/* URL input — full width on mobile, flex-1 on desktop */}
       <Input
         value={localUrl}
         onChange={handleChange}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         placeholder={getPlatformUrlPrefix(icon.platform) || "https://"}
-        className="flex-1 h-8 text-sm"
+        className="h-8 text-sm w-full sm:flex-1"
         aria-label={`${label} URL`}
       />
 
-      {/* Active toggle */}
-      <Switch
-        checked={icon.is_active}
-        onCheckedChange={() => onToggle(icon.id)}
-        aria-label={`Toggle ${label}`}
-      />
-
-      {/* Delete button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="size-8 shrink-0 text-muted-foreground hover:text-destructive"
-        onClick={() => onDelete(icon.id)}
-        aria-label={`Remove ${label}`}
-      >
-        <Trash2 size={15} />
-      </Button>
+      {/* Toggle + delete — desktop only */}
+      <div className="hidden sm:flex items-center gap-2 shrink-0">
+        <Switch
+          checked={icon.is_active}
+          onCheckedChange={() => onToggle(icon.id)}
+          aria-label={`Toggle ${label}`}
+        />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-8 shrink-0 text-muted-foreground hover:text-destructive"
+          onClick={() => onDelete(icon.id)}
+          aria-label={`Remove ${label}`}
+        >
+          <Trash2 size={15} />
+        </Button>
+      </div>
     </motion.div>
   );
 }

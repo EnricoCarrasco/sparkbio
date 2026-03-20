@@ -87,7 +87,7 @@ export function ProfilePage({ data }: ProfilePageProps) {
         <ProfileHeader profile={profile} textColor={theme.text_color} />
 
         {/* Social icons row — shown above links if present */}
-        {social_icons.length > 0 && (
+        {(social_icons ?? []).length > 0 && (
           <SocialIconsBar socialIcons={social_icons} textColor={theme.text_color} />
         )}
 

@@ -84,7 +84,7 @@ export function LinkCard({ link }: LinkCardProps) {
         ref={setNodeRef}
         style={style}
         className={cn(
-          "flex items-center gap-3 p-4 rounded-xl border border-border bg-white transition-shadow",
+          "flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl border border-border bg-white transition-shadow",
           isDragging && "shadow-lg opacity-80 z-50"
         )}
       >

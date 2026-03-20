@@ -218,7 +218,7 @@ export function AnalyticsCharts({ data }: AnalyticsChartsProps) {
                   <YAxis
                     type="category"
                     dataKey="title"
-                    width={110}
+                    width={90}
                     tick={{ fontSize: 11, fill: "#64748B" }}
                     axisLine={false}
                     tickLine={false}

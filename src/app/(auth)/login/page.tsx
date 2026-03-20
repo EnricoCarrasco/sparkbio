@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default function LoginPage() {
   const t = useTranslations("auth.login");
@@ -57,7 +58,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA] px-4">
+    <div className="relative min-h-screen flex items-center justify-center bg-[#FAFAFA] px-4">
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <Link href="/" className="text-2xl font-bold text-[#1E1E2E]">
@@ -67,7 +71,7 @@ export default function LoginPage() {
           <p className="mt-2 text-sm text-gray-500">{t("subtitle")}</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl p-5 sm:p-8 shadow-sm border border-gray-100">
           <Button
             type="button"
             variant="outline"

@@ -14,7 +14,7 @@
         "description": "Deixe com a sua cara com temas, cores, fontes e estilos de botão que combinam com sua marca."
       },
       "analytics": {
-        "title": "Analytics poderoso",
+        "title": "Análises poderosas",
         "description": "Acompanhe visualizações, cliques, localizações e dispositivos. Conheça melhor seu público."
       },
       "simple": {
@@ -22,7 +22,7 @@
         "description": "Adicione seus links, personalize sua página e compartilhe em todos os lugares — em minutos."
       },
       "fast": {
-        "title": "Ultra rápido",
+        "title": "Ultrarápido",
         "description": "Otimizado para velocidade e SEO. Seu perfil carrega instantaneamente em qualquer dispositivo."
       }
     },
@@ -41,7 +41,7 @@
     "footer": {
       "product": "Produto",
       "company": "Empresa",
-      "legal": "Legal",
+      "legal": "Jurídico",
       "features": "Recursos",
       "pricing": "Preços",
       "about": "Sobre",
@@ -164,14 +164,14 @@
       "topLinks": "Links mais clicados",
       "viewsOverTime": "Visualizações ao longo do tempo",
       "devices": "Dispositivos",
-      "referrers": "Principais referências",
+      "referrers": "Principais origens",
       "countries": "Principais países",
       "timeRange": "Período",
       "last7days": "Últimos 7 dias",
       "last30days": "Últimos 30 dias",
       "allTime": "Todo o período",
       "noData": "Sem dados de analytics ainda",
-      "noDataDesc": "Compartilhe seu link Sparkbio para começar a rastrear visualizações e cliques."
+      "noDataDesc": "Compartilhe seu link Sparkbio para começar a acompanhar visualizações e cliques."
     },
     "settings": {
       "title": "Configurações",

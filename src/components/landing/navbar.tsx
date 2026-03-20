@@ -11,6 +11,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 export function Navbar() {
   const t = useTranslations("landing.nav");
@@ -52,7 +53,8 @@ export function Navbar() {
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-4">
+            <LanguageSwitcher />
             <Link
               href="/login"
               className="text-sm font-medium text-gray-600 hover:text-[#1E1E2E] transition-colors"
@@ -107,6 +109,9 @@ export function Navbar() {
                     >
                       {t("signup")}
                     </Link>
+                    <div className="pt-2">
+                      <LanguageSwitcher />
+                    </div>
                   </div>
                 </div>
               </SheetContent>

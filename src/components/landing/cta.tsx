@@ -81,7 +81,7 @@ export function CTA() {
           {/* Headline */}
           <motion.h2
             variants={itemVariants}
-            className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight tracking-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight"
           >
             {t("title")}
           </motion.h2>
@@ -89,7 +89,7 @@ export function CTA() {
           {/* Subtitle */}
           <motion.p
             variants={itemVariants}
-            className="text-lg text-gray-400 max-w-md leading-relaxed"
+            className="text-base sm:text-lg text-gray-400 max-w-md leading-relaxed px-2 sm:px-0"
           >
             {t("subtitle")}
           </motion.p>
