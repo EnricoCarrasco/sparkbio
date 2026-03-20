@@ -13,15 +13,52 @@ import { TextPanel } from "./design/text-panel";
 import { ButtonsPanel } from "./design/buttons-panel";
 import { ColorsPanel } from "./design/colors-panel";
 import { FooterPanel } from "./design/footer-panel";
+import {
+  User,
+  LayoutGrid,
+  Diamond,
+  Type,
+  RectangleHorizontal,
+  Palette,
+  Sparkles,
+} from "lucide-react";
 
-const SUB_TABS: { key: DesignSubTab; labelKey: string }[] = [
-  { key: "header", labelKey: "header" },
-  { key: "theme", labelKey: "themeTab" },
-  { key: "wallpaper", labelKey: "wallpaper" },
-  { key: "text", labelKey: "textTab" },
-  { key: "buttons", labelKey: "buttonsTab" },
-  { key: "colors", labelKey: "colorsTab" },
-  { key: "footer", labelKey: "footerTab" },
+const SUB_TABS: { key: DesignSubTab; labelKey: string; icon: React.ReactNode }[] = [
+  {
+    key: "header",
+    labelKey: "header",
+    icon: <User className="size-4 shrink-0" />,
+  },
+  {
+    key: "theme",
+    labelKey: "themeTab",
+    icon: <LayoutGrid className="size-4 shrink-0" />,
+  },
+  {
+    key: "wallpaper",
+    labelKey: "wallpaper",
+    icon: <Diamond className="size-4 shrink-0" />,
+  },
+  {
+    key: "text",
+    labelKey: "textTab",
+    icon: <Type className="size-4 shrink-0" />,
+  },
+  {
+    key: "buttons",
+    labelKey: "buttonsTab",
+    icon: <RectangleHorizontal className="size-4 shrink-0" />,
+  },
+  {
+    key: "colors",
+    labelKey: "colorsTab",
+    icon: <Palette className="size-4 shrink-0" />,
+  },
+  {
+    key: "footer",
+    labelKey: "footerTab",
+    icon: <Sparkles className="size-4 shrink-0" />,
+  },
 ];
 
 function DesignSkeleton() {
@@ -49,43 +86,59 @@ export function DesignTab() {
   return (
     <div className="flex h-full">
       {/* Sub-navigation sidebar */}
-      <div className="w-[168px] shrink-0 border-r border-border bg-white overflow-y-auto">
-        <div className="py-4 px-2">
-          <h2 className="text-sm font-semibold text-foreground px-2 mb-3">
-            {t("designTitle")}
-          </h2>
-          <nav className="flex flex-col gap-0.5">
-            {SUB_TABS.map(({ key, labelKey }) => {
-              const isActive = activeSubTab === key;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setActiveSubTab(key)}
+      <div className="w-[140px] shrink-0 border-r border-border bg-white overflow-y-auto">
+        <nav className="flex flex-col gap-0.5 py-3 px-2">
+          {SUB_TABS.map(({ key, labelKey, icon }) => {
+            const isActive = activeSubTab === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setActiveSubTab(key)}
+                className={cn(
+                  "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-colors text-left",
+                  isActive
+                    ? "font-semibold text-foreground"
+                    : "font-normal text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                )}
+              >
+                <span
                   className={cn(
-                    "text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-[#FF6B35]/10 text-[#FF6B35]"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    "transition-colors",
+                    isActive ? "text-foreground" : "text-muted-foreground"
                   )}
                 >
-                  {t(labelKey)}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
+                  {icon}
+                </span>
+                <span className="truncate">{t(labelKey)}</span>
+              </button>
+            );
+          })}
+        </nav>
       </div>
 
       {/* Active sub-tab content */}
-      <div className="flex-1 overflow-y-auto p-6">
-        {activeSubTab === "header" && <HeaderPanel />}
-        {activeSubTab === "theme" && <ThemePanel />}
-        {activeSubTab === "wallpaper" && <WallpaperPanel />}
-        {activeSubTab === "text" && <TextPanel />}
-        {activeSubTab === "buttons" && <ButtonsPanel />}
-        {activeSubTab === "colors" && <ColorsPanel />}
-        {activeSubTab === "footer" && <FooterPanel />}
+      <div className="flex-1 overflow-y-auto bg-[#FAFAFA]">
+        {/* Enhance pill button at the top */}
+        <div className="flex justify-center pt-4 pb-2 px-6">
+          <button
+            type="button"
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-border bg-white text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shadow-sm"
+          >
+            <Sparkles className="size-3.5 text-[#FF6B35]" />
+            Enhance
+          </button>
+        </div>
+
+        <div className="px-6 pb-6">
+          {activeSubTab === "header" && <HeaderPanel />}
+          {activeSubTab === "theme" && <ThemePanel />}
+          {activeSubTab === "wallpaper" && <WallpaperPanel />}
+          {activeSubTab === "text" && <TextPanel />}
+          {activeSubTab === "buttons" && <ButtonsPanel />}
+          {activeSubTab === "colors" && <ColorsPanel />}
+          {activeSubTab === "footer" && <FooterPanel />}
+        </div>
       </div>
     </div>
   );
