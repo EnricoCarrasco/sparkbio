@@ -17,15 +17,24 @@ function buildBackgroundStyle(theme: PublicProfile["theme"]): React.CSSPropertie
     bg_gradient_from,
     bg_gradient_to,
     bg_gradient_direction,
+    wallpaper_animate,
   } = theme;
 
   const hasGradient = bg_gradient_from && bg_gradient_to;
 
   if (hasGradient) {
     const direction = bg_gradient_direction ?? "to bottom";
-    return {
-      background: `linear-gradient(${direction}, ${bg_gradient_from}, ${bg_gradient_to})`,
-    };
+    const gradientBg = `linear-gradient(${direction}, ${bg_gradient_from}, ${bg_gradient_to})`;
+
+    if (wallpaper_animate) {
+      return {
+        background: `${gradientBg}`,
+        backgroundSize: "200% 200%",
+        animation: "gradientShift 6s ease infinite",
+      };
+    }
+
+    return { background: gradientBg };
   }
 
   return { backgroundColor: bg_color };
@@ -36,7 +45,6 @@ export function ProfilePage({ data }: ProfilePageProps) {
 
   const backgroundStyle = useMemo(() => buildBackgroundStyle(theme), [theme]);
 
-  // Apply CSS custom properties to :root so child components can reference them
   useEffect(() => {
     const root = document.documentElement;
     root.style.setProperty("--profile-bg", theme.bg_color);
@@ -55,7 +63,6 @@ export function ProfilePage({ data }: ProfilePageProps) {
     }
 
     return () => {
-      // Clean up custom properties on unmount to avoid leaking into other pages
       root.style.removeProperty("--profile-bg");
       root.style.removeProperty("--profile-text");
       root.style.removeProperty("--btn-color");
@@ -70,23 +77,48 @@ export function ProfilePage({ data }: ProfilePageProps) {
     .filter((link) => link.is_active)
     .sort((a, b) => a.position - b.position);
 
+  const showFooter = !theme.hide_footer;
+
   return (
     <div
-      className="min-h-screen w-full flex flex-col items-center"
+      className="min-h-screen w-full flex flex-col items-center relative"
       style={{
         ...backgroundStyle,
         fontFamily: theme.font_family ? `'${theme.font_family}', sans-serif` : undefined,
       }}
     >
+      {/* Noise overlay */}
+      {theme.wallpaper_noise && (
+        <div
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
+            backgroundSize: "256px 256px",
+          }}
+        />
+      )}
+
+      {/* Gradient animation keyframes */}
+      {theme.wallpaper_animate && (
+        <style>{`
+          @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+        `}</style>
+      )}
+
       {/* Non-rendering analytics tracker */}
       <AnalyticsTracker profileId={profile.id} />
 
       {/* Centered content column */}
-      <main className="w-full max-w-[680px] mx-auto flex flex-col items-center gap-6 px-4 py-12 md:py-16">
-        {/* Profile header: avatar + name + bio */}
-        <ProfileHeader profile={profile} textColor={theme.text_color} />
+      <main className="w-full max-w-[680px] mx-auto flex flex-col items-center gap-6 px-4 py-12 md:py-16 relative z-10">
+        {/* Profile header */}
+        <ProfileHeader profile={profile} textColor={theme.text_color} theme={theme} />
 
-        {/* Social icons row — shown above links if present */}
+        {/* Social icons row */}
         {(social_icons ?? []).length > 0 && (
           <SocialIconsBar socialIcons={social_icons} textColor={theme.text_color} />
         )}
@@ -107,15 +139,17 @@ export function ProfilePage({ data }: ProfilePageProps) {
         )}
 
         {/* Sparkbio branding footer */}
-        <a
-          href="https://sparkbio.co"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 text-xs font-medium tracking-wide opacity-40 hover:opacity-70 transition-opacity"
-          style={{ color: theme.text_color }}
-        >
-          Made with Sparkbio
-        </a>
+        {showFooter && (
+          <a
+            href="https://sparkbio.co"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 text-xs font-medium tracking-wide opacity-40 hover:opacity-70 transition-opacity"
+            style={{ color: theme.text_color }}
+          >
+            Made with Sparkbio
+          </a>
+        )}
       </main>
     </div>
   );

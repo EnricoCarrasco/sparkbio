@@ -10,8 +10,27 @@ interface ProfileLinkProps {
   index: number;
 }
 
+function getCornerRadius(corner: string): string {
+  switch (corner) {
+    case "square": return "0";
+    case "round": return "8px";
+    case "rounder": return "16px";
+    case "full": return "999px";
+    default: return "8px";
+  }
+}
+
+function getShadow(shadow: string): string {
+  switch (shadow) {
+    case "soft": return "0 2px 4px rgba(0,0,0,0.1)";
+    case "strong": return "0 4px 12px rgba(0,0,0,0.2)";
+    case "hard": return "4px 4px 0 rgba(0,0,0,0.8)";
+    default: return "none";
+  }
+}
+
 function getLinkStyles(theme: Theme): React.CSSProperties {
-  const { button_color, button_text_color, button_style } = theme;
+  const { button_color, button_text_color, button_style_v2, button_corner, button_shadow } = theme;
 
   const base: React.CSSProperties = {
     display: "flex",
@@ -24,52 +43,42 @@ function getLinkStyles(theme: Theme): React.CSSProperties {
     fontWeight: 600,
     letterSpacing: "0.01em",
     cursor: "pointer",
-    border: "none",
     textDecoration: "none",
     transition: "opacity 0.15s ease",
     lineHeight: 1.4,
     textAlign: "center",
     wordBreak: "break-word",
+    borderRadius: getCornerRadius(button_corner),
+    boxShadow: getShadow(button_shadow),
   };
 
-  switch (button_style) {
-    case "pill":
+  // Use new v2 style if available, fall back to legacy
+  const styleV2 = button_style_v2;
+
+  switch (styleV2) {
+    case "glass":
       return {
         ...base,
-        borderRadius: "999px",
-        backgroundColor: button_color,
-        color: button_text_color,
-      };
-    case "sharp":
-      return {
-        ...base,
-        borderRadius: "0",
-        backgroundColor: button_color,
-        color: button_text_color,
+        backgroundColor: `${button_color}33`,
+        color: button_color,
+        border: `1px solid ${button_color}66`,
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
       };
     case "outline":
       return {
         ...base,
-        borderRadius: "12px",
         backgroundColor: "transparent",
         color: button_color,
         border: `2px solid ${button_color}`,
       };
-    case "shadow":
-      return {
-        ...base,
-        borderRadius: "12px",
-        backgroundColor: button_color,
-        color: button_text_color,
-        boxShadow: "rgba(0, 0, 0, 0.2) 0px 4px 8px",
-      };
-    case "rounded":
+    case "solid":
     default:
       return {
         ...base,
-        borderRadius: "12px",
         backgroundColor: button_color,
         color: button_text_color,
+        border: "none",
       };
   }
 }
@@ -78,7 +87,6 @@ export function ProfileLink({ link, profileId, theme, index }: ProfileLinkProps)
   const styles = getLinkStyles(theme);
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
-    // Fire analytics beacon non-blocking BEFORE navigating
     const payload = JSON.stringify({
       profile_id: profileId,
       link_id: link.id,
@@ -93,10 +101,7 @@ export function ProfileLink({ link, profileId, theme, index }: ProfileLinkProps)
       );
     }
 
-    // If the browser blocks window.open from the anchor's default behaviour,
-    // ensure we open the tab. The href already handles it, but we add a guard.
-    // We do NOT call e.preventDefault() so the browser's native target=_blank works.
-    void e; // suppress lint unused-variable
+    void e;
   }
 
   return (

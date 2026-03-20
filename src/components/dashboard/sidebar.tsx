@@ -1,22 +1,20 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
-  Link2,
-  Palette,
+  FileText,
+  Paintbrush,
   BarChart3,
   Settings,
   ExternalLink,
   LogOut,
+  ChevronLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useProfileStore } from "@/lib/stores/profile-store";
+import { useDashboardStore, type DashboardTab } from "@/lib/stores/dashboard-store";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -25,18 +23,19 @@ interface SidebarProps {
   onNavigate: () => void;
 }
 
-const NAV_ITEMS = [
-  { key: "links" as const, href: "/dashboard", icon: Link2 },
-  { key: "appearance" as const, href: "/dashboard/appearance", icon: Palette },
-  { key: "analytics" as const, href: "/dashboard/analytics", icon: BarChart3 },
-  { key: "settings" as const, href: "/dashboard/settings", icon: Settings },
+const NAV_ITEMS: { key: DashboardTab; labelKey: string; icon: React.ElementType }[] = [
+  { key: "content", labelKey: "content", icon: FileText },
+  { key: "design", labelKey: "design", icon: Paintbrush },
+  { key: "analytics", labelKey: "analytics", icon: BarChart3 },
+  { key: "settings", labelKey: "settings", icon: Settings },
 ];
 
 export function Sidebar({ onNavigate }: SidebarProps) {
   const t = useTranslations("dashboard.sidebar");
-  const pathname = usePathname();
   const router = useRouter();
   const profile = useProfileStore((s) => s.profile);
+  const activeTab = useDashboardStore((s) => s.activeTab);
+  const setActiveTab = useDashboardStore((s) => s.setActiveTab);
 
   async function handleSignOut() {
     const supabase = createClient();
@@ -48,76 +47,79 @@ export function Sidebar({ onNavigate }: SidebarProps) {
     router.push("/login");
   }
 
-  // Normalize pathname: strip locale prefix like /en or /pt-BR
-  const normalizedPath = pathname.replace(/^\/(en|pt-BR)/, "") || "/";
-
-  function isActive(href: string): boolean {
-    if (href === "/dashboard") {
-      return normalizedPath === "/dashboard";
-    }
-    return normalizedPath.startsWith(href);
+  function handleTabClick(tab: DashboardTab) {
+    setActiveTab(tab);
+    onNavigate();
   }
 
   return (
-    <div className="flex flex-col h-full py-4">
-      {/* Logo */}
-      <div className="px-4 mb-6">
+    <div className="flex flex-col h-full py-3">
+      {/* Compact logo */}
+      <div className="flex items-center justify-center mb-4 px-2">
         <span
-          className="font-bold text-xl tracking-tight select-none"
+          className="font-bold text-base tracking-tight select-none"
           style={{ color: "#FF6B35" }}
         >
-          Sparkbio
+          Spark
         </span>
       </div>
 
-      {/* Nav links */}
-      <nav className="flex flex-col gap-1 px-2 flex-1">
-        {NAV_ITEMS.map(({ key, href, icon: Icon }) => (
-          <Link
-            key={key}
-            href={href}
-            onClick={onNavigate}
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-              isActive(href)
-                ? "bg-[#FF6B35]/10 text-[#FF6B35]"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            )}
-          >
-            <Icon className="size-4 shrink-0" />
-            {t(key)}
-          </Link>
-        ))}
+      {/* Nav icons */}
+      <nav className="flex flex-col items-center gap-1 flex-1 px-1">
+        {NAV_ITEMS.map(({ key, labelKey, icon: Icon }) => {
+          const isActive = activeTab === key;
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => handleTabClick(key)}
+              className={cn(
+                "flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-2.5 transition-colors",
+                isActive
+                  ? "bg-[#FF6B35]/10 text-[#FF6B35]"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+            >
+              <Icon className="size-5" strokeWidth={isActive ? 2 : 1.5} />
+              <span className="text-[10px] font-medium leading-tight">
+                {t(labelKey)}
+              </span>
+            </button>
+          );
+        })}
       </nav>
 
-      <div className="px-2 mt-auto flex flex-col gap-1">
-        <Separator className="mb-2" />
-
+      {/* Bottom actions */}
+      <div className="flex flex-col items-center gap-1 px-1 mt-auto">
         {/* View my Sparkbio */}
         {profile?.username && (
           <a
             href={`/${profile.username}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            className="flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-2.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           >
-            <ExternalLink className="size-4 shrink-0" />
-            {t("viewProfile")}
+            <ExternalLink className="size-5" strokeWidth={1.5} />
+            <span className="text-[10px] font-medium leading-tight">
+              {t("viewProfile")}
+            </span>
           </a>
         )}
 
         {/* Language switcher */}
-        <div className="px-1 py-1">
+        <div className="py-1">
           <LanguageSwitcher />
         </div>
 
         {/* Sign out */}
         <button
           onClick={handleSignOut}
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors w-full text-left"
+          className="flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-2.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
         >
-          <LogOut className="size-4 shrink-0" />
-          {t("signOut")}
+          <LogOut className="size-5" strokeWidth={1.5} />
+          <span className="text-[10px] font-medium leading-tight">
+            {t("signOut")}
+          </span>
         </button>
       </div>
     </div>

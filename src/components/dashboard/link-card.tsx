@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
-import { GripVertical, Pencil, Trash2 } from "lucide-react";
+import { GripVertical, Pencil, Trash2, Share2 } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { toast } from "sonner";
@@ -50,10 +50,10 @@ export function LinkCard({ link }: LinkCardProps) {
   function truncateUrl(url: string): string {
     try {
       const { host, pathname } = new URL(url);
-      const path = pathname.length > 20 ? pathname.slice(0, 20) + "…" : pathname;
+      const path = pathname.length > 30 ? pathname.slice(0, 30) + "..." : pathname;
       return `${host}${path}`;
     } catch {
-      return url.length > 40 ? url.slice(0, 40) + "…" : url;
+      return url.length > 50 ? url.slice(0, 50) + "..." : url;
     }
   }
 
@@ -84,60 +84,84 @@ export function LinkCard({ link }: LinkCardProps) {
         ref={setNodeRef}
         style={style}
         className={cn(
-          "flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl border border-border bg-white transition-shadow",
+          "rounded-2xl bg-white border border-border/60 shadow-sm transition-shadow",
           isDragging && "shadow-lg opacity-80 z-50"
         )}
       >
-        {/* Drag handle */}
-        <button
-          type="button"
-          aria-label="Drag to reorder"
-          className="touch-none cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground shrink-0"
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical className="size-4" />
-        </button>
+        {/* Main card body */}
+        <div className="flex items-start gap-2 p-4">
+          {/* Drag handle */}
+          <button
+            type="button"
+            aria-label="Drag to reorder"
+            className="touch-none cursor-grab active:cursor-grabbing text-muted-foreground/50 hover:text-muted-foreground shrink-0 mt-1"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical className="size-5" />
+          </button>
 
-        {/* Link info */}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-foreground truncate">
-            {link.title}
-          </p>
-          <p className="text-xs text-muted-foreground truncate">
-            {truncateUrl(link.url)}
-          </p>
+          {/* Link info */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm font-semibold text-foreground truncate">
+                {link.title}
+              </p>
+              <button
+                type="button"
+                onClick={() => setEditOpen(true)}
+                className="shrink-0 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+              >
+                <Pencil className="size-3" />
+              </button>
+            </div>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <p className="text-xs text-muted-foreground truncate">
+                {truncateUrl(link.url)}
+              </p>
+              <button
+                type="button"
+                onClick={() => setEditOpen(true)}
+                className="shrink-0 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+              >
+                <Pencil className="size-2.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Right side: share + toggle */}
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-8 text-muted-foreground/60 hover:text-muted-foreground"
+            >
+              <Share2 className="size-3.5" />
+            </Button>
+            <Switch
+              checked={link.is_active}
+              onCheckedChange={handleToggle}
+              aria-label={link.is_active ? t("active") : t("inactive")}
+            />
+          </div>
         </div>
 
-        {/* Active toggle */}
-        <Switch
-          checked={link.is_active}
-          onCheckedChange={handleToggle}
-          aria-label={link.is_active ? t("active") : t("inactive")}
-        />
-
-        {/* Edit button */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          onClick={() => setEditOpen(true)}
-          aria-label={t("edit")}
-        >
-          <Pencil className="size-3.5" />
-        </Button>
-
-        {/* Delete button */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          onClick={() => setDeleteOpen(true)}
-          aria-label={t("delete")}
-          className="text-muted-foreground hover:text-destructive"
-        >
-          <Trash2 className="size-3.5" />
-        </Button>
+        {/* Bottom action bar */}
+        <div className="flex items-center justify-between px-4 pb-3 pt-0">
+          <div className="flex items-center gap-1">
+            {/* Placeholder action icons - matching Linktree's bottom row */}
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => setDeleteOpen(true)}
+            className="size-7 text-muted-foreground/40 hover:text-destructive"
+          >
+            <Trash2 className="size-3.5" />
+          </Button>
+        </div>
       </div>
 
       {/* Edit dialog */}
@@ -171,7 +195,7 @@ export function LinkCard({ link }: LinkCardProps) {
               disabled={deleting}
               className="bg-destructive/10 text-destructive hover:bg-destructive/20"
             >
-              {deleting ? "Deleting…" : t("delete")}
+              {deleting ? "Deleting..." : t("delete")}
             </Button>
           </DialogFooter>
         </DialogContent>

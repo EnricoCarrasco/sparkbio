@@ -1,5 +1,13 @@
 export type ButtonStyle = "rounded" | "pill" | "sharp" | "outline" | "shadow";
 
+export type ButtonStyleV2 = "solid" | "glass" | "outline";
+export type ButtonCorner = "square" | "round" | "rounder" | "full";
+export type ButtonShadow = "none" | "soft" | "strong" | "hard";
+export type ProfileLayout = "classic" | "hero";
+export type TitleStyle = "text" | "logo";
+export type TitleSize = "small" | "large";
+export type WallpaperStyle = "fill" | "gradient" | "blur" | "pattern";
+
 export type SocialPlatform =
   | "instagram"
   | "tiktok"
@@ -55,6 +63,21 @@ export interface Theme {
   button_text_color: string;
   button_style: ButtonStyle;
   font_family: string;
+  // New design rework fields
+  profile_layout: ProfileLayout;
+  title_style: TitleStyle;
+  title_size: TitleSize;
+  title_font_alt: boolean;
+  title_color: string | null;
+  wallpaper_style: WallpaperStyle;
+  wallpaper_gradient_style: "custom" | "premade";
+  wallpaper_gradient_preset: string | null;
+  wallpaper_animate: boolean;
+  wallpaper_noise: boolean;
+  button_style_v2: ButtonStyleV2;
+  button_corner: ButtonCorner;
+  button_shadow: ButtonShadow;
+  hide_footer: boolean;
 }
 
 export interface SocialIcon {

@@ -6,6 +6,13 @@ export type {
   AnalyticsEvent,
   PublicProfile,
   ButtonStyle,
+  ButtonStyleV2,
+  ButtonCorner,
+  ButtonShadow,
+  ProfileLayout,
+  TitleStyle,
+  TitleSize,
+  WallpaperStyle,
   SocialPlatform,
   EventType,
 } from "./database";

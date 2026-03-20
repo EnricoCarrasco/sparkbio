@@ -90,6 +90,9 @@ export const THEME_PRESETS = [
     button_color: "#FF6B35",
     button_text_color: "#FFFFFF",
     button_style: "pill" as const,
+    button_style_v2: "solid" as const,
+    button_corner: "full" as const,
+    button_shadow: "none" as const,
     font_family: "Inter",
   },
   {
@@ -99,6 +102,9 @@ export const THEME_PRESETS = [
     button_color: "#6366F1",
     button_text_color: "#FFFFFF",
     button_style: "rounded" as const,
+    button_style_v2: "solid" as const,
+    button_corner: "round" as const,
+    button_shadow: "none" as const,
     font_family: "Space Grotesk",
   },
   {
@@ -108,6 +114,9 @@ export const THEME_PRESETS = [
     button_color: "#00897B",
     button_text_color: "#FFFFFF",
     button_style: "pill" as const,
+    button_style_v2: "solid" as const,
+    button_corner: "full" as const,
+    button_shadow: "none" as const,
     font_family: "Poppins",
   },
   {
@@ -117,6 +126,9 @@ export const THEME_PRESETS = [
     button_color: "#FF5722",
     button_text_color: "#FFFFFF",
     button_style: "rounded" as const,
+    button_style_v2: "solid" as const,
+    button_corner: "round" as const,
+    button_shadow: "none" as const,
     font_family: "Montserrat",
   },
   {
@@ -126,6 +138,9 @@ export const THEME_PRESETS = [
     button_color: "#EC4899",
     button_text_color: "#FFFFFF",
     button_style: "pill" as const,
+    button_style_v2: "solid" as const,
+    button_corner: "full" as const,
+    button_shadow: "none" as const,
     font_family: "Playfair Display",
   },
   {
@@ -135,6 +150,9 @@ export const THEME_PRESETS = [
     button_color: "#4CAF50",
     button_text_color: "#FFFFFF",
     button_style: "rounded" as const,
+    button_style_v2: "solid" as const,
+    button_corner: "round" as const,
+    button_shadow: "none" as const,
     font_family: "DM Sans",
   },
   {
@@ -144,6 +162,9 @@ export const THEME_PRESETS = [
     button_color: "#9C27B0",
     button_text_color: "#FFFFFF",
     button_style: "shadow" as const,
+    button_style_v2: "solid" as const,
+    button_corner: "round" as const,
+    button_shadow: "hard" as const,
     font_family: "Nunito",
   },
   {
@@ -153,6 +174,9 @@ export const THEME_PRESETS = [
     button_color: "#111111",
     button_text_color: "#FFFFFF",
     button_style: "sharp" as const,
+    button_style_v2: "solid" as const,
+    button_corner: "square" as const,
+    button_shadow: "none" as const,
     font_family: "Inter",
   },
   {
@@ -162,6 +186,9 @@ export const THEME_PRESETS = [
     button_color: "#E94560",
     button_text_color: "#FFFFFF",
     button_style: "pill" as const,
+    button_style_v2: "solid" as const,
+    button_corner: "full" as const,
+    button_shadow: "none" as const,
     font_family: "Space Grotesk",
   },
   {
@@ -171,6 +198,9 @@ export const THEME_PRESETS = [
     button_color: "#795548",
     button_text_color: "#FFFFFF",
     button_style: "outline" as const,
+    button_style_v2: "outline" as const,
+    button_corner: "round" as const,
+    button_shadow: "none" as const,
     font_family: "Raleway",
   },
   {
@@ -180,6 +210,9 @@ export const THEME_PRESETS = [
     button_color: "#2196F3",
     button_text_color: "#FFFFFF",
     button_style: "pill" as const,
+    button_style_v2: "solid" as const,
+    button_corner: "full" as const,
+    button_shadow: "none" as const,
     font_family: "Roboto",
   },
   {
@@ -189,8 +222,23 @@ export const THEME_PRESETS = [
     button_color: "#FF9800",
     button_text_color: "#263238",
     button_style: "rounded" as const,
+    button_style_v2: "solid" as const,
+    button_corner: "round" as const,
+    button_shadow: "none" as const,
     font_family: "Open Sans",
   },
+] as const;
+
+export const PREMADE_GRADIENTS = [
+  { name: "Sunset", from: "#FF512F", to: "#DD2476" },
+  { name: "Ocean", from: "#2E3192", to: "#1BFFFF" },
+  { name: "Peach", from: "#FFDEE9", to: "#B5FFFC" },
+  { name: "Lavender", from: "#C471F5", to: "#FA71CD" },
+  { name: "Mint", from: "#0BAB64", to: "#3BB78F" },
+  { name: "Dusk", from: "#2C3E50", to: "#FD746C" },
+  { name: "Cotton Candy", from: "#E8CBC0", to: "#636FA4" },
+  { name: "Aurora", from: "#00C9FF", to: "#92FE9D" },
+  { name: "Ember", from: "#F7971E", to: "#FFD200" },
 ] as const;
 
 export const AVATAR_MAX_SIZE = 2 * 1024 * 1024; // 2MB
