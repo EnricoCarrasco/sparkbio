@@ -1,143 +1,293 @@
 "use client";
 
 import { useRef } from "react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { motion, useInView, type Variants } from "framer-motion";
-import { PaletteIcon, BarChart3Icon, ZapIcon, RocketIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 
-interface FeatureCard {
-  icon: React.ReactNode;
-  titleKey: "customization" | "analytics" | "simple" | "fast";
-  accentColor: string;
-  bgColor: string;
+const EASE = [0.25, 0.1, 0.25, 1] as const;
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 32 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: EASE },
+  },
+};
+
+const fadeIn: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { duration: 0.55, ease: EASE, delay: 0.15 },
+  },
+};
+
+interface FeatureRowProps {
+  eyebrow: string;
+  heading: string;
+  body: string;
+  cta: string;
+  visual: React.ReactNode;
+  reversed?: boolean;
+  index: number;
 }
 
-const FEATURE_CARDS: FeatureCard[] = [
-  {
-    icon: <PaletteIcon className="h-6 w-6" />,
-    titleKey: "customization",
-    accentColor: "#FF6B35",
-    bgColor: "#FFF4EF",
-  },
-  {
-    icon: <BarChart3Icon className="h-6 w-6" />,
-    titleKey: "analytics",
-    accentColor: "#6366f1",
-    bgColor: "#F0F0FF",
-  },
-  {
-    icon: <ZapIcon className="h-6 w-6" />,
-    titleKey: "simple",
-    accentColor: "#10b981",
-    bgColor: "#EFFFF8",
-  },
-  {
-    icon: <RocketIcon className="h-6 w-6" />,
-    titleKey: "fast",
-    accentColor: "#f59e0b",
-    bgColor: "#FFFBEF",
-  },
-];
+function FeatureRow({
+  eyebrow,
+  heading,
+  body,
+  cta,
+  visual,
+  reversed = false,
+  index,
+}: FeatureRowProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
 
-const containerVariants: Variants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
+  return (
+    <div
+      ref={ref}
+      className={`flex flex-col ${
+        reversed ? "lg:flex-row-reverse" : "lg:flex-row"
+      } items-center gap-16 lg:gap-24`}
+    >
+      {/* Text side */}
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        animate={inView ? "visible" : "hidden"}
+        className="flex-1 max-w-lg"
+      >
+        <span className="inline-block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#FF6B35] mb-5">
+          {eyebrow}
+        </span>
+        <h2
+          className="text-[38px] sm:text-[46px] md:text-[52px] leading-[1.08] tracking-[-0.03em] font-bold text-[#111113] mb-6"
+          style={{ fontFamily: "var(--font-display), 'Instrument Serif', Georgia, serif" }}
+        >
+          {heading}
+        </h2>
+        <p className="text-[17px] text-[#666] leading-[1.7] mb-8">{body}</p>
+        <Link
+          href="/register"
+          className="inline-flex items-center gap-2 text-[15px] font-semibold text-[#111113] group"
+        >
+          {cta}
+          <ArrowRightIcon
+            className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+            strokeWidth={2.5}
+          />
+        </Link>
+      </motion.div>
 
-const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, ease: [0.25, 0.1, 0.25, 1] },
-  },
-};
+      {/* Visual side */}
+      <motion.div
+        variants={fadeIn}
+        initial="hidden"
+        animate={inView ? "visible" : "hidden"}
+        className="flex-1 w-full"
+      >
+        {visual}
+      </motion.div>
+    </div>
+  );
+}
 
-const titleVariants: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] },
-  },
-};
+/* ─── Visual Cards ──────────────────────────────────────────── */
+
+function CustomizeVisual() {
+  const themes = [
+    { name: "Ember", bg: "#111113", accent: "#FF6B35" },
+    { name: "Sage", bg: "#F0F4EE", accent: "#4A7C59" },
+    { name: "Dusk", bg: "#1A1130", accent: "#C084FC" },
+    { name: "Stone", bg: "#F5F0EB", accent: "#8B6F5E" },
+    { name: "Ocean", bg: "#0D1B2A", accent: "#38BDF8" },
+    { name: "Rose", bg: "#FFF1F2", accent: "#F43F5E" },
+  ];
+
+  return (
+    <div className="rounded-[24px] bg-[#F8F7F5] p-6 sm:p-8 aspect-[4/3] flex flex-col gap-4">
+      <span className="text-[12px] font-semibold text-[#999] uppercase tracking-[0.08em]">
+        Theme preview
+      </span>
+      <div className="grid grid-cols-3 gap-3 flex-1">
+        {themes.map((theme) => (
+          <div
+            key={theme.name}
+            className="rounded-[14px] flex flex-col gap-2 p-3 cursor-pointer transition-transform hover:scale-[1.03] duration-150"
+            style={{ backgroundColor: theme.bg }}
+          >
+            {/* Fake avatar */}
+            <div
+              className="h-6 w-6 rounded-full"
+              style={{ backgroundColor: theme.accent }}
+            />
+            {/* Fake links */}
+            <div
+              className="h-2 rounded-full w-full opacity-60"
+              style={{ backgroundColor: theme.accent }}
+            />
+            <div
+              className="h-2 rounded-full w-4/5 opacity-40"
+              style={{ backgroundColor: theme.accent }}
+            />
+            <div
+              className="h-2 rounded-full w-3/5 opacity-25"
+              style={{ backgroundColor: theme.accent }}
+            />
+            <span
+              className="text-[9px] font-semibold mt-auto"
+              style={{ color: theme.accent, opacity: 0.8 }}
+            >
+              {theme.name}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ShareVisual() {
+  const platforms = [
+    { label: "Instagram bio", color: "#E1306C", icon: "IG" },
+    { label: "Twitter / X", color: "#000", icon: "X" },
+    { label: "TikTok bio", color: "#010101", icon: "TK" },
+    { label: "YouTube about", color: "#FF0000", icon: "YT" },
+    { label: "Email signature", color: "#4F46E5", icon: "✉" },
+  ];
+
+  return (
+    <div className="rounded-[24px] bg-[#111113] p-6 sm:p-8 aspect-[4/3] flex flex-col gap-5">
+      {/* URL bar */}
+      <div className="flex items-center gap-3 rounded-[10px] bg-white/[0.07] px-4 py-3">
+        <div className="h-2 w-2 rounded-full bg-[#FF6B35]" />
+        <span className="text-[13px] font-medium text-white/60 tracking-[-0.01em]">
+          sparkbio.com/
+          <span className="text-white/90">yourname</span>
+        </span>
+      </div>
+
+      <div className="flex flex-col gap-2.5">
+        {platforms.map((p) => (
+          <div
+            key={p.label}
+            className="flex items-center gap-3 rounded-[10px] bg-white/[0.04] px-4 py-3 border border-white/[0.06]"
+          >
+            <div
+              className="h-6 w-6 rounded-md flex items-center justify-center text-[9px] font-bold text-white shrink-0"
+              style={{ backgroundColor: p.color }}
+            >
+              {p.icon}
+            </div>
+            <span className="text-[13px] font-medium text-white/70">{p.label}</span>
+            <div className="ml-auto h-1.5 w-1.5 rounded-full bg-green-400" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsVisual() {
+  const bars = [42, 68, 55, 81, 73, 90, 64, 88, 76, 95, 83, 100];
+  const stats = [
+    { label: "Views", value: "12.4K" },
+    { label: "Click rate", value: "34.2%" },
+    { label: "Countries", value: "48" },
+  ];
+
+  return (
+    <div className="rounded-[24px] bg-[#F8F7F5] p-6 sm:p-8 aspect-[4/3] flex flex-col gap-5">
+      {/* Stat row */}
+      <div className="grid grid-cols-3 gap-3">
+        {stats.map((s) => (
+          <div key={s.label} className="rounded-[12px] bg-white p-3 border border-black/[0.06]">
+            <span className="block text-[11px] font-medium text-[#999] mb-1">{s.label}</span>
+            <span className="block text-[20px] font-bold text-[#111113] tracking-[-0.02em] leading-none">
+              {s.value}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Bar chart */}
+      <div className="flex-1 rounded-[14px] bg-white border border-black/[0.06] p-4 flex flex-col gap-3">
+        <span className="text-[11px] font-semibold text-[#999] uppercase tracking-[0.06em]">
+          Views — last 30 days
+        </span>
+        <div className="flex items-end gap-1.5 flex-1 pb-1">
+          {bars.map((h, i) => (
+            <div
+              key={i}
+              className="flex-1 rounded-t-[4px] transition-all"
+              style={{
+                height: `${h}%`,
+                backgroundColor: i === bars.length - 1 ? "#FF6B35" : "#111113",
+                opacity: i === bars.length - 1 ? 1 : 0.08 + (i / bars.length) * 0.35,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main component ──────────────────────────────────────── */
 
 export function Features() {
   const t = useTranslations("landing.features");
-  const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
+
+  const rows = [
+    {
+      eyebrow: "Customization",
+      heading: "Make it unmistakably yours.",
+      body: t("customization.description"),
+      cta: "Get started for free",
+      visual: <CustomizeVisual />,
+      reversed: false,
+    },
+    {
+      eyebrow: "Sharing",
+      heading: "One link. Every platform.",
+      body: t("simple.description"),
+      cta: "Get started for free",
+      visual: <ShareVisual />,
+      reversed: true,
+    },
+    {
+      eyebrow: "Analytics",
+      heading: "Know your audience, grow your reach.",
+      body: t("analytics.description"),
+      cta: "Get started for free",
+      visual: <AnalyticsVisual />,
+      reversed: false,
+    },
+  ];
 
   return (
-    <section
-      ref={sectionRef}
-      className="bg-white py-24 md:py-32"
-      id="features"
-    >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <motion.div
-          variants={titleVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          className="mx-auto max-w-2xl text-center mb-16"
-        >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#1E1E2E] leading-tight tracking-tight">
-            {t("title")}
-          </h2>
-        </motion.div>
-
-        {/* Feature cards grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-6"
-        >
-          {FEATURE_CARDS.map((card) => (
-            <motion.div
-              key={card.titleKey}
-              variants={cardVariants}
-              whileHover={{
-                y: -4,
-                boxShadow: "0 20px 40px -12px rgba(0,0,0,0.12)",
-                transition: { duration: 0.2 },
-              }}
-              className="group relative flex flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 shadow-sm transition-shadow"
-            >
-              {/* Icon container */}
-              <div
-                className="inline-flex h-12 w-12 items-center justify-center rounded-xl transition-transform group-hover:scale-110"
-                style={{
-                  backgroundColor: card.bgColor,
-                  color: card.accentColor,
-                }}
-              >
-                {card.icon}
-              </div>
-
-              {/* Text */}
-              <div className="flex flex-col gap-2">
-                <h3 className="text-lg font-bold text-[#1E1E2E]">
-                  {t(`${card.titleKey}.title`)}
-                </h3>
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  {t(`${card.titleKey}.description`)}
-                </p>
-              </div>
-
-              {/* Subtle accent border on hover */}
-              <div
-                className="absolute bottom-0 left-6 right-6 sm:left-8 sm:right-8 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{ backgroundColor: card.accentColor }}
-              />
-            </motion.div>
+    <section className="bg-white py-28 md:py-40" id="features">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="flex flex-col gap-28 md:gap-40">
+          {rows.map((row, i) => (
+            <FeatureRow
+              key={i}
+              index={i}
+              eyebrow={row.eyebrow}
+              heading={row.heading}
+              body={row.body}
+              cta={row.cta}
+              visual={row.visual}
+              reversed={row.reversed}
+            />
           ))}
-        </motion.div>
+        </div>
       </div>
+
     </section>
   );
 }

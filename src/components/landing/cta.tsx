@@ -4,120 +4,90 @@ import { useRef } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { motion, useInView, type Variants } from "framer-motion";
-import { ArrowRightIcon, ZapIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 
-const containerVariants: Variants = {
+const EASE = [0.25, 0.1, 0.25, 1] as const;
+
+const stagger: Variants = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.12, delayChildren: 0.1 },
+    transition: { staggerChildren: 0.1, delayChildren: 0.05 },
   },
 };
 
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 28 },
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] },
+    transition: { duration: 0.55, ease: EASE },
   },
 };
 
 export function CTA() {
   const t = useTranslations("landing.cta");
   const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
+  const inView = useInView(sectionRef, { once: true, margin: "-60px" });
 
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden bg-[#1E1E2E] py-24 md:py-32"
+      className="bg-[#111113] py-28 md:py-40"
     >
-      {/* Background decorations */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        {/* Orange glow top-right */}
-        <div className="absolute -top-20 -right-20 h-[400px] w-[400px] rounded-full bg-[#FF6B35]/20 blur-3xl" />
-        {/* Orange glow bottom-left */}
-        <div className="absolute -bottom-20 -left-20 h-[300px] w-[300px] rounded-full bg-[#FF6B35]/10 blur-3xl" />
-        {/* Subtle grid lines */}
-        <svg
-          className="absolute inset-0 h-full w-full opacity-[0.04]"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <pattern
-              id="cta-grid"
-              x="0"
-              y="0"
-              width="40"
-              height="40"
-              patternUnits="userSpaceOnUse"
-            >
-              <path
-                d="M 40 0 L 0 0 0 40"
-                fill="none"
-                stroke="white"
-                strokeWidth="1"
-              />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#cta-grid)" />
-        </svg>
-      </div>
-
-      <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
+      <div className="mx-auto max-w-4xl px-6 lg:px-8 text-center">
         <motion.div
-          variants={containerVariants}
+          variants={stagger}
           initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
+          animate={inView ? "visible" : "hidden"}
           className="flex flex-col items-center gap-8"
         >
-          {/* Icon */}
-          <motion.div variants={itemVariants}>
-            <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#FF6B35]/20 border border-[#FF6B35]/30">
-              <ZapIcon className="h-7 w-7 text-[#FF6B35]" />
-            </div>
-          </motion.div>
-
-          {/* Headline */}
+          {/* Heading */}
           <motion.h2
-            variants={itemVariants}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight"
+            variants={fadeUp}
+            className="text-[44px] sm:text-[56px] md:text-[68px] leading-[1.04] tracking-[-0.04em] font-bold text-white max-w-2xl"
+            style={{ fontFamily: "var(--font-display), 'Instrument Serif', Georgia, serif" }}
           >
-            {t("title")}
+            The fast, friendly and{" "}
+            <em
+              style={{
+                fontStyle: "italic",
+                background: "linear-gradient(135deg, #FF6B35 0%, #ff8c5a 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              powerful
+            </em>{" "}
+            link in bio tool.
           </motion.h2>
 
           {/* Subtitle */}
           <motion.p
-            variants={itemVariants}
-            className="text-base sm:text-lg text-gray-400 max-w-md leading-relaxed px-2 sm:px-0"
+            variants={fadeUp}
+            className="text-[17px] text-white/50 max-w-md leading-[1.7]"
           >
             {t("subtitle")}
           </motion.p>
 
-          {/* CTA button */}
-          <motion.div
-            variants={itemVariants}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-          >
+          {/* CTA */}
+          <motion.div variants={fadeUp}>
             <Link
               href="/register"
-              className="inline-flex items-center gap-3 rounded-full bg-[#FF6B35] px-8 py-4 text-base font-bold text-white shadow-[0_0_40px_rgba(255,107,53,0.35)] hover:bg-[#e85a24] hover:shadow-[0_0_60px_rgba(255,107,53,0.45)] transition-all duration-300"
+              className="inline-flex items-center gap-3 rounded-full bg-[#FF6B35] px-8 py-4 text-[16px] font-semibold text-white hover:bg-[#e85a24] active:scale-[0.97] transition-all duration-150"
             >
               {t("button")}
-              <ArrowRightIcon className="h-5 w-5" />
+              <ArrowRightIcon className="h-4 w-4" strokeWidth={2.5} />
             </Link>
           </motion.div>
 
-          {/* Trust note */}
-          <motion.p
-            variants={itemVariants}
-            className="text-sm text-gray-500"
-          >
-            Free forever · No credit card · Takes 60 seconds
+          {/* Trust line */}
+          <motion.p variants={fadeUp} className="text-[13px] text-white/30">
+            Free forever &middot; No credit card &middot; Takes 60 seconds
           </motion.p>
         </motion.div>
       </div>
+
     </section>
   );
 }
