@@ -47,19 +47,26 @@ export function CTA() {
             className="text-[44px] sm:text-[56px] md:text-[68px] leading-[1.04] tracking-[-0.04em] font-bold text-white max-w-2xl"
             style={{ fontFamily: "var(--font-display), 'Instrument Serif', Georgia, serif" }}
           >
-            The fast, friendly and{" "}
-            <em
-              style={{
-                fontStyle: "italic",
-                background: "linear-gradient(135deg, #FF6B35 0%, #ff8c5a 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              powerful
-            </em>{" "}
-            link in bio tool.
+            {t("title").split(t("titleHighlight")).map((part, i, arr) =>
+              i < arr.length - 1 ? (
+                <span key={i}>
+                  {part}
+                  <em
+                    style={{
+                      fontStyle: "italic",
+                      background: "linear-gradient(135deg, #FF6B35 0%, #ff8c5a 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    {t("titleHighlight")}
+                  </em>
+                </span>
+              ) : (
+                <span key={i}>{part}</span>
+              )
+            )}
           </motion.h2>
 
           {/* Subtitle */}
@@ -83,7 +90,7 @@ export function CTA() {
 
           {/* Trust line */}
           <motion.p variants={fadeUp} className="text-[13px] text-white/30">
-            Free forever &middot; No credit card &middot; Takes 60 seconds
+            {t("trustLine")}
           </motion.p>
         </motion.div>
       </div>

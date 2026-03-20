@@ -98,7 +98,7 @@ function FeatureRow({
 
 /* ─── Visual Cards ──────────────────────────────────────────── */
 
-function CustomizeVisual() {
+function CustomizeVisual({ t }: { t: (key: string) => string }) {
   const themes = [
     { name: "Ember", bg: "#111113", accent: "#FF6B35" },
     { name: "Sage", bg: "#F0F4EE", accent: "#4A7C59" },
@@ -111,7 +111,7 @@ function CustomizeVisual() {
   return (
     <div className="rounded-[24px] bg-[#F8F7F5] p-6 sm:p-8 aspect-[4/3] flex flex-col gap-4">
       <span className="text-[12px] font-semibold text-[#999] uppercase tracking-[0.08em]">
-        Theme preview
+        {t("visuals.themePreview")}
       </span>
       <div className="grid grid-cols-3 gap-3 flex-1">
         {themes.map((theme) => (
@@ -151,13 +151,13 @@ function CustomizeVisual() {
   );
 }
 
-function ShareVisual() {
+function ShareVisual({ t }: { t: (key: string) => string }) {
   const platforms = [
-    { label: "Instagram bio", color: "#E1306C", icon: "IG" },
-    { label: "Twitter / X", color: "#000", icon: "X" },
-    { label: "TikTok bio", color: "#010101", icon: "TK" },
-    { label: "YouTube about", color: "#FF0000", icon: "YT" },
-    { label: "Email signature", color: "#4F46E5", icon: "✉" },
+    { labelKey: "visuals.instagramBio", color: "#E1306C", icon: "IG" },
+    { labelKey: "visuals.twitterX", color: "#000", icon: "X" },
+    { labelKey: "visuals.tiktokBio", color: "#010101", icon: "TK" },
+    { labelKey: "visuals.youtubeAbout", color: "#FF0000", icon: "YT" },
+    { labelKey: "visuals.emailSignature", color: "#4F46E5", icon: "✉" },
   ];
 
   return (
@@ -174,7 +174,7 @@ function ShareVisual() {
       <div className="flex flex-col gap-2.5">
         {platforms.map((p) => (
           <div
-            key={p.label}
+            key={p.labelKey}
             className="flex items-center gap-3 rounded-[10px] bg-white/[0.04] px-4 py-3 border border-white/[0.06]"
           >
             <div
@@ -183,7 +183,7 @@ function ShareVisual() {
             >
               {p.icon}
             </div>
-            <span className="text-[13px] font-medium text-white/70">{p.label}</span>
+            <span className="text-[13px] font-medium text-white/70">{t(p.labelKey)}</span>
             <div className="ml-auto h-1.5 w-1.5 rounded-full bg-green-400" />
           </div>
         ))}
@@ -192,12 +192,12 @@ function ShareVisual() {
   );
 }
 
-function AnalyticsVisual() {
+function AnalyticsVisual({ t }: { t: (key: string) => string }) {
   const bars = [42, 68, 55, 81, 73, 90, 64, 88, 76, 95, 83, 100];
   const stats = [
-    { label: "Views", value: "12.4K" },
-    { label: "Click rate", value: "34.2%" },
-    { label: "Countries", value: "48" },
+    { labelKey: "visuals.views", value: "12.4K" },
+    { labelKey: "visuals.clickRate", value: "34.2%" },
+    { labelKey: "visuals.countries", value: "48" },
   ];
 
   return (
@@ -205,8 +205,8 @@ function AnalyticsVisual() {
       {/* Stat row */}
       <div className="grid grid-cols-3 gap-3">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-[12px] bg-white p-3 border border-black/[0.06]">
-            <span className="block text-[11px] font-medium text-[#999] mb-1">{s.label}</span>
+          <div key={s.labelKey} className="rounded-[12px] bg-white p-3 border border-black/[0.06]">
+            <span className="block text-[11px] font-medium text-[#999] mb-1">{t(s.labelKey)}</span>
             <span className="block text-[20px] font-bold text-[#111113] tracking-[-0.02em] leading-none">
               {s.value}
             </span>
@@ -217,7 +217,7 @@ function AnalyticsVisual() {
       {/* Bar chart */}
       <div className="flex-1 rounded-[14px] bg-white border border-black/[0.06] p-4 flex flex-col gap-3">
         <span className="text-[11px] font-semibold text-[#999] uppercase tracking-[0.06em]">
-          Views — last 30 days
+          {t("visuals.viewsLast30")}
         </span>
         <div className="flex items-end gap-1.5 flex-1 pb-1">
           {bars.map((h, i) => (
@@ -244,27 +244,27 @@ export function Features() {
 
   const rows = [
     {
-      eyebrow: "Customization",
-      heading: "Make it unmistakably yours.",
+      eyebrow: t("customization.eyebrow"),
+      heading: t("customization.heading"),
       body: t("customization.description"),
-      cta: "Get started for free",
-      visual: <CustomizeVisual />,
+      cta: t("getStarted"),
+      visual: <CustomizeVisual t={t} />,
       reversed: false,
     },
     {
-      eyebrow: "Sharing",
-      heading: "One link. Every platform.",
+      eyebrow: t("sharing.eyebrow"),
+      heading: t("sharing.heading"),
       body: t("simple.description"),
-      cta: "Get started for free",
-      visual: <ShareVisual />,
+      cta: t("getStarted"),
+      visual: <ShareVisual t={t} />,
       reversed: true,
     },
     {
-      eyebrow: "Analytics",
-      heading: "Know your audience, grow your reach.",
+      eyebrow: t("analytics.eyebrow"),
+      heading: t("analytics.heading"),
       body: t("analytics.description"),
-      cta: "Get started for free",
-      visual: <AnalyticsVisual />,
+      cta: t("getStarted"),
+      visual: <AnalyticsVisual t={t} />,
       reversed: false,
     },
   ];

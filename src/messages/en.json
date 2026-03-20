@@ -2,18 +2,47 @@
   "landing": {
     "hero": {
       "title": "Everything you are. One simple link.",
+      "titleLine1": "Everything",
+      "titleLine1b": "you are.",
+      "titleLine2a": "One simple",
+      "titleLine2b": "link.",
       "subtitle": "Join millions of creators using Sparkbio to share everything they create, curate and sell — all from one link in bio.",
       "claim": "Claim your Sparkbio",
       "placeholder": "sparkbio.com/yourname",
-      "getStarted": "Get started for free"
+      "getStarted": "Get started for free",
+      "eyebrow": "Free forever — no credit card needed",
+      "inputHint": "Set up in under 60 seconds. No credit card required.",
+      "marquee": {
+        "creators": "Creators",
+        "influencers": "Influencers",
+        "smallBusinesses": "Small businesses",
+        "musicians": "Musicians",
+        "podcasters": "Podcasters",
+        "athletes": "Athletes",
+        "coaches": "Coaches",
+        "photographers": "Photographers",
+        "writers": "Writers",
+        "artists": "Artists",
+        "brands": "Brands",
+        "freelancers": "Freelancers"
+      }
     },
     "features": {
       "title": "The easiest way to connect your audience to everything you are.",
+      "getStarted": "Get started for free",
       "customization": {
+        "eyebrow": "Customization",
+        "heading": "Make it unmistakably yours.",
         "title": "Fully customizable",
         "description": "Make it yours with themes, colors, fonts, and button styles that match your brand."
       },
+      "sharing": {
+        "eyebrow": "Sharing",
+        "heading": "One link. Every platform."
+      },
       "analytics": {
+        "eyebrow": "Analytics",
+        "heading": "Know your audience, grow your reach.",
         "title": "Powerful analytics",
         "description": "Track views, clicks, locations, and devices. Know your audience better."
       },
@@ -24,19 +53,43 @@
       "fast": {
         "title": "Lightning fast",
         "description": "Optimized for speed and SEO. Your profile loads instantly on any device."
+      },
+      "visuals": {
+        "themePreview": "Theme preview",
+        "views": "Views",
+        "clickRate": "Click rate",
+        "countries": "Countries",
+        "viewsLast30": "Views — last 30 days",
+        "instagramBio": "Instagram bio",
+        "twitterX": "Twitter / X",
+        "tiktokBio": "TikTok bio",
+        "youtubeAbout": "YouTube about",
+        "emailSignature": "Email signature"
       }
     },
     "pricing": {
+      "eyebrow": "Pricing",
       "title": "Free forever. Upgrade when you need to.",
       "subtitle": "Start building your audience for free. No credit card required.",
       "free": "Free",
+      "freePlan": "Free plan",
       "freeDesc": "Everything you need to get started",
-      "getStarted": "Get started"
+      "getStarted": "Get started",
+      "getStartedFree": "Get started — it's free",
+      "perMonth": "/ month",
+      "active": "Active",
+      "unlimitedLinks": "Unlimited links",
+      "customThemes": "Custom themes & colors",
+      "basicAnalytics": "Basic click analytics",
+      "socialIcons": "Social media icons",
+      "proHint": "Pro plan coming soon with advanced analytics, custom domains & priority support."
     },
     "cta": {
-      "title": "Ready to build your Sparkbio?",
+      "title": "The fast, friendly and powerful link in bio tool.",
+      "titleHighlight": "powerful",
       "subtitle": "Join thousands of creators already using Sparkbio.",
-      "button": "Create your Sparkbio — it's free"
+      "button": "Create your Sparkbio — it's free",
+      "trustLine": "Free forever · No credit card · Takes 60 seconds"
     },
     "footer": {
       "product": "Product",

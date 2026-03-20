@@ -2,18 +2,47 @@
   "landing": {
     "hero": {
       "title": "Tudo o que você é. Em um simples link.",
+      "titleLine1": "Tudo",
+      "titleLine1b": "o que você é.",
+      "titleLine2a": "Em um simples",
+      "titleLine2b": "link.",
       "subtitle": "Junte-se a milhões de criadores usando o Sparkbio para compartilhar tudo o que criam, curam e vendem — tudo a partir de um link na bio.",
       "claim": "Crie seu Sparkbio",
       "placeholder": "sparkbio.com/seunome",
-      "getStarted": "Comece gratuitamente"
+      "getStarted": "Comece gratuitamente",
+      "eyebrow": "Grátis para sempre — sem cartão de crédito",
+      "inputHint": "Configure em menos de 60 segundos. Sem cartão de crédito.",
+      "marquee": {
+        "creators": "Criadores",
+        "influencers": "Influenciadores",
+        "smallBusinesses": "Pequenos negócios",
+        "musicians": "Músicos",
+        "podcasters": "Podcasters",
+        "athletes": "Atletas",
+        "coaches": "Coaches",
+        "photographers": "Fotógrafos",
+        "writers": "Escritores",
+        "artists": "Artistas",
+        "brands": "Marcas",
+        "freelancers": "Freelancers"
+      }
     },
     "features": {
       "title": "A maneira mais fácil de conectar seu público a tudo o que você é.",
+      "getStarted": "Comece gratuitamente",
       "customization": {
+        "eyebrow": "Personalização",
+        "heading": "Deixe com a sua cara.",
         "title": "Totalmente personalizável",
         "description": "Deixe com a sua cara com temas, cores, fontes e estilos de botão que combinam com sua marca."
       },
+      "sharing": {
+        "eyebrow": "Compartilhamento",
+        "heading": "Um link. Todas as plataformas."
+      },
       "analytics": {
+        "eyebrow": "Análises",
+        "heading": "Conheça seu público, amplie seu alcance.",
         "title": "Análises poderosas",
         "description": "Acompanhe visualizações, cliques, localizações e dispositivos. Conheça melhor seu público."
       },
@@ -24,19 +53,43 @@
       "fast": {
         "title": "Ultrarápido",
         "description": "Otimizado para velocidade e SEO. Seu perfil carrega instantaneamente em qualquer dispositivo."
+      },
+      "visuals": {
+        "themePreview": "Pré-visualização de tema",
+        "views": "Visualizações",
+        "clickRate": "Taxa de cliques",
+        "countries": "Países",
+        "viewsLast30": "Visualizações — últimos 30 dias",
+        "instagramBio": "Bio do Instagram",
+        "twitterX": "Twitter / X",
+        "tiktokBio": "Bio do TikTok",
+        "youtubeAbout": "Sobre do YouTube",
+        "emailSignature": "Assinatura de email"
       }
     },
     "pricing": {
+      "eyebrow": "Preços",
       "title": "Grátis para sempre. Faça upgrade quando precisar.",
       "subtitle": "Comece a construir seu público gratuitamente. Sem cartão de crédito.",
       "free": "Grátis",
+      "freePlan": "Plano grátis",
       "freeDesc": "Tudo o que você precisa para começar",
-      "getStarted": "Começar"
+      "getStarted": "Começar",
+      "getStartedFree": "Começar — é grátis",
+      "perMonth": "/ mês",
+      "active": "Ativo",
+      "unlimitedLinks": "Links ilimitados",
+      "customThemes": "Temas e cores personalizados",
+      "basicAnalytics": "Análise básica de cliques",
+      "socialIcons": "Ícones de redes sociais",
+      "proHint": "Plano Pro em breve com análises avançadas, domínios personalizados e suporte prioritário."
     },
     "cta": {
-      "title": "Pronto para criar seu Sparkbio?",
+      "title": "A ferramenta de link na bio rápida, amigável e poderosa.",
+      "titleHighlight": "poderosa",
       "subtitle": "Junte-se a milhares de criadores que já usam o Sparkbio.",
-      "button": "Crie seu Sparkbio — é grátis"
+      "button": "Crie seu Sparkbio — é grátis",
+      "trustLine": "Grátis para sempre · Sem cartão · Pronto em 60 segundos"
     },
     "footer": {
       "product": "Produto",

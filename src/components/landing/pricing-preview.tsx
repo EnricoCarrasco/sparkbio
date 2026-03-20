@@ -30,11 +30,11 @@ const stagger: Variants = {
   },
 };
 
-const FREE_FEATURES = [
-  { icon: <LinkIcon className="h-3.5 w-3.5" />, label: "Unlimited links" },
-  { icon: <PaletteIcon className="h-3.5 w-3.5" />, label: "Custom themes & colors" },
-  { icon: <BarChart2Icon className="h-3.5 w-3.5" />, label: "Basic click analytics" },
-  { icon: <Share2Icon className="h-3.5 w-3.5" />, label: "Social media icons" },
+const FREE_FEATURE_KEYS = [
+  { icon: <LinkIcon className="h-3.5 w-3.5" />, key: "unlimitedLinks" },
+  { icon: <PaletteIcon className="h-3.5 w-3.5" />, key: "customThemes" },
+  { icon: <BarChart2Icon className="h-3.5 w-3.5" />, key: "basicAnalytics" },
+  { icon: <Share2Icon className="h-3.5 w-3.5" />, key: "socialIcons" },
 ];
 
 export function PricingPreview() {
@@ -61,7 +61,7 @@ export function PricingPreview() {
               variants={fadeUp}
               className="inline-block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#FF6B35] mb-5"
             >
-              Pricing
+              {t("eyebrow")}
             </motion.span>
 
             <motion.h2
@@ -77,7 +77,7 @@ export function PricingPreview() {
             </motion.p>
 
             <motion.ul variants={stagger} className="flex flex-col gap-3.5">
-              {FREE_FEATURES.map((f, i) => (
+              {FREE_FEATURE_KEYS.map((f, i) => (
                 <motion.li
                   key={i}
                   variants={fadeUp}
@@ -86,7 +86,7 @@ export function PricingPreview() {
                   <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#111113] text-white">
                     <CheckIcon className="h-3 w-3" strokeWidth={3} />
                   </div>
-                  <span className="text-[15px] text-[#444] font-medium">{f.label}</span>
+                  <span className="text-[15px] text-[#444] font-medium">{t(f.key)}</span>
                 </motion.li>
               ))}
             </motion.ul>
@@ -104,17 +104,17 @@ export function PricingPreview() {
               <div className="flex items-start justify-between mb-8">
                 <div>
                   <h3 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#999] mb-2">
-                    {t("free")} plan
+                    {t("freePlan")}
                   </h3>
                   <div className="flex items-baseline gap-1">
                     <span className="text-[56px] font-bold text-[#111113] tracking-[-0.04em] leading-none">
                       $0
                     </span>
-                    <span className="text-[#aaa] text-[14px] ml-1">/ month</span>
+                    <span className="text-[#aaa] text-[14px] ml-1">{t("perMonth")}</span>
                   </div>
                 </div>
                 <span className="inline-flex items-center rounded-full bg-[#ECFDF5] px-3 py-1 text-[11px] font-semibold text-[#059669] mt-1">
-                  Active
+                  {t("active")}
                 </span>
               </div>
 
@@ -127,12 +127,12 @@ export function PricingPreview() {
 
               {/* Features */}
               <ul className="flex flex-col gap-3 mb-10">
-                {FREE_FEATURES.map((f, i) => (
+                {FREE_FEATURE_KEYS.map((f, i) => (
                   <li key={i} className="flex items-center gap-3">
                     <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#F0F0F0] text-[#111113]">
                       <CheckIcon className="h-2.5 w-2.5" strokeWidth={3} />
                     </div>
-                    <span className="text-[14px] text-[#555]">{f.label}</span>
+                    <span className="text-[14px] text-[#555]">{t(f.key)}</span>
                   </li>
                 ))}
               </ul>
@@ -142,15 +142,13 @@ export function PricingPreview() {
                 href="/register"
                 className="flex w-full items-center justify-center rounded-full bg-[#FF6B35] px-6 py-4 text-[15px] font-semibold text-white hover:bg-[#e85a24] active:scale-[0.97] transition-all duration-150"
               >
-                {t("getStarted")} — it&rsquo;s free
+                {t("getStartedFree")}
               </Link>
             </div>
 
             {/* Pro hint */}
             <p className="mt-5 text-center text-[12px] text-[#bbb] leading-relaxed">
-              Pro plan coming soon with advanced analytics,
-              <br />
-              custom domains &amp; priority support.
+              {t("proHint")}
             </p>
           </motion.div>
         </div>

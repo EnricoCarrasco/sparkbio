@@ -27,20 +27,20 @@ const itemVariants: Variants = {
   },
 };
 
-const MARQUEE_CATEGORIES = [
-  "Creators",
-  "Influencers",
-  "Small businesses",
-  "Musicians",
-  "Podcasters",
-  "Athletes",
-  "Coaches",
-  "Photographers",
-  "Writers",
-  "Artists",
-  "Brands",
-  "Freelancers",
-];
+const MARQUEE_KEYS = [
+  "creators",
+  "influencers",
+  "smallBusinesses",
+  "musicians",
+  "podcasters",
+  "athletes",
+  "coaches",
+  "photographers",
+  "writers",
+  "artists",
+  "brands",
+  "freelancers",
+] as const;
 
 export function Hero() {
   const t = useTranslations("landing.hero");
@@ -74,7 +74,7 @@ export function Hero() {
                 className="inline-block h-1.5 w-1.5 rounded-full bg-[#FF6B35]"
                 aria-hidden="true"
               />
-              Free forever — no credit card needed
+              {t("eyebrow")}
             </span>
           </motion.div>
 
@@ -85,10 +85,10 @@ export function Hero() {
             style={{ fontFamily: "var(--font-display), 'Instrument Serif', Georgia, serif" }}
           >
             {/* Line 1: italic serif word */}
-            <span style={{ fontStyle: "italic" }}>Everything</span>{" "}
-            you are.
+            <span style={{ fontStyle: "italic" }}>{t("titleLine1")}</span>{" "}
+            {t("titleLine1b")}
             <br />
-            <span className="text-[#111113]">One simple</span>{" "}
+            <span className="text-[#111113]">{t("titleLine2a")}</span>{" "}
             <span
               style={{
                 background: "linear-gradient(135deg, #FF6B35 0%, #ff8c5a 100%)",
@@ -97,7 +97,7 @@ export function Hero() {
                 backgroundClip: "text",
               }}
             >
-              link.
+              {t("titleLine2b")}
             </span>
           </motion.h1>
 
@@ -145,7 +145,7 @@ export function Hero() {
             </div>
 
             <p className="mt-4 text-[13px] text-[#aaa] text-center">
-              Set up in under 60 seconds. No credit card required.
+              {t("inputHint")}
             </p>
           </motion.form>
         </motion.div>
@@ -160,12 +160,12 @@ export function Hero() {
         aria-label="Trusted by creators worldwide"
       >
         <div className="flex items-center gap-8 whitespace-nowrap animate-marquee">
-          {[...MARQUEE_CATEGORIES, ...MARQUEE_CATEGORIES].map((cat, i) => (
+          {[...MARQUEE_KEYS, ...MARQUEE_KEYS].map((key, i) => (
             <span
               key={i}
               className="text-[13px] font-medium text-[#999] uppercase tracking-[0.08em] shrink-0"
             >
-              {cat}
+              {t(`marquee.${key}`)}
               <span className="ml-8 text-[#ddd]" aria-hidden="true">
                 ·
               </span>
