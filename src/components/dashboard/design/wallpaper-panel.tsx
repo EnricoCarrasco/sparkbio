@@ -2,33 +2,18 @@
 
 import React from "react";
 import { useTranslations } from "next-intl";
-import { ImageIcon, Video, Crown } from "lucide-react";
+import { Crown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useThemeStore } from "@/lib/stores/theme-store";
 import { PREMADE_GRADIENTS } from "@/lib/constants";
+import { ColorInput } from "./color-input";
 import { cn } from "@/lib/utils";
 import type { WallpaperStyle } from "@/types";
 
-/** Small pro badge shown in top-right corner of locked options */
-function ProBadge({ className }: { className?: string }) {
-  return (
-    <span
-      className={cn(
-        "absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-amber-400 flex items-center justify-center shadow-sm",
-        className
-      )}
-    >
-      <Crown className="size-2.5 text-white" strokeWidth={2.5} />
-    </span>
-  );
-}
-
 interface WallpaperStyleCardProps {
-  value: WallpaperStyle | "image" | "video";
   label: string;
   preview: React.ReactNode;
   isActive: boolean;
-  isPro?: boolean;
   onClick: () => void;
 }
 
@@ -36,16 +21,13 @@ function WallpaperStyleCard({
   label,
   preview,
   isActive,
-  isPro,
   onClick,
 }: WallpaperStyleCardProps) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={cn(
-        "relative flex flex-col items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35]"
-      )}
+      className="relative flex flex-col items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35]"
     >
       <div
         className={cn(
@@ -54,40 +36,10 @@ function WallpaperStyleCard({
         )}
       >
         {preview}
-        {isPro && <ProBadge />}
       </div>
       <span className="text-[11px] text-center text-muted-foreground font-medium leading-tight">
         {label}
       </span>
-    </button>
-  );
-}
-
-interface GradientStylePillProps {
-  label: string;
-  isActive: boolean;
-  isPro?: boolean;
-  onClick: () => void;
-}
-
-function GradientStylePill({ label, isActive, isPro, onClick }: GradientStylePillProps) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "relative flex-1 py-2.5 rounded-full text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35]",
-        isActive
-          ? "border-2 border-foreground bg-white shadow-sm text-foreground"
-          : "border border-border bg-transparent text-muted-foreground hover:text-foreground"
-      )}
-    >
-      {label}
-      {isPro && (
-        <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-400 flex items-center justify-center shadow-sm">
-          <Crown className="size-2 text-white" strokeWidth={2.5} />
-        </span>
-      )}
     </button>
   );
 }
@@ -99,12 +51,29 @@ export function WallpaperPanel() {
 
   if (!theme) return null;
 
-  const wallpaperStyles: {
-    value: WallpaperStyle | "image" | "video";
-    label: string;
-    isPro?: boolean;
-    preview: React.ReactNode;
-  }[] = [
+  function handleStyleChange(style: WallpaperStyle) {
+    if (style === "gradient") {
+      updateTheme({
+        wallpaper_style: style,
+        bg_gradient_from: theme!.bg_gradient_from ?? theme!.bg_color,
+        bg_gradient_to: theme!.bg_gradient_to ?? "#FFFFFF",
+        bg_gradient_direction: theme!.bg_gradient_direction ?? "to bottom",
+      });
+    } else if (style === "fill") {
+      updateTheme({
+        wallpaper_style: style,
+        bg_gradient_from: null,
+        bg_gradient_to: null,
+        bg_gradient_direction: null,
+      });
+    } else {
+      updateTheme({ wallpaper_style: style });
+    }
+  }
+
+  const activeStyle = theme.wallpaper_style ?? "fill";
+
+  const wallpaperCards: { value: WallpaperStyle; label: string; preview: React.ReactNode }[] = [
     {
       value: "fill",
       label: t("fill"),
@@ -132,7 +101,6 @@ export function WallpaperPanel() {
       label: t("blur"),
       preview: (
         <div className="w-full h-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 relative overflow-hidden">
-          <div className="absolute inset-0 backdrop-blur-sm" />
           <div className="absolute top-2 left-2 w-8 h-8 rounded-full bg-slate-500/60 blur-md" />
           <div className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-slate-600/50 blur-lg" />
         </div>
@@ -152,100 +120,98 @@ export function WallpaperPanel() {
         />
       ),
     },
-    {
-      value: "image",
-      label: t("image"),
-      isPro: true,
-      preview: (
-        <div className="w-full h-full bg-[#f3f3f3] flex items-center justify-center">
-          <ImageIcon className="size-6 text-muted-foreground/50" />
-        </div>
-      ),
-    },
-    {
-      value: "video",
-      label: t("video"),
-      isPro: true,
-      preview: (
-        <div className="w-full h-full bg-[#f3f3f3] flex items-center justify-center">
-          <Video className="size-6 text-muted-foreground/50" />
-        </div>
-      ),
-    },
   ];
-
-  const isGradient = theme.wallpaper_style === "gradient";
 
   return (
     <div className="space-y-6">
-      {/* Wallpaper style heading + grid */}
+      {/* Wallpaper style grid */}
       <div className="space-y-3">
         <h3 className="text-sm font-medium text-foreground">{t("wallpaperStyle")}</h3>
-        <div className="grid grid-cols-3 gap-2.5">
-          {wallpaperStyles.map((style) => {
-            const isRealStyle =
-              style.value === "fill" ||
-              style.value === "gradient" ||
-              style.value === "blur" ||
-              style.value === "pattern";
-            const isActive = isRealStyle && theme.wallpaper_style === style.value;
-
-            return (
-              <WallpaperStyleCard
-                key={style.value}
-                value={style.value}
-                label={style.label}
-                preview={style.preview}
-                isActive={isActive}
-                isPro={style.isPro}
-                onClick={() => {
-                  if (!isRealStyle) return;
-                  const v = style.value as WallpaperStyle;
-                  updateTheme({ wallpaper_style: v });
-                  if (v === "gradient" && !theme.bg_gradient_from) {
-                    updateTheme({
-                      bg_gradient_from: theme.bg_color,
-                      bg_gradient_to: "#FFFFFF",
-                      bg_gradient_direction: "to bottom",
-                    });
-                  }
-                  if (v === "fill") {
-                    updateTheme({
-                      bg_gradient_from: null,
-                      bg_gradient_to: null,
-                      bg_gradient_direction: null,
-                    });
-                  }
-                }}
-              />
-            );
-          })}
+        <div className="grid grid-cols-4 gap-2.5">
+          {wallpaperCards.map((card) => (
+            <WallpaperStyleCard
+              key={card.value}
+              label={card.label}
+              preview={card.preview}
+              isActive={activeStyle === card.value}
+              onClick={() => handleStyleChange(card.value)}
+            />
+          ))}
         </div>
       </div>
 
-      {/* Gradient-specific controls */}
-      {isGradient && (
+      {/* Fill: background color picker */}
+      {activeStyle === "fill" && (
+        <ColorInput
+          id="wallpaper-bg"
+          label={t("bgColor")}
+          value={theme.bg_color}
+          onChange={(v) => updateTheme({ bg_color: v })}
+        />
+      )}
+
+      {/* Gradient controls */}
+      {activeStyle === "gradient" && (
         <>
           {/* Gradient style toggle */}
           <div className="space-y-3">
             <h3 className="text-sm font-medium text-foreground">{t("gradientStyle")}</h3>
             <div className="flex gap-2">
-              <GradientStylePill
-                label={t("custom")}
-                isActive={theme.wallpaper_gradient_style !== "premade"}
+              <button
+                type="button"
                 onClick={() => updateTheme({ wallpaper_gradient_style: "custom" })}
-              />
-              <GradientStylePill
-                label={t("premade")}
-                isActive={theme.wallpaper_gradient_style === "premade"}
-                isPro
+                className={cn(
+                  "flex-1 py-2.5 rounded-full text-sm font-medium transition-all",
+                  theme.wallpaper_gradient_style !== "premade"
+                    ? "border-2 border-foreground bg-white shadow-sm text-foreground"
+                    : "border border-border bg-transparent text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {t("custom")}
+              </button>
+              <button
+                type="button"
                 onClick={() => updateTheme({ wallpaper_gradient_style: "premade" })}
-              />
+                className={cn(
+                  "flex-1 py-2.5 rounded-full text-sm font-medium transition-all",
+                  theme.wallpaper_gradient_style === "premade"
+                    ? "border-2 border-foreground bg-white shadow-sm text-foreground"
+                    : "border border-border bg-transparent text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {t("premade")}
+              </button>
             </div>
           </div>
 
-          {/* Gradient swatches */}
-          {theme.wallpaper_gradient_style === "premade" ? (
+          {/* Custom: from/to color pickers */}
+          {theme.wallpaper_gradient_style !== "premade" && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <ColorInput
+                  id="gradient-from"
+                  label="From"
+                  value={theme.bg_gradient_from ?? theme.bg_color}
+                  onChange={(v) => updateTheme({ bg_gradient_from: v })}
+                />
+                <ColorInput
+                  id="gradient-to"
+                  label="To"
+                  value={theme.bg_gradient_to ?? "#FFFFFF"}
+                  onChange={(v) => updateTheme({ bg_gradient_to: v })}
+                />
+              </div>
+              <div
+                className="w-full h-8 rounded-lg border border-border"
+                style={{
+                  background: `linear-gradient(${theme.bg_gradient_direction ?? "to bottom"}, ${theme.bg_gradient_from ?? theme.bg_color}, ${theme.bg_gradient_to ?? "#FFFFFF"})`,
+                }}
+              />
+            </div>
+          )}
+
+          {/* Pre-made gradient swatches */}
+          {theme.wallpaper_gradient_style === "premade" && (
             <div className="space-y-3">
               <h3 className="text-sm font-medium text-foreground">{t("gradientSwatches")}</h3>
               <div className="grid grid-cols-6 gap-2.5">
@@ -278,52 +244,13 @@ export function WallpaperPanel() {
                 })}
               </div>
             </div>
-          ) : (
-            /* Custom gradient: from/to color pickers would go here (not changing that component) */
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium text-foreground">{t("gradientSwatches")}</h3>
-              <div className="grid grid-cols-6 gap-2.5">
-                {PREMADE_GRADIENTS.map((g) => {
-                  const isActive =
-                    theme.bg_gradient_from === g.from && theme.bg_gradient_to === g.to;
-                  return (
-                    <button
-                      key={g.name}
-                      type="button"
-                      title={g.name}
-                      onClick={() => {
-                        updateTheme({
-                          bg_gradient_from: g.from,
-                          bg_gradient_to: g.to,
-                          bg_gradient_direction: theme.bg_gradient_direction ?? "to bottom",
-                        });
-                      }}
-                      className={cn(
-                        "w-full aspect-square rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35]",
-                        isActive
-                          ? "ring-2 ring-offset-2 ring-foreground scale-110 shadow-md"
-                          : "hover:scale-105"
-                      )}
-                      style={{
-                        background: `linear-gradient(135deg, ${g.from}, ${g.to})`,
-                      }}
-                    />
-                  );
-                })}
-              </div>
-            </div>
           )}
         </>
       )}
 
       {/* Animate toggle */}
       <div className="flex items-center justify-between py-0.5">
-        <div className="flex items-center gap-1.5">
-          <span className="text-sm font-medium text-foreground">{t("animate")}</span>
-          <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-400 shadow-sm">
-            <Crown className="size-2.5 text-white" strokeWidth={2.5} />
-          </span>
-        </div>
+        <span className="text-sm font-medium text-foreground">{t("animate")}</span>
         <Switch
           checked={theme.wallpaper_animate}
           onCheckedChange={(v) => updateTheme({ wallpaper_animate: v })}
