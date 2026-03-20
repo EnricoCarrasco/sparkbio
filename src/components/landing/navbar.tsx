@@ -51,7 +51,7 @@ export function Navbar() {
 
           {/* Right: language + auth */}
           <div className="flex items-center gap-1.5">
-            <div className="hidden sm:block mr-2">
+            <div className="mr-1 sm:mr-2">
               <LanguageSwitcher />
             </div>
             <Link
