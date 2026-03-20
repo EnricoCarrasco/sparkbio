@@ -72,7 +72,7 @@ export function PricingPreview() {
             animate={isInView ? "visible" : "hidden"}
             className="w-full max-w-sm"
           >
-            <div className="relative rounded-3xl border-2 border-[#FF6B35] bg-white p-8 shadow-xl">
+            <div className="relative rounded-3xl border-2 border-[#FF6B35] bg-white p-6 sm:p-8 shadow-xl">
               {/* Plan badge */}
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FF6B35] px-4 py-1.5 text-xs font-bold text-white shadow-md">

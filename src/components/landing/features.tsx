@@ -106,7 +106,7 @@ export function Features() {
                 boxShadow: "0 20px 40px -12px rgba(0,0,0,0.12)",
                 transition: { duration: 0.2 },
               }}
-              className="group relative flex flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-8 shadow-sm transition-shadow"
+              className="group relative flex flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 shadow-sm transition-shadow"
             >
               {/* Icon container */}
               <div
@@ -131,7 +131,7 @@ export function Features() {
 
               {/* Subtle accent border on hover */}
               <div
-                className="absolute bottom-0 left-8 right-8 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                className="absolute bottom-0 left-6 right-6 sm:left-8 sm:right-8 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 style={{ backgroundColor: card.accentColor }}
               />
             </motion.div>

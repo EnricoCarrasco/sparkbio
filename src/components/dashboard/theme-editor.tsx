@@ -469,7 +469,7 @@ export function ThemeEditor() {
         {/* Button style picker */}
         <div className="space-y-2">
           <Label>{t("buttonStyle")}</Label>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
             {BUTTON_STYLES.map(({ value, label }) => {
               const isSelected = theme.button_style === value;
               return (

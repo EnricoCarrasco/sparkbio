@@ -194,7 +194,7 @@ export function Hero() {
             {/* Main headline — "Everything you are. One simple link." */}
             <motion.h1
               variants={itemVariants}
-              className="text-5xl sm:text-6xl md:text-7xl font-bold text-[#1E1E2E] leading-[1.05] tracking-tight"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[#1E1E2E] leading-[1.05] tracking-tight"
             >
               {/* Split each sentence onto its own line with the period in orange */}
               {t("title")
