@@ -14,6 +14,7 @@ import { PreviewPanel } from "@/components/dashboard/preview-panel";
 import { useLinkStore } from "@/lib/stores/link-store";
 import { useProfileStore } from "@/lib/stores/profile-store";
 import { useThemeStore } from "@/lib/stores/theme-store";
+import { useSocialStore } from "@/lib/stores/social-store";
 
 export default function DashboardLayout({
   children,
@@ -26,12 +27,14 @@ export default function DashboardLayout({
   const fetchLinks = useLinkStore((s) => s.fetchLinks);
   const fetchProfile = useProfileStore((s) => s.fetchProfile);
   const fetchTheme = useThemeStore((s) => s.fetchTheme);
+  const fetchSocialIcons = useSocialStore((s) => s.fetchSocialIcons);
 
   useEffect(() => {
     fetchProfile();
     fetchLinks();
     fetchTheme();
-  }, [fetchProfile, fetchLinks, fetchTheme]);
+    fetchSocialIcons();
+  }, [fetchProfile, fetchLinks, fetchTheme, fetchSocialIcons]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#FAFAFA]">

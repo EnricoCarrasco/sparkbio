@@ -4,16 +4,20 @@ import React from "react";
 import { useTranslations } from "next-intl";
 import { ProfileEditor } from "@/components/dashboard/profile-editor";
 import { LinkList } from "@/components/dashboard/link-list";
+import { SocialIconManager } from "@/components/dashboard/social-icon-manager";
 import { useLinkStore } from "@/lib/stores/link-store";
 import { useProfileStore } from "@/lib/stores/profile-store";
+import { useSocialStore } from "@/lib/stores/social-store";
+import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
   const t = useTranslations("dashboard.links");
   const profileLoading = useProfileStore((s) => s.loading);
   const linksLoading = useLinkStore((s) => s.loading);
+  const socialLoading = useSocialStore((s) => s.loading);
 
-  const isLoading = profileLoading || linksLoading;
+  const isLoading = profileLoading || linksLoading || socialLoading;
 
   if (isLoading) {
     return (
@@ -69,6 +73,8 @@ export default function DashboardPage() {
         </h2>
         <LinkList />
       </div>
+      <Separator />
+      <SocialIconManager />
     </div>
   );
 }
