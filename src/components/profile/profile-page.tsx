@@ -31,7 +31,7 @@ function buildBackgroundStyle(theme: PublicProfile["theme"]): React.CSSPropertie
       return {
         background: animatedGradient,
         backgroundSize: "100% 400%",
-        animation: "gradientShift 8s ease infinite",
+        animation: "gradientShift 20s ease-in-out infinite",
       };
     }
 
