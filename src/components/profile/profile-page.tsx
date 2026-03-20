@@ -26,10 +26,9 @@ function buildBackgroundStyle(theme: PublicProfile["theme"]): React.CSSPropertie
     const direction = bg_gradient_direction ?? "to bottom";
 
     if (wallpaper_animate) {
-      // Use conic-gradient that rotates via CSS custom property
+      // Static base — the animated blurred layer renders as a separate div
       return {
-        background: `conic-gradient(from var(--gradient-angle, 0deg), ${bg_gradient_from}, ${bg_gradient_to}, ${bg_gradient_from})`,
-        animation: "gradientRotate 20s linear infinite",
+        backgroundColor: bg_gradient_from,
       };
     }
 
@@ -98,19 +97,35 @@ export function ProfilePage({ data }: ProfilePageProps) {
         />
       )}
 
-      {/* Conic gradient rotation via @property */}
-      {theme.wallpaper_animate && (
-        <style>{`
-          @property --gradient-angle {
-            syntax: "<angle>";
-            initial-value: 0deg;
-            inherits: false;
-          }
-          @keyframes gradientRotate {
-            from { --gradient-angle: 0deg; }
-            to { --gradient-angle: 360deg; }
-          }
-        `}</style>
+      {/* Animated rotating gradient background layer */}
+      {theme.wallpaper_animate && theme.bg_gradient_from && theme.bg_gradient_to && (
+        <>
+          <div
+            className="absolute inset-0 pointer-events-none z-0 overflow-hidden"
+            aria-hidden="true"
+          >
+            <div
+              style={{
+                position: "absolute",
+                inset: "-20%",
+                background: `conic-gradient(from var(--gradient-angle, 0deg), ${theme.bg_gradient_from} 0%, ${theme.bg_gradient_to} 25%, ${theme.bg_gradient_from} 50%, ${theme.bg_gradient_to} 75%, ${theme.bg_gradient_from} 100%)`,
+                filter: "blur(80px)",
+                animation: "gradientRotate 12s linear infinite",
+              }}
+            />
+          </div>
+          <style>{`
+            @property --gradient-angle {
+              syntax: "<angle>";
+              initial-value: 0deg;
+              inherits: false;
+            }
+            @keyframes gradientRotate {
+              from { --gradient-angle: 0deg; }
+              to { --gradient-angle: 360deg; }
+            }
+          `}</style>
+        </>
       )}
 
       {/* Non-rendering analytics tracker */}
