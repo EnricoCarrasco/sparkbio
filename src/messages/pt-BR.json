@@ -1,0 +1,221 @@
+{
+  "landing": {
+    "hero": {
+      "title": "Tudo o que você é. Em um simples link.",
+      "subtitle": "Junte-se a milhões de criadores usando o Sparkbio para compartilhar tudo o que criam, curam e vendem — tudo a partir de um link na bio.",
+      "claim": "Crie seu Sparkbio",
+      "placeholder": "sparkbio.com/seunome",
+      "getStarted": "Comece gratuitamente"
+    },
+    "features": {
+      "title": "A maneira mais fácil de conectar seu público a tudo o que você é.",
+      "customization": {
+        "title": "Totalmente personalizável",
+        "description": "Deixe com a sua cara com temas, cores, fontes e estilos de botão que combinam com sua marca."
+      },
+      "analytics": {
+        "title": "Analytics poderoso",
+        "description": "Acompanhe visualizações, cliques, localizações e dispositivos. Conheça melhor seu público."
+      },
+      "simple": {
+        "title": "Simples de usar",
+        "description": "Adicione seus links, personalize sua página e compartilhe em todos os lugares — em minutos."
+      },
+      "fast": {
+        "title": "Ultra rápido",
+        "description": "Otimizado para velocidade e SEO. Seu perfil carrega instantaneamente em qualquer dispositivo."
+      }
+    },
+    "pricing": {
+      "title": "Grátis para sempre. Faça upgrade quando precisar.",
+      "subtitle": "Comece a construir seu público gratuitamente. Sem cartão de crédito.",
+      "free": "Grátis",
+      "freeDesc": "Tudo o que você precisa para começar",
+      "getStarted": "Começar"
+    },
+    "cta": {
+      "title": "Pronto para criar seu Sparkbio?",
+      "subtitle": "Junte-se a milhares de criadores que já usam o Sparkbio.",
+      "button": "Crie seu Sparkbio — é grátis"
+    },
+    "footer": {
+      "product": "Produto",
+      "company": "Empresa",
+      "legal": "Legal",
+      "features": "Recursos",
+      "pricing": "Preços",
+      "about": "Sobre",
+      "blog": "Blog",
+      "privacy": "Privacidade",
+      "terms": "Termos",
+      "copyright": "© {year} Sparkbio. Todos os direitos reservados."
+    },
+    "nav": {
+      "login": "Entrar",
+      "signup": "Cadastre-se grátis"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bem-vindo de volta",
+      "subtitle": "Faça login na sua conta Sparkbio",
+      "email": "Email",
+      "password": "Senha",
+      "submit": "Entrar",
+      "forgotPassword": "Esqueceu a senha?",
+      "noAccount": "Não tem uma conta?",
+      "signUp": "Cadastre-se",
+      "orContinue": "Ou continue com",
+      "google": "Continuar com Google",
+      "error": "Email ou senha inválidos"
+    },
+    "register": {
+      "title": "Crie seu Sparkbio",
+      "subtitle": "Junte-se a milhões de criadores e construa seu link na bio",
+      "username": "Nome de usuário",
+      "usernamePlaceholder": "seunome",
+      "email": "Email",
+      "emailPlaceholder": "voce@exemplo.com",
+      "password": "Senha",
+      "passwordPlaceholder": "Pelo menos 8 caracteres",
+      "submit": "Criar conta",
+      "hasAccount": "Já tem uma conta?",
+      "logIn": "Entrar",
+      "orContinue": "Ou continue com",
+      "google": "Continuar com Google",
+      "usernameHelp": "sparkbio.com/{username}",
+      "usernameTaken": "Este nome de usuário já está em uso",
+      "usernameInvalid": "O nome de usuário deve ter 3-30 caracteres, apenas letras minúsculas, números e hifens"
+    },
+    "forgotPassword": {
+      "title": "Redefinir sua senha",
+      "subtitle": "Digite seu email e enviaremos um link de redefinição",
+      "email": "Email",
+      "submit": "Enviar link de redefinição",
+      "sent": "Verifique seu email para o link de redefinição",
+      "backToLogin": "Voltar ao login"
+    },
+    "resetPassword": {
+      "title": "Definir nova senha",
+      "subtitle": "Digite sua nova senha abaixo",
+      "password": "Nova senha",
+      "confirm": "Confirmar senha",
+      "submit": "Atualizar senha",
+      "success": "Senha atualizada com sucesso",
+      "backToLogin": "Voltar ao login"
+    }
+  },
+  "dashboard": {
+    "sidebar": {
+      "links": "Links",
+      "appearance": "Aparência",
+      "analytics": "Analytics",
+      "settings": "Configurações",
+      "viewProfile": "Ver meu Sparkbio",
+      "signOut": "Sair"
+    },
+    "links": {
+      "title": "Links",
+      "add": "Adicionar novo link",
+      "edit": "Editar link",
+      "empty": "Nenhum link ainda",
+      "emptyDesc": "Adicione seu primeiro link para começar.",
+      "titleLabel": "Título",
+      "titlePlaceholder": "Meu link incrível",
+      "urlLabel": "URL",
+      "urlPlaceholder": "https://exemplo.com",
+      "save": "Salvar link",
+      "delete": "Excluir link",
+      "deleteConfirm": "Tem certeza de que deseja excluir este link?",
+      "active": "Ativo",
+      "inactive": "Inativo"
+    },
+    "profile": {
+      "title": "Perfil",
+      "displayName": "Nome de exibição",
+      "displayNamePlaceholder": "Seu nome",
+      "bio": "Bio",
+      "bioPlaceholder": "Conte ao mundo sobre você",
+      "avatar": "Foto de perfil",
+      "avatarUpload": "Enviar foto",
+      "avatarRemove": "Remover foto",
+      "save": "Salvar perfil"
+    },
+    "appearance": {
+      "title": "Aparência",
+      "background": "Fundo",
+      "solid": "Cor sólida",
+      "gradient": "Gradiente",
+      "buttons": "Botões",
+      "buttonColor": "Cor do botão",
+      "buttonTextColor": "Cor do texto",
+      "buttonStyle": "Estilo do botão",
+      "fonts": "Fontes",
+      "fontFamily": "Família da fonte",
+      "textColor": "Cor do texto",
+      "presets": "Temas prontos",
+      "presetsDesc": "Comece rápido com um tema pré-desenhado"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "views": "Visualizações",
+      "clicks": "Cliques",
+      "ctr": "Taxa de cliques",
+      "topLinks": "Links mais clicados",
+      "viewsOverTime": "Visualizações ao longo do tempo",
+      "devices": "Dispositivos",
+      "referrers": "Principais referências",
+      "countries": "Principais países",
+      "timeRange": "Período",
+      "last7days": "Últimos 7 dias",
+      "last30days": "Últimos 30 dias",
+      "allTime": "Todo o período",
+      "noData": "Sem dados de analytics ainda",
+      "noDataDesc": "Compartilhe seu link Sparkbio para começar a rastrear visualizações e cliques."
+    },
+    "settings": {
+      "title": "Configurações",
+      "profileUrl": "Sua URL Sparkbio",
+      "copy": "Copiar",
+      "copied": "Copiado!",
+      "changeUsername": "Alterar nome de usuário",
+      "newUsername": "Novo nome de usuário",
+      "changePassword": "Alterar senha",
+      "currentPassword": "Senha atual",
+      "newPassword": "Nova senha",
+      "confirmPassword": "Confirmar senha",
+      "updatePassword": "Atualizar senha",
+      "deleteAccount": "Excluir conta",
+      "deleteAccountDesc": "Exclua permanentemente sua conta e todos os dados. Esta ação não pode ser desfeita.",
+      "deleteConfirm": "Tem certeza? Isso excluirá permanentemente sua conta.",
+      "signOut": "Sair"
+    }
+  },
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "loading": "Carregando...",
+    "error": "Algo deu errado",
+    "success": "Sucesso",
+    "confirm": "Confirmar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "close": "Fechar",
+    "or": "ou",
+    "sparkbio": "Sparkbio"
+  },
+  "errors": {
+    "notFound": {
+      "title": "Página não encontrada",
+      "description": "A página que você está procurando não existe.",
+      "backHome": "Voltar ao início"
+    },
+    "generic": {
+      "title": "Algo deu errado",
+      "description": "Ocorreu um erro inesperado. Tente novamente.",
+      "retry": "Tentar novamente"
+    }
+  }
+}

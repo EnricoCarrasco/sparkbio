@@ -1,0 +1,221 @@
+{
+  "landing": {
+    "hero": {
+      "title": "Everything you are. One simple link.",
+      "subtitle": "Join millions of creators using Sparkbio to share everything they create, curate and sell — all from one link in bio.",
+      "claim": "Claim your Sparkbio",
+      "placeholder": "sparkbio.com/yourname",
+      "getStarted": "Get started for free"
+    },
+    "features": {
+      "title": "The easiest way to connect your audience to everything you are.",
+      "customization": {
+        "title": "Fully customizable",
+        "description": "Make it yours with themes, colors, fonts, and button styles that match your brand."
+      },
+      "analytics": {
+        "title": "Powerful analytics",
+        "description": "Track views, clicks, locations, and devices. Know your audience better."
+      },
+      "simple": {
+        "title": "Simple to use",
+        "description": "Add your links, customize your page, and share it everywhere — in minutes."
+      },
+      "fast": {
+        "title": "Lightning fast",
+        "description": "Optimized for speed and SEO. Your profile loads instantly on any device."
+      }
+    },
+    "pricing": {
+      "title": "Free forever. Upgrade when you need to.",
+      "subtitle": "Start building your audience for free. No credit card required.",
+      "free": "Free",
+      "freeDesc": "Everything you need to get started",
+      "getStarted": "Get started"
+    },
+    "cta": {
+      "title": "Ready to build your Sparkbio?",
+      "subtitle": "Join thousands of creators already using Sparkbio.",
+      "button": "Create your Sparkbio — it's free"
+    },
+    "footer": {
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal",
+      "features": "Features",
+      "pricing": "Pricing",
+      "about": "About",
+      "blog": "Blog",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "copyright": "© {year} Sparkbio. All rights reserved."
+    },
+    "nav": {
+      "login": "Log in",
+      "signup": "Sign up free"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Log in to your Sparkbio account",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log in",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "orContinue": "Or continue with",
+      "google": "Continue with Google",
+      "error": "Invalid email or password"
+    },
+    "register": {
+      "title": "Create your Sparkbio",
+      "subtitle": "Join millions of creators and build your link in bio",
+      "username": "Username",
+      "usernamePlaceholder": "yourname",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "At least 8 characters",
+      "submit": "Create account",
+      "hasAccount": "Already have an account?",
+      "logIn": "Log in",
+      "orContinue": "Or continue with",
+      "google": "Continue with Google",
+      "usernameHelp": "sparkbio.com/{username}",
+      "usernameTaken": "This username is already taken",
+      "usernameInvalid": "Username must be 3-30 characters, lowercase letters, numbers, and hyphens only"
+    },
+    "forgotPassword": {
+      "title": "Reset your password",
+      "subtitle": "Enter your email and we'll send you a reset link",
+      "email": "Email",
+      "submit": "Send reset link",
+      "sent": "Check your email for a reset link",
+      "backToLogin": "Back to login"
+    },
+    "resetPassword": {
+      "title": "Set new password",
+      "subtitle": "Enter your new password below",
+      "password": "New password",
+      "confirm": "Confirm password",
+      "submit": "Update password",
+      "success": "Password updated successfully",
+      "backToLogin": "Back to login"
+    }
+  },
+  "dashboard": {
+    "sidebar": {
+      "links": "Links",
+      "appearance": "Appearance",
+      "analytics": "Analytics",
+      "settings": "Settings",
+      "viewProfile": "View my Sparkbio",
+      "signOut": "Sign out"
+    },
+    "links": {
+      "title": "Links",
+      "add": "Add new link",
+      "edit": "Edit link",
+      "empty": "No links yet",
+      "emptyDesc": "Add your first link to get started.",
+      "titleLabel": "Title",
+      "titlePlaceholder": "My awesome link",
+      "urlLabel": "URL",
+      "urlPlaceholder": "https://example.com",
+      "save": "Save link",
+      "delete": "Delete link",
+      "deleteConfirm": "Are you sure you want to delete this link?",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "profile": {
+      "title": "Profile",
+      "displayName": "Display Name",
+      "displayNamePlaceholder": "Your name",
+      "bio": "Bio",
+      "bioPlaceholder": "Tell the world about yourself",
+      "avatar": "Profile Photo",
+      "avatarUpload": "Upload photo",
+      "avatarRemove": "Remove photo",
+      "save": "Save profile"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "background": "Background",
+      "solid": "Solid color",
+      "gradient": "Gradient",
+      "buttons": "Buttons",
+      "buttonColor": "Button color",
+      "buttonTextColor": "Text color",
+      "buttonStyle": "Button style",
+      "fonts": "Fonts",
+      "fontFamily": "Font family",
+      "textColor": "Text color",
+      "presets": "Theme presets",
+      "presetsDesc": "Quick start with a pre-designed theme"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "views": "Views",
+      "clicks": "Clicks",
+      "ctr": "Click rate",
+      "topLinks": "Top links",
+      "viewsOverTime": "Views over time",
+      "devices": "Devices",
+      "referrers": "Top referrers",
+      "countries": "Top countries",
+      "timeRange": "Time range",
+      "last7days": "Last 7 days",
+      "last30days": "Last 30 days",
+      "allTime": "All time",
+      "noData": "No analytics data yet",
+      "noDataDesc": "Share your Sparkbio link to start tracking views and clicks."
+    },
+    "settings": {
+      "title": "Settings",
+      "profileUrl": "Your Sparkbio URL",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "changeUsername": "Change username",
+      "newUsername": "New username",
+      "changePassword": "Change password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "updatePassword": "Update password",
+      "deleteAccount": "Delete account",
+      "deleteAccountDesc": "Permanently delete your account and all data. This action cannot be undone.",
+      "deleteConfirm": "Are you sure? This will permanently delete your account.",
+      "signOut": "Sign out"
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "success": "Success",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "or": "or",
+    "sparkbio": "Sparkbio"
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page not found",
+      "description": "The page you're looking for doesn't exist.",
+      "backHome": "Go back home"
+    },
+    "generic": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. Please try again.",
+      "retry": "Try again"
+    }
+  }
+}
