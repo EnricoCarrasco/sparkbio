@@ -26,12 +26,10 @@ function buildBackgroundStyle(theme: PublicProfile["theme"]): React.CSSPropertie
     const direction = bg_gradient_direction ?? "to bottom";
 
     if (wallpaper_animate) {
-      // Repeat colors so background-position shift creates a visible cycle
-      const animatedGradient = `linear-gradient(${direction}, ${bg_gradient_from}, ${bg_gradient_to}, ${bg_gradient_from})`;
+      // Use conic-gradient that rotates via CSS custom property
       return {
-        background: animatedGradient,
-        backgroundSize: "100% 400%",
-        animation: "gradientShift 20s ease-in-out infinite",
+        background: `conic-gradient(from var(--gradient-angle, 0deg), ${bg_gradient_from}, ${bg_gradient_to}, ${bg_gradient_from})`,
+        animation: "gradientRotate 20s linear infinite",
       };
     }
 
@@ -100,13 +98,17 @@ export function ProfilePage({ data }: ProfilePageProps) {
         />
       )}
 
-      {/* Gradient animation keyframes */}
+      {/* Conic gradient rotation via @property */}
       {theme.wallpaper_animate && (
         <style>{`
-          @keyframes gradientShift {
-            0% { background-position: 0% 0%; }
-            50% { background-position: 0% 100%; }
-            100% { background-position: 0% 0%; }
+          @property --gradient-angle {
+            syntax: "<angle>";
+            initial-value: 0deg;
+            inherits: false;
+          }
+          @keyframes gradientRotate {
+            from { --gradient-angle: 0deg; }
+            to { --gradient-angle: 360deg; }
           }
         `}</style>
       )}
