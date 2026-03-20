@@ -154,7 +154,7 @@ export function WallpaperPanel() {
     },
     {
       value: "image",
-      label: "Image",
+      label: t("image"),
       isPro: true,
       preview: (
         <div className="w-full h-full bg-[#f3f3f3] flex items-center justify-center">
@@ -164,7 +164,7 @@ export function WallpaperPanel() {
     },
     {
       value: "video",
-      label: "Video",
+      label: t("video"),
       isPro: true,
       preview: (
         <div className="w-full h-full bg-[#f3f3f3] flex items-center justify-center">
@@ -180,7 +180,7 @@ export function WallpaperPanel() {
     <div className="space-y-6">
       {/* Wallpaper style heading + grid */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-foreground">Wallpaper style</h3>
+        <h3 className="text-sm font-medium text-foreground">{t("wallpaperStyle")}</h3>
         <div className="grid grid-cols-3 gap-2.5">
           {wallpaperStyles.map((style) => {
             const isRealStyle =
@@ -228,7 +228,7 @@ export function WallpaperPanel() {
         <>
           {/* Gradient style toggle */}
           <div className="space-y-3">
-            <h3 className="text-sm font-medium text-foreground">Gradient style</h3>
+            <h3 className="text-sm font-medium text-foreground">{t("gradientStyle")}</h3>
             <div className="flex gap-2">
               <GradientStylePill
                 label={t("custom")}
@@ -247,7 +247,7 @@ export function WallpaperPanel() {
           {/* Gradient swatches */}
           {theme.wallpaper_gradient_style === "premade" ? (
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-foreground">Gradient</h3>
+              <h3 className="text-sm font-medium text-foreground">{t("gradientSwatches")}</h3>
               <div className="grid grid-cols-6 gap-2.5">
                 {PREMADE_GRADIENTS.map((g) => {
                   const isActive = theme.wallpaper_gradient_preset === g.name;
@@ -281,7 +281,7 @@ export function WallpaperPanel() {
           ) : (
             /* Custom gradient: from/to color pickers would go here (not changing that component) */
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-foreground">Gradient</h3>
+              <h3 className="text-sm font-medium text-foreground">{t("gradientSwatches")}</h3>
               <div className="grid grid-cols-6 gap-2.5">
                 {PREMADE_GRADIENTS.map((g) => {
                   const isActive =
@@ -334,7 +334,7 @@ export function WallpaperPanel() {
       <div className="flex items-center justify-between py-0.5">
         <div className="space-y-0.5">
           <p className="text-sm font-medium text-foreground">{t("noise")}</p>
-          <p className="text-xs text-muted-foreground">Add a subtle grain texture</p>
+          <p className="text-xs text-muted-foreground">{t("noiseDesc")}</p>
         </div>
         <Switch
           checked={theme.wallpaper_noise}

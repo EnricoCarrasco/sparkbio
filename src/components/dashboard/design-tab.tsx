@@ -126,7 +126,7 @@ export function DesignTab() {
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-border bg-white text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shadow-sm"
           >
             <Sparkles className="size-3.5 text-[#FF6B35]" />
-            Enhance
+            {t("enhance")}
           </button>
         </div>
 

@@ -89,7 +89,7 @@ export function HeaderPanel() {
             onClick={() => fileInputRef.current?.click()}
             disabled={avatarUploading}
           >
-            {avatarUploading ? "Uploading..." : t("editImage")}
+            {avatarUploading ? t("uploading") : t("editImage")}
           </Button>
           <input
             ref={fileInputRef}
@@ -121,7 +121,7 @@ export function HeaderPanel() {
           id="header-title"
           value={profile?.display_name ?? ""}
           onChange={(e) => updateProfile({ display_name: e.target.value.trim() || null })}
-          placeholder="Your name"
+          placeholder={t("yourName")}
           maxLength={100}
         />
       </div>

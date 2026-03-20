@@ -192,7 +192,7 @@ export function ThemePanel() {
                 : "text-muted-foreground hover:text-foreground border-b-2 border-transparent"
             )}
           >
-            {tab === "customizable" ? "Customizable" : "Curated"}
+            {tab === "customizable" ? t("customizable") : t("curated")}
           </button>
         ))}
       </div>
@@ -248,7 +248,7 @@ export function ThemePanel() {
                     !activePresetName && "font-semibold"
                   )}
                 >
-                  Custom
+                  {t("customTheme")}
                 </p>
               </div>
             </button>

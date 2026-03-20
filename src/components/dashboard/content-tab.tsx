@@ -168,7 +168,8 @@ function SocialIconBubble({ icon }: { icon: SocialIcon }) {
 // ---------------------------------------------------------------------------
 
 export function ContentTab() {
-  const t = useTranslations("dashboard.links");
+  const t = useTranslations("dashboard.design");
+  const tLinks = useTranslations("dashboard.links");
   const profileLoading = useProfileStore((s) => s.loading);
   const linksLoading = useLinkStore((s) => s.loading);
   const socialLoading = useSocialStore((s) => s.loading);
@@ -183,20 +184,14 @@ export function ContentTab() {
 
   return (
     <div className="max-w-[680px] mx-auto px-4 py-6 space-y-5">
-      {/* ── Top bar: Links | Shop tabs + Enhance button ── */}
+      {/* ── Top bar: Links tab + Enhance button ── */}
       <div className="flex items-center">
         <div className="flex items-center gap-5">
           <button
             type="button"
             className="text-base font-bold text-foreground border-b-2 border-foreground pb-0.5"
           >
-            Links
-          </button>
-          <button
-            type="button"
-            className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors pb-0.5"
-          >
-            Shop
+            {t("linksTab")}
           </button>
         </div>
         <div className="ml-auto flex items-center gap-2">
@@ -206,7 +201,7 @@ export function ContentTab() {
             className="rounded-full gap-1.5 text-xs font-medium"
           >
             <Sparkles className="size-3.5" />
-            Enhance
+            {t("enhance")}
           </Button>
         </div>
       </div>
@@ -224,7 +219,7 @@ export function ContentTab() {
         }}
       >
         <Plus className="size-4" strokeWidth={2.5} />
-        Add
+        {t("addLink")}
       </button>
 
       {/* ── Add collection + View archive row ── */}
@@ -235,14 +230,14 @@ export function ContentTab() {
           className="rounded-full gap-1.5 text-xs font-medium text-muted-foreground"
         >
           <FolderPlus className="size-3.5" />
-          Add collection
+          {t("addCollection")}
         </Button>
         <button
           type="button"
           className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
           <Archive className="size-3.5" />
-          View archive
+          {t("viewArchive")}
           <ChevronRight className="size-3" />
         </button>
       </div>
