@@ -12,6 +12,10 @@ export function AnalyticsTracker({ profileId }: AnalyticsTrackerProps) {
   useEffect(() => {
     // Guard: fire only once per mount
     if (firedRef.current) return;
+
+    // Skip analytics in preview mode (dashboard iframe)
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("preview")) return;
+
     firedRef.current = true;
 
     const payload = JSON.stringify({
