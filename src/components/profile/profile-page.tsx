@@ -66,7 +66,7 @@ export function ProfilePage({ data }: ProfilePageProps) {
     };
   }, [theme]);
 
-  const activeLinks = links
+  const activeLinks = (links ?? [])
     .filter((link) => link.is_active)
     .sort((a, b) => a.position - b.position);
 
