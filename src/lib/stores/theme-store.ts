@@ -50,7 +50,10 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
       if (!current) return;
       const supabase = createClient();
       const { id, user_id, ...fields } = current;
-      await supabase.from("themes").update(fields).eq("id", id);
+      const { error } = await supabase.from("themes").update(fields).eq("id", id);
+      if (error) {
+        console.error("[theme-store] save failed:", error.message, error);
+      }
     }, 500);
   },
 }));
