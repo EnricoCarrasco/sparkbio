@@ -24,17 +24,18 @@ function buildBackgroundStyle(theme: PublicProfile["theme"]): React.CSSPropertie
 
   if (hasGradient) {
     const direction = bg_gradient_direction ?? "to bottom";
-    const gradientBg = `linear-gradient(${direction}, ${bg_gradient_from}, ${bg_gradient_to})`;
 
     if (wallpaper_animate) {
+      // Repeat colors so background-position shift creates a visible cycle
+      const animatedGradient = `linear-gradient(${direction}, ${bg_gradient_from}, ${bg_gradient_to}, ${bg_gradient_from})`;
       return {
-        background: `${gradientBg}`,
-        backgroundSize: "200% 200%",
-        animation: "gradientShift 6s ease infinite",
+        background: animatedGradient,
+        backgroundSize: "100% 400%",
+        animation: "gradientShift 8s ease infinite",
       };
     }
 
-    return { background: gradientBg };
+    return { background: `linear-gradient(${direction}, ${bg_gradient_from}, ${bg_gradient_to})` };
   }
 
   return { backgroundColor: bg_color };
@@ -103,9 +104,9 @@ export function ProfilePage({ data }: ProfilePageProps) {
       {theme.wallpaper_animate && (
         <style>{`
           @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% { background-position: 0% 0%; }
+            50% { background-position: 0% 100%; }
+            100% { background-position: 0% 0%; }
           }
         `}</style>
       )}
