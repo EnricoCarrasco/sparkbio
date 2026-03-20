@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ProfilePage } from "@/components/profile/profile-page";
 import type { Metadata } from "next";
 import type { PublicProfile } from "@/types";
+import { generatePersonJsonLd } from "@/lib/json-ld";
 
 type Props = { params: Promise<{ username: string }> };
 
@@ -85,5 +86,27 @@ export default async function PublicProfilePage({ params }: Props) {
     notFound();
   }
 
-  return <ProfilePage data={data} />;
+  const { profile } = data;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sparkbio.co";
+  const profileUrl = `${siteUrl}/${username}`;
+  const displayName = profile.display_name ?? username;
+
+  const jsonLd = generatePersonJsonLd({
+    name: displayName,
+    url: profileUrl,
+    description: profile.bio ?? undefined,
+    image: profile.avatar_url ?? undefined,
+  });
+
+  return (
+    <>
+      {/* Structured data for search engines */}
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: controlled server-generated JSON-LD
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ProfilePage data={data} />
+    </>
+  );
 }
