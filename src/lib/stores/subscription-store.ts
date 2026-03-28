@@ -14,7 +14,7 @@ interface SubscriptionState {
 
 export const useSubscriptionStore = create<SubscriptionState>((set) => ({
   subscription: null,
-  loading: false,
+  loading: true,
   isPro: false,
 
   fetchSubscription: async () => {
