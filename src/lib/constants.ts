@@ -243,3 +243,17 @@ export const PREMADE_GRADIENTS = [
 
 export const AVATAR_MAX_SIZE = 2 * 1024 * 1024; // 2MB
 export const AVATAR_ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+export const PLANS = {
+  free: {
+    name: "Free",
+    price: 0,
+  },
+  pro: {
+    name: "Pro",
+    monthlyPrice: 9,
+    yearlyPrice: 7,
+    yearlyTotal: 84,
+    trialDays: 7,
+  },
+} as const;

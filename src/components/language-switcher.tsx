@@ -24,7 +24,11 @@ const LANGUAGES: Language[] = [
   { locale: "pt-BR", label: "Português (BR)", shortLabel: "PT" },
 ];
 
-export function LanguageSwitcher() {
+interface LanguageSwitcherProps {
+  variant?: "dark" | "light";
+}
+
+export function LanguageSwitcher({ variant = "dark" }: LanguageSwitcherProps) {
   const currentLocale = useLocale() as Locale;
   const router = useRouter();
 
@@ -46,16 +50,17 @@ export function LanguageSwitcher() {
       <DropdownMenuTrigger
         aria-label="Switch language"
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white/80",
-          "px-3 py-1.5 text-xs font-medium text-gray-600 shadow-none",
-          "hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900",
+          "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium shadow-none",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35]/40",
-          "transition-colors duration-150 cursor-pointer select-none"
+          "transition-colors duration-150 cursor-pointer select-none",
+          variant === "light"
+            ? "border-white/30 bg-white/15 text-white/90 hover:bg-white/25 hover:border-white/50 hover:text-white"
+            : "border-gray-200 bg-white/80 text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900"
         )}
       >
-        <Globe className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+        <Globe className={cn("h-3.5 w-3.5 shrink-0", variant === "light" ? "text-white/70" : "text-gray-400")} />
         <span>{currentLanguage.shortLabel}</span>
-        <ChevronDown className="h-3 w-3 shrink-0 text-gray-400" />
+        <ChevronDown className={cn("h-3 w-3 shrink-0", variant === "light" ? "text-white/70" : "text-gray-400")} />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="min-w-[160px]">

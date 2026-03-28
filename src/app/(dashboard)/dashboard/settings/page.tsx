@@ -16,10 +16,12 @@ import {
   AtSign,
   Link2,
   AlertTriangle,
+  CreditCard,
 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
 import { useProfileStore } from "@/lib/stores/profile-store";
+import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { usernameChangeSchema } from "@/lib/validators/profile";
 import { RESERVED_USERNAMES } from "@/lib/constants";
 
@@ -45,6 +47,8 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
+import { UpgradeButton } from "@/components/billing/upgrade-button";
+import { UpgradeDialog } from "@/components/billing/upgrade-dialog";
 
 // ---------------------------------------------------------------------------
 // Password change schema — defined locally since it lives only in this page
@@ -364,6 +368,152 @@ function ChangePasswordSection() {
 }
 
 // ---------------------------------------------------------------------------
+// Billing section
+// ---------------------------------------------------------------------------
+function BillingSection() {
+  const t = useTranslations("billing");
+  const subscription = useSubscriptionStore((s) => s.subscription);
+  const isPro = useSubscriptionStore((s) => s.isPro);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+
+  // Derive billing interval from variant ID if needed in the future.
+  // For now we show "Pro" without distinguishing monthly/yearly unless
+  // the subscription object carries explicit interval metadata.
+  const isCancelled =
+    subscription?.status === "cancelled" ||
+    subscription?.status === "expired";
+
+  const accessUntil = subscription?.current_period_end
+    ? new Date(subscription.current_period_end).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : null;
+
+  const nextBilling = subscription?.current_period_end
+    ? new Date(subscription.current_period_end).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : null;
+
+  const trialEnds = subscription?.trial_ends_at
+    ? new Date(subscription.trial_ends_at).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : null;
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <CreditCard className="size-4 text-muted-foreground" />
+            <CardTitle>{t("billing")}</CardTitle>
+          </div>
+          <CardDescription>
+            {t("billingDesc")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Current plan label */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">{t("currentPlan")}</span>
+            {isPro && !isCancelled ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
+                <CreditCard className="size-3" />
+                Pro
+              </span>
+            ) : isCancelled ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                Pro ({t("cancelled")})
+              </span>
+            ) : (
+              <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                {t("free")}
+              </span>
+            )}
+          </div>
+
+          {/* Status rows for pro users */}
+          {isPro && !isCancelled && (
+            <div className="space-y-1.5 text-sm">
+              {subscription?.status === "on_trial" && trialEnds && (
+                <p className="text-muted-foreground">
+                  {t("status")}:{" "}
+                  <span className="font-medium text-foreground">
+                    {t("statusTrial")}
+                  </span>{" "}
+                  &mdash;{" "}
+                  <span className="font-medium text-foreground">
+                    {t("trialEnds", { date: trialEnds })}
+                  </span>
+                </p>
+              )}
+              {subscription?.status === "active" && (
+                <p className="text-muted-foreground">
+                  {t("status")}:{" "}
+                  <span className="font-medium text-foreground">
+                    {t("statusActive")}
+                  </span>
+                </p>
+              )}
+              {nextBilling && (
+                <p className="font-medium text-foreground">
+                  {t("nextBilling", { date: nextBilling })}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Access-until row for cancelled users */}
+          {isCancelled && accessUntil && (
+            <p className="text-sm font-medium text-foreground">
+              {t("accessUntil", { date: accessUntil })}
+            </p>
+          )}
+
+          {/* CTA buttons */}
+          {!isPro && !isCancelled && (
+            <UpgradeButton />
+          )}
+
+          {isPro && !isCancelled && subscription?.customer_portal_url && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                window.open(subscription.customer_portal_url!, "_blank", "noopener,noreferrer")
+              }
+            >
+              {t("manageSubscription")}
+            </Button>
+          )}
+
+          {isCancelled && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 text-amber-600 border-amber-200 hover:bg-amber-50"
+                onClick={() => setUpgradeOpen(true)}
+              >
+                {t("resubscribe")}
+              </Button>
+              <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Sign out section
 // ---------------------------------------------------------------------------
 function SignOutSection() {
@@ -534,6 +684,9 @@ export default function SettingsPage() {
 
       {/* Section: Change password */}
       <ChangePasswordSection />
+
+      {/* Section: Billing */}
+      <BillingSection />
 
       <Separator />
 

@@ -39,7 +39,7 @@ function buildBackgroundStyle(theme: PublicProfile["theme"]): React.CSSPropertie
 }
 
 export function ProfilePage({ data }: ProfilePageProps) {
-  const { profile, links, theme, social_icons } = data;
+  const { profile, links, theme, social_icons, subscription } = data;
 
   const backgroundStyle = useMemo(() => buildBackgroundStyle(theme), [theme]);
 
@@ -75,7 +75,8 @@ export function ProfilePage({ data }: ProfilePageProps) {
     .filter((link) => link.is_active)
     .sort((a, b) => a.position - b.position);
 
-  const showFooter = !theme.hide_footer;
+  const isProActive = subscription?.status === "on_trial" || subscription?.status === "active";
+  const showFooter = !(theme.hide_footer && isProActive);
 
   return (
     <div

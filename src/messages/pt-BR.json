@@ -1,17 +1,20 @@
 {
   "landing": {
     "hero": {
-      "title": "Tudo o que você é. Em um simples link.",
+      "title": "Tudo o que voc\u00ea \u00e9. Em um simples link.",
       "titleLine1": "Tudo",
       "titleLine1b": "o que você é.",
       "titleLine2a": "Em um simples",
+      "trustLine1": "Grátis para sempre",
+      "trustLine2": "Pronto em 60 seg",
+      "trustLine3": "Teste Pro de 7 dias",
       "titleLine2b": "link.",
       "subtitle": "Junte-se a milhões de criadores usando o Sparkbio para compartilhar tudo o que criam, curam e vendem — tudo a partir de um link na bio.",
       "claim": "Crie seu Sparkbio",
       "placeholder": "sparkbio.com/seunome",
       "getStarted": "Comece gratuitamente",
-      "eyebrow": "Grátis para sempre — sem cartão de crédito",
-      "inputHint": "Configure em menos de 60 segundos. Sem cartão de crédito.",
+      "eyebrow": "Grátis para sempre — pronto em 60 segundos",
+      "inputHint": "Plano grátis para sempre. Configure em menos de 60 segundos.",
       "marquee": {
         "creators": "Criadores",
         "influencers": "Influenciadores",
@@ -82,14 +85,81 @@
       "customThemes": "Temas e cores personalizados",
       "basicAnalytics": "Análise básica de cliques",
       "socialIcons": "Ícones de redes sociais",
-      "proHint": "Plano Pro em breve com análises avançadas, domínios personalizados e suporte prioritário."
+      "pro": "Pro",
+      "proPrice": "R$9",
+      "proYearlyPrice": "R$7",
+      "proBilledYearly": "cobrado anualmente",
+      "startTrial": "Iniciar teste grátis de 7 dias",
+      "hideBranding": "Ocultar marca Sparkbio",
+      "everythingInFree": "Tudo do plano Grátis, mais",
+      "mostPopular": "Mais popular",
+      "proDesc": "Destaque-se com uma página limpa, sem marca"
+    },
+    "themeGallery": {
+      "eyebrow": "Personalização",
+      "heading": "Deixe com a sua cara.",
+      "headingHighlight": "sua cara.",
+      "subheading": "12 temas incríveis para combinar com seu estilo. Personalize cores, fontes e mais."
+    },
+    "howItWorks": {
+      "eyebrow": "Como funciona",
+      "heading": "Pronto em três passos.",
+      "headingHighlight": "três",
+      "step1Title": "Crie seu link",
+      "step1Desc": "Escolha seu nome de usuário e cadastre-se em segundos.",
+      "step2Title": "Adicione seu conteúdo",
+      "step2Desc": "Links, ícones sociais, escolha seu tema.",
+      "step3Title": "Compartilhe em todo lugar",
+      "step3Desc": "Coloque seu link em toda bio e perfil."
+    },
+    "featuresBento": {
+      "eyebrow": "Recursos",
+      "heading": "Tudo o que você precisa.",
+      "headingHighlight": "precisa.",
+      "customization": {
+        "eyebrow": "Personalização",
+        "heading": "Deixe com a sua cara.",
+        "headingHighlight": "sua cara.",
+        "description": "12 temas incríveis, cores ilimitadas, 10 fontes, fundos gradientes, estilos de botão. Sua página é sua tela.",
+        "themes": "12 Temas",
+        "colors": "Cores personalizadas",
+        "fonts": "10 Fontes",
+        "gradients": "Gradientes"
+      },
+      "sharing": {
+        "eyebrow": "Compartilhamento",
+        "heading": "Um link. Todas as plataformas.",
+        "headingHighlight": "Todas"
+      },
+      "analytics": {
+        "eyebrow": "Análises",
+        "heading": "Conheça seu público.",
+        "headingHighlight": "público."
+      }
+    },
+    "marquee": {
+      "label": "Junte-se aos criadores no"
+    },
+    "stats": {
+      "creators": "Criadores",
+      "links": "Links criados",
+      "uptime": "Disponibilidade"
     },
     "cta": {
-      "title": "A ferramenta de link na bio rápida, amigável e poderosa.",
-      "titleHighlight": "poderosa",
-      "subtitle": "Junte-se a milhares de criadores que já usam o Sparkbio.",
-      "button": "Crie seu Sparkbio — é grátis",
-      "trustLine": "Grátis para sempre · Sem cartão · Pronto em 60 segundos"
+      "title": "Seu público está esperando.",
+      "titleHighlight": "esperando",
+      "subtitle": "Crie sua página Sparkbio em 60 segundos.",
+      "button": "Comece gratuitamente",
+      "trustLine": "Grátis para sempre · Pronto em 60 segundos"
+    },
+    "pricingNew": {
+      "eyebrow": "Preços",
+      "heading": "Preços simples e transparentes.",
+      "headingHighlight": "transparentes.",
+      "monthly": "Mensal",
+      "yearly": "Anual",
+      "discount": "-22%",
+      "billedYearly": "cobrado anualmente"
     },
     "footer": {
       "product": "Produto",
@@ -321,6 +391,54 @@
       "deleteConfirm": "Tem certeza? Isso excluirá permanentemente sua conta.",
       "signOut": "Sair"
     }
+  },
+  "billing": {
+    "title": "Faturamento",
+    "currentPlan": "Plano atual",
+    "free": "Grátis",
+    "pro": "Pro",
+    "monthly": "Mensal",
+    "yearly": "Anual",
+    "perMonth": "/mês",
+    "billedYearly": "Cobrado anualmente por R${total}",
+    "upgrade": "Fazer upgrade para Pro",
+    "upgradeToPro": "Fazer upgrade para Pro",
+    "upgradeDesc": "Remova a marca Sparkbio da sua página de perfil.",
+    "manageSub": "Gerenciar assinatura",
+    "cancelSub": "Cancelar assinatura",
+    "resubscribe": "Reassinar",
+    "trialEnds": "Teste termina em {date}",
+    "nextBilling": "Próxima cobrança: {date}",
+    "accessUntil": "Acesso até {date}",
+    "status": "Status",
+    "active": "Ativo",
+    "onTrial": "Teste",
+    "cancelled": "Cancelado",
+    "pastDue": "Pagamento pendente",
+    "startTrial": "Iniciar teste grátis de 7 dias",
+    "trialBadge": "Teste grátis de 7 dias",
+    "save": "Economize {percent}%",
+    "proFeature": "Recurso Pro",
+    "hideBranding": "Ocultar marca Sparkbio",
+    "everythingInFree": "Tudo do plano Grátis, mais:",
+    "checkout": "Continuar para pagamento",
+    "welcomePro": "Bem-vindo ao Sparkbio Pro!",
+    "billing": "Faturamento",
+    "billingDesc": "Gerencie sua assinatura e plano.",
+    "proBadge": "Pro",
+    "statusActive": "Ativo",
+    "statusTrial": "Teste",
+    "monthlyPrice": "R$45/mês",
+    "yearlyPrice": "R$35/mês",
+    "yearlySavings": "Economize 22%",
+    "dialogTitle": "Faça upgrade para o Sparkbio Pro",
+    "dialogSubtitle": "Desbloqueie a experiência completa do Sparkbio com uma assinatura Pro.",
+    "redirecting": "Redirecionando\u2026",
+    "checkoutError": "Não foi possível iniciar o pagamento. Tente novamente.",
+    "trialDisclaimer": "Sem cobrança durante o teste. Cancele a qualquer momento.",
+    "manageSubscription": "Gerenciar assinatura",
+    "feature_hideFooter": "Ocultar marca Sparkbio",
+    "billedYearlyAmount": "Cobrado R$420 / ano"
   },
   "common": {
     "save": "Salvar",

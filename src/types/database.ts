@@ -103,9 +103,39 @@ export interface AnalyticsEvent {
   created_at: string;
 }
 
+export type SubscriptionStatus =
+  | "on_trial"
+  | "active"
+  | "paused"
+  | "past_due"
+  | "cancelled"
+  | "expired";
+
+export interface Subscription {
+  id: string;
+  user_id: string;
+  lemonsqueezy_subscription_id: string;
+  lemonsqueezy_customer_id: string;
+  lemonsqueezy_variant_id: string;
+  status: SubscriptionStatus;
+  current_period_end: string | null;
+  trial_ends_at: string | null;
+  cancel_at: string | null;
+  update_payment_url: string | null;
+  customer_portal_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PublicSubscription {
+  status: SubscriptionStatus;
+  current_period_end: string | null;
+}
+
 export interface PublicProfile {
   profile: Profile;
   links: Link[];
   theme: Theme;
   social_icons: SocialIcon[];
+  subscription: PublicSubscription | null;
 }

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Theme } from "@/types";
 import { createClient } from "@/lib/supabase/client";
+import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 
 interface ThemeState {
   theme: Theme | null;
@@ -39,6 +40,12 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
   updateTheme: async (updates) => {
     const { theme } = get();
     if (!theme) return;
+
+    // Guard: don't allow hide_footer without Pro
+    if (updates.hide_footer === true) {
+      const { isPro } = useSubscriptionStore.getState();
+      if (!isPro) return;
+    }
 
     // Optimistic update (instant UI)
     set({ theme: { ...theme, ...updates } });

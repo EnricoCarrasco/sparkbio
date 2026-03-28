@@ -1,16 +1,10 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { motion, useInView, type Variants } from "framer-motion";
-import {
-  CheckIcon,
-  LinkIcon,
-  PaletteIcon,
-  BarChart2Icon,
-  Share2Icon,
-} from "lucide-react";
+import { CheckIcon } from "lucide-react";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -26,134 +20,190 @@ const fadeUp: Variants = {
 const stagger: Variants = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.07, delayChildren: 0.1 },
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
   },
 };
 
-const FREE_FEATURE_KEYS = [
-  { icon: <LinkIcon className="h-3.5 w-3.5" />, key: "unlimitedLinks" },
-  { icon: <PaletteIcon className="h-3.5 w-3.5" />, key: "customThemes" },
-  { icon: <BarChart2Icon className="h-3.5 w-3.5" />, key: "basicAnalytics" },
-  { icon: <Share2Icon className="h-3.5 w-3.5" />, key: "socialIcons" },
-];
+const FREE_FEATURES = [
+  "unlimitedLinks",
+  "customThemes",
+  "basicAnalytics",
+  "socialIcons",
+] as const;
+
+const PRO_FEATURES = ["everythingInFree", "hideBranding"] as const;
 
 export function PricingPreview() {
   const t = useTranslations("landing.pricing");
+  const tNew = useTranslations("landing.pricingNew");
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: "-60px" });
+  const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
 
   return (
-    <section
-      ref={sectionRef}
-      className="bg-[#F8F7F5] py-28 md:py-40"
-      id="pricing"
-    >
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
-          {/* Left: copy */}
+    <section ref={sectionRef} className="bg-white py-20 md:py-28" id="pricing">
+      <div className="mx-auto max-w-4xl px-6 lg:px-8">
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          animate={inView ? "visible" : "hidden"}
+          className="flex flex-col items-center"
+        >
+          {/* Eyebrow */}
+          <motion.span
+            variants={fadeUp}
+            className="text-[13px] font-semibold uppercase tracking-[0.15em] text-[#FF6B35]"
+          >
+            {tNew("eyebrow")}
+          </motion.span>
+
+          {/* Heading */}
+          <motion.h2
+            variants={fadeUp}
+            className="mt-4 text-center text-[36px] md:text-[48px] leading-[1.1] tracking-[-0.02em] text-[#111113]"
+            style={{
+              fontFamily:
+                "var(--font-display), 'Instrument Serif', Georgia, serif",
+            }}
+          >
+            {tNew("heading")
+              .split(tNew("headingHighlight"))
+              .map((part, i, arr) =>
+                i < arr.length - 1 ? (
+                  <span key={i}>
+                    {part}
+                    <em className="italic">{tNew("headingHighlight")}</em>
+                  </span>
+                ) : (
+                  <span key={i}>{part}</span>
+                )
+              )}
+          </motion.h2>
+
+          {/* Monthly / Yearly toggle */}
+          <motion.div variants={fadeUp} className="mt-6">
+            <div className="inline-flex rounded-full bg-[#f0f0f0] p-[3px]">
+              <button
+                type="button"
+                onClick={() => setBilling("monthly")}
+                className={`rounded-full px-4 py-2 text-[14px] font-medium transition-all duration-200 ${
+                  billing === "monthly"
+                    ? "bg-[#111113] text-white"
+                    : "text-[#999]"
+                }`}
+              >
+                {tNew("monthly")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setBilling("yearly")}
+                className={`rounded-full px-4 py-2 text-[14px] font-medium transition-all duration-200 ${
+                  billing === "yearly"
+                    ? "bg-[#111113] text-white"
+                    : "text-[#999]"
+                }`}
+              >
+                {tNew("yearly")}{" "}
+                <span className="font-bold text-[#FF6B35]">
+                  {tNew("discount")}
+                </span>
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Pricing cards */}
           <motion.div
             variants={stagger}
-            initial="hidden"
-            animate={inView ? "visible" : "hidden"}
-            className="flex-1 max-w-lg"
+            className="mt-10 flex w-full flex-col gap-4 sm:flex-row md:gap-6"
           >
-            <motion.span
-              variants={fadeUp}
-              className="inline-block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#FF6B35] mb-5"
-            >
-              {t("eyebrow")}
-            </motion.span>
+            {/* Free card */}
+            <motion.div variants={fadeUp} className="flex-1">
+              <div className="rounded-[20px] border border-[#eee] bg-white p-6 md:p-8">
+                <h3 className="text-[18px] font-bold text-[#111113]">
+                  {t("free")}
+                </h3>
 
-            <motion.h2
-              variants={fadeUp}
-              className="text-[42px] sm:text-[52px] leading-[1.06] tracking-[-0.03em] font-bold text-[#111113] mb-6"
-              style={{ fontFamily: "var(--font-display), 'Instrument Serif', Georgia, serif" }}
-            >
-              {t("title")}
-            </motion.h2>
-
-            <motion.p variants={fadeUp} className="text-[17px] text-[#666] leading-[1.7] mb-8">
-              {t("subtitle")}
-            </motion.p>
-
-            <motion.ul variants={stagger} className="flex flex-col gap-3.5">
-              {FREE_FEATURE_KEYS.map((f, i) => (
-                <motion.li
-                  key={i}
-                  variants={fadeUp}
-                  className="flex items-center gap-3"
-                >
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#111113] text-white">
-                    <CheckIcon className="h-3 w-3" strokeWidth={3} />
-                  </div>
-                  <span className="text-[15px] text-[#444] font-medium">{t(f.key)}</span>
-                </motion.li>
-              ))}
-            </motion.ul>
-          </motion.div>
-
-          {/* Right: pricing card */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate={inView ? "visible" : "hidden"}
-            className="flex-1 w-full max-w-sm"
-          >
-            <div className="relative rounded-[28px] bg-white border border-black/[0.08] p-8 sm:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.07)]">
-              {/* Plan */}
-              <div className="flex items-start justify-between mb-8">
-                <div>
-                  <h3 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#999] mb-2">
-                    {t("freePlan")}
-                  </h3>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-[56px] font-bold text-[#111113] tracking-[-0.04em] leading-none">
-                      $0
-                    </span>
-                    <span className="text-[#aaa] text-[14px] ml-1">{t("perMonth")}</span>
-                  </div>
+                <div className="mt-4">
+                  <span className="text-[48px] font-bold leading-none text-[#111113]">
+                    $0
+                  </span>
                 </div>
-                <span className="inline-flex items-center rounded-full bg-[#ECFDF5] px-3 py-1 text-[11px] font-semibold text-[#059669] mt-1">
-                  {t("active")}
-                </span>
+
+                <ul className="mt-6 flex flex-col gap-3">
+                  {FREE_FEATURES.map((key) => (
+                    <li key={key} className="flex items-center gap-2.5">
+                      <CheckIcon
+                        className="h-4 w-4 shrink-0 text-[#00D4AA]"
+                        strokeWidth={2.5}
+                      />
+                      <span className="text-[14px] text-[#666]">
+                        {t(key)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Link
+                  href="/register"
+                  className="mt-6 block w-full rounded-xl bg-[#f0f0f0] py-3 text-center text-[14px] font-semibold text-[#111113] transition-colors duration-150 hover:bg-[#e5e5e5] active:scale-[0.98]"
+                >
+                  {t("getStarted")}
+                </Link>
               </div>
+            </motion.div>
 
-              <p className="text-[14px] text-[#888] mb-8 leading-relaxed">
-                {t("freeDesc")}
-              </p>
+            {/* Pro card */}
+            <motion.div variants={fadeUp} className="relative flex-1">
+              <div className="rounded-[20px] border-2 border-[#FF6B35] bg-[#FFFAF5] p-6 md:p-8">
+                {/* Most Popular badge */}
+                <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2">
+                  <span className="inline-block rounded-full bg-[#FF6B35] px-3 py-1 text-[12px] font-semibold text-white">
+                    {t("mostPopular")}
+                  </span>
+                </div>
 
-              {/* Divider */}
-              <div className="h-px bg-black/[0.06] mb-8" />
+                <h3 className="mt-1 text-[18px] font-bold text-[#FF6B35]">
+                  {t("pro")}
+                </h3>
 
-              {/* Features */}
-              <ul className="flex flex-col gap-3 mb-10">
-                {FREE_FEATURE_KEYS.map((f, i) => (
-                  <li key={i} className="flex items-center gap-3">
-                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#F0F0F0] text-[#111113]">
-                      <CheckIcon className="h-2.5 w-2.5" strokeWidth={3} />
-                    </div>
-                    <span className="text-[14px] text-[#555]">{t(f.key)}</span>
-                  </li>
-                ))}
-              </ul>
+                <div className="mt-4 flex items-baseline gap-1">
+                  <span className="text-[48px] font-bold leading-none text-[#111113]">
+                    {billing === "monthly" ? "$9" : "$7"}
+                  </span>
+                  <span className="text-[16px] text-[#999]">{t("perMonth")}</span>
+                </div>
 
-              {/* CTA */}
-              <Link
-                href="/register"
-                className="flex w-full items-center justify-center rounded-full bg-[#FF6B35] px-6 py-4 text-[15px] font-semibold text-white hover:bg-[#e85a24] active:scale-[0.97] transition-all duration-150"
-              >
-                {t("getStartedFree")}
-              </Link>
-            </div>
+                {billing === "yearly" && (
+                  <p className="mt-1 text-[13px] text-[#999]">
+                    {tNew("billedYearly")}
+                  </p>
+                )}
 
-            {/* Pro hint */}
-            <p className="mt-5 text-center text-[12px] text-[#bbb] leading-relaxed">
-              {t("proHint")}
-            </p>
+                <ul className="mt-6 flex flex-col gap-3">
+                  {PRO_FEATURES.map((key) => (
+                    <li key={key} className="flex items-center gap-2.5">
+                      <CheckIcon
+                        className="h-4 w-4 shrink-0 text-[#FF6B35]"
+                        strokeWidth={2.5}
+                      />
+                      <span className="text-[14px] text-[#666]">
+                        {t(key)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Link
+                  href="/register"
+                  className="mt-6 block w-full rounded-xl bg-[#FF6B35] py-3 text-center text-[14px] font-semibold text-white transition-colors duration-150 hover:bg-[#e85a24] active:scale-[0.98]"
+                >
+                  {t("startTrial")} &rarr;
+                </Link>
+              </div>
+            </motion.div>
           </motion.div>
-        </div>
+        </motion.div>
       </div>
-
     </section>
   );
 }

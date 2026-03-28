@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useEffect, useState, lazy, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +20,7 @@ import { useProfileStore } from "@/lib/stores/profile-store";
 import { useThemeStore } from "@/lib/stores/theme-store";
 import { useSocialStore } from "@/lib/stores/social-store";
 import { useDashboardStore } from "@/lib/stores/dashboard-store";
+import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Lazy-load heavier tab content
@@ -50,6 +53,7 @@ export default function DashboardLayout({
   const fetchProfile = useProfileStore((s) => s.fetchProfile);
   const fetchTheme = useThemeStore((s) => s.fetchTheme);
   const fetchSocialIcons = useSocialStore((s) => s.fetchSocialIcons);
+  const fetchSubscription = useSubscriptionStore((s) => s.fetchSubscription);
   const activeTab = useDashboardStore((s) => s.activeTab);
 
   useEffect(() => {
@@ -57,7 +61,18 @@ export default function DashboardLayout({
     fetchLinks();
     fetchTheme();
     fetchSocialIcons();
-  }, [fetchProfile, fetchLinks, fetchTheme, fetchSocialIcons]);
+    fetchSubscription();
+  }, [fetchProfile, fetchLinks, fetchTheme, fetchSocialIcons, fetchSubscription]);
+
+  // Handle redirect back from LemonSqueezy checkout
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    if (searchParams.get("upgraded") === "1") {
+      toast.success("Welcome to Sparkbio Pro!");
+      fetchSubscription();
+      window.history.replaceState({}, "", "/dashboard");
+    }
+  }, [searchParams, fetchSubscription]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#FAFAFA]">

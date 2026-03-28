@@ -1,17 +1,20 @@
 {
   "landing": {
     "hero": {
-      "title": "Everything you are. One simple link.",
+      "title": "Everything you are. In one simple link.",
       "titleLine1": "Everything",
       "titleLine1b": "you are.",
-      "titleLine2a": "One simple",
+      "titleLine2a": "In one simple",
       "titleLine2b": "link.",
       "subtitle": "Join millions of creators using Sparkbio to share everything they create, curate and sell — all from one link in bio.",
       "claim": "Claim your Sparkbio",
       "placeholder": "sparkbio.com/yourname",
       "getStarted": "Get started for free",
-      "eyebrow": "Free forever — no credit card needed",
-      "inputHint": "Set up in under 60 seconds. No credit card required.",
+      "eyebrow": "Free forever — set up in 60 seconds",
+      "inputHint": "Free plan available forever. Set up in under 60 seconds.",
+      "trustLine1": "Free forever",
+      "trustLine2": "Setup in 60 sec",
+      "trustLine3": "Pro 7-day trial",
       "marquee": {
         "creators": "Creators",
         "influencers": "Influencers",
@@ -82,14 +85,81 @@
       "customThemes": "Custom themes & colors",
       "basicAnalytics": "Basic click analytics",
       "socialIcons": "Social media icons",
-      "proHint": "Pro plan coming soon with advanced analytics, custom domains & priority support."
+      "pro": "Pro",
+      "proPrice": "$9",
+      "proYearlyPrice": "$7",
+      "proBilledYearly": "billed yearly",
+      "startTrial": "Start 7-day free trial",
+      "hideBranding": "Hide Sparkbio branding",
+      "everythingInFree": "Everything in Free, plus",
+      "mostPopular": "Most popular",
+      "proDesc": "Stand out with a clean, brandless page"
+    },
+    "themeGallery": {
+      "eyebrow": "Customization",
+      "heading": "Make it unmistakably yours.",
+      "headingHighlight": "unmistakably",
+      "subheading": "12 stunning themes to match your vibe. Customize colors, fonts, and more."
+    },
+    "howItWorks": {
+      "eyebrow": "How it works",
+      "heading": "Live in three steps.",
+      "headingHighlight": "three",
+      "step1Title": "Claim your link",
+      "step1Desc": "Pick your username and sign up in seconds.",
+      "step2Title": "Add your content",
+      "step2Desc": "Links, social icons, choose your theme.",
+      "step3Title": "Share everywhere",
+      "step3Desc": "Put your link in every bio and profile."
+    },
+    "featuresBento": {
+      "eyebrow": "Features",
+      "heading": "Everything you need.",
+      "headingHighlight": "need.",
+      "customization": {
+        "eyebrow": "Customization",
+        "heading": "Make it yours.",
+        "headingHighlight": "yours.",
+        "description": "12 stunning themes, unlimited colors, 10 fonts, gradient backgrounds, button styles. Your page is your canvas.",
+        "themes": "12 Themes",
+        "colors": "Custom Colors",
+        "fonts": "10 Fonts",
+        "gradients": "Gradients"
+      },
+      "sharing": {
+        "eyebrow": "Sharing",
+        "heading": "One link. Every platform.",
+        "headingHighlight": "Every"
+      },
+      "analytics": {
+        "eyebrow": "Analytics",
+        "heading": "Know your audience.",
+        "headingHighlight": "audience."
+      }
+    },
+    "marquee": {
+      "label": "Join creators on"
+    },
+    "stats": {
+      "creators": "Creators",
+      "links": "Links created",
+      "uptime": "Uptime"
     },
     "cta": {
-      "title": "The fast, friendly and powerful link in bio tool.",
-      "titleHighlight": "powerful",
-      "subtitle": "Join thousands of creators already using Sparkbio.",
-      "button": "Create your Sparkbio — it's free",
-      "trustLine": "Free forever · No credit card · Takes 60 seconds"
+      "title": "Your audience is waiting.",
+      "titleHighlight": "waiting",
+      "subtitle": "Create your Sparkbio page in 60 seconds.",
+      "button": "Get started free",
+      "trustLine": "Free forever · Setup in 60 seconds"
+    },
+    "pricingNew": {
+      "eyebrow": "Pricing",
+      "heading": "Simple, transparent pricing.",
+      "headingHighlight": "pricing.",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "discount": "-22%",
+      "billedYearly": "billed yearly"
     },
     "footer": {
       "product": "Product",
@@ -321,6 +391,57 @@
       "deleteConfirm": "Are you sure? This will permanently delete your account.",
       "signOut": "Sign out"
     }
+  },
+  "billing": {
+    "title": "Billing",
+    "currentPlan": "Current plan",
+    "free": "Free",
+    "pro": "Pro",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "perMonth": "/month",
+    "billedYearly": "Billed annually at ${total}",
+    "upgrade": "Upgrade to Pro",
+    "upgradeToPro": "Upgrade to Pro",
+    "upgradeDesc": "Remove Sparkbio branding from your profile page.",
+    "manageSub": "Manage subscription",
+    "cancelSub": "Cancel subscription",
+    "resubscribe": "Resubscribe",
+    "trialEnds": "Trial ends {date}",
+    "nextBilling": "Next billing: {date}",
+    "accessUntil": "Access until {date}",
+    "status": "Status",
+    "active": "Active",
+    "onTrial": "Trial",
+    "cancelled": "Cancelled",
+    "pastDue": "Past due",
+    "startTrial": "Start 7-day free trial",
+    "trialBadge": "7-day free trial",
+    "save": "Save {percent}%",
+    "proFeature": "Pro feature",
+    "hideBranding": "Hide Sparkbio branding",
+    "everythingInFree": "Everything in Free, plus:",
+    "checkout": "Continue to checkout",
+    "welcomePro": "Welcome to Sparkbio Pro!",
+    "billing": "Billing",
+    "billingDesc": "Manage your subscription and plan.",
+    "proBadge": "Pro",
+    "statusActive": "Active",
+    "statusTrial": "Trial",
+    "trialEnds": "Trial ends {date}",
+    "nextBilling": "Next billing: {date}",
+    "accessUntil": "Access until {date}",
+    "monthlyPrice": "$9/mo",
+    "yearlyPrice": "$7/mo",
+    "yearlySavings": "Save 22%",
+    "dialogTitle": "Upgrade to Sparkbio Pro",
+    "dialogSubtitle": "Unlock the full Sparkbio experience with a Pro subscription.",
+    "redirecting": "Redirecting\u2026",
+    "checkoutError": "Could not start checkout. Please try again.",
+    "trialDisclaimer": "No charge during trial. Cancel anytime.",
+    "manageSubscription": "Manage subscription",
+    "feature_hideFooter": "Hide Sparkbio branding",
+    "billedYearlyAmount": "Billed $84 / year"
   },
   "common": {
     "save": "Save",

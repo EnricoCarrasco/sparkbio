@@ -4,7 +4,6 @@ import { useRef } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { motion, useInView, type Variants } from "framer-motion";
-import { ArrowRightIcon } from "lucide-react";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -32,69 +31,68 @@ export function CTA() {
   return (
     <section
       ref={sectionRef}
-      className="bg-[#111113] py-28 md:py-40"
+      style={{
+        background: "linear-gradient(135deg, #FF6B35, #ff8c5a, #FFD700)",
+      }}
+      className="py-24 md:py-32"
     >
-      <div className="mx-auto max-w-4xl px-6 lg:px-8 text-center">
+      <div className="mx-auto max-w-3xl px-6 lg:px-8 text-center">
         <motion.div
           variants={stagger}
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
-          className="flex flex-col items-center gap-8"
+          className="flex flex-col items-center"
         >
-          {/* Heading */}
+          {/* Headline */}
           <motion.h2
             variants={fadeUp}
-            className="text-[44px] sm:text-[56px] md:text-[68px] leading-[1.04] tracking-[-0.04em] font-bold text-white max-w-2xl"
-            style={{ fontFamily: "var(--font-display), 'Instrument Serif', Georgia, serif" }}
+            className="text-[36px] md:text-[52px] lg:text-[60px] leading-[1.08] tracking-[-0.03em] text-white"
+            style={{
+              fontFamily:
+                "var(--font-display), 'Instrument Serif', Georgia, serif",
+            }}
           >
-            {t("title").split(t("titleHighlight")).map((part, i, arr) =>
-              i < arr.length - 1 ? (
-                <span key={i}>
-                  {part}
-                  <em
-                    style={{
-                      fontStyle: "italic",
-                      background: "linear-gradient(135deg, #FF6B35 0%, #ff8c5a 100%)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      backgroundClip: "text",
-                    }}
-                  >
-                    {t("titleHighlight")}
-                  </em>
-                </span>
-              ) : (
-                <span key={i}>{part}</span>
-              )
-            )}
+            {t("title")
+              .split(t("titleHighlight"))
+              .map((part, i, arr) =>
+                i < arr.length - 1 ? (
+                  <span key={i}>
+                    {part}
+                    <em className="italic">{t("titleHighlight")}</em>
+                  </span>
+                ) : (
+                  <span key={i}>{part}</span>
+                )
+              )}
           </motion.h2>
 
           {/* Subtitle */}
           <motion.p
             variants={fadeUp}
-            className="text-[17px] text-white/50 max-w-md leading-[1.7]"
+            className="mt-4 text-[16px] md:text-[18px] text-white/85 leading-relaxed"
           >
             {t("subtitle")}
           </motion.p>
 
-          {/* CTA */}
-          <motion.div variants={fadeUp}>
+          {/* Button */}
+          <motion.div variants={fadeUp} className="mt-8">
             <Link
               href="/register"
-              className="inline-flex items-center gap-3 rounded-full bg-[#FF6B35] px-8 py-4 text-[16px] font-semibold text-white hover:bg-[#e85a24] active:scale-[0.97] transition-all duration-150"
+              className="inline-block rounded-xl bg-white px-8 py-4 text-[16px] font-bold text-[#FF6B35] shadow-sm transition-all duration-200 hover:scale-[1.03] hover:shadow-lg active:scale-[0.98]"
             >
-              {t("button")}
-              <ArrowRightIcon className="h-4 w-4" strokeWidth={2.5} />
+              {t("button")} &rarr;
             </Link>
           </motion.div>
 
           {/* Trust line */}
-          <motion.p variants={fadeUp} className="text-[13px] text-white/30">
+          <motion.p
+            variants={fadeUp}
+            className="mt-6 text-[13px] text-white/70"
+          >
             {t("trustLine")}
           </motion.p>
         </motion.div>
       </div>
-
     </section>
   );
 }
