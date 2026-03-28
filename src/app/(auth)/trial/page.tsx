@@ -54,26 +54,45 @@ export default function TrialPage() {
     // Listen for checkout events
     window.LemonSqueezy?.Setup({
       eventHandler: (event: { event: string }) => {
-        // LemonSqueezy fires these events from the overlay iframe
+        // Any event from the overlay — start polling for subscription
         if (
           event.event === "Checkout.Success" ||
-          event.event === "checkout.completed" ||
-          event.event === "PaymentMethodUpdate.Updated"
+          event.event === "Checkout.Close" ||
+          event.event === "close"
         ) {
-          // Hard redirect — router.push doesn't work reliably from iframe events
-          window.location.href = "/dashboard?upgraded=1";
-        }
-        // Also redirect when overlay is closed after a successful checkout
-        if (event.event === "Checkout.Close" || event.event === "close") {
-          // Small delay to let webhook process
-          setTimeout(() => {
-            window.location.href = "/dashboard?upgraded=1";
-          }, 1500);
+          startPolling();
         }
       },
     });
 
     setLemonReady(true);
+  }
+
+  // Poll the subscription store to detect when the webhook has created the row
+  function startPolling() {
+    let attempts = 0;
+    const maxAttempts = 20; // 20 * 2s = 40s max wait
+
+    async function check() {
+      attempts++;
+      try {
+        const res = await fetch("/api/checkout/status");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.hasSubscription) {
+            window.location.href = "/dashboard?upgraded=1";
+            return;
+          }
+        }
+      } catch { /* ignore */ }
+      if (attempts >= maxAttempts) {
+        window.location.href = "/dashboard?upgraded=1";
+        return;
+      }
+      setTimeout(check, 2000);
+    }
+
+    setTimeout(check, 2000);
   }
 
   async function handleStartTrial() {
