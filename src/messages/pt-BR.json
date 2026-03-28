@@ -265,7 +265,9 @@
       "blog": "Blog",
       "privacy": "Privacidade",
       "terms": "Termos",
-      "copyright": "© {year} Viopage. Todos os direitos reservados."
+      "copyright": "© {year} Viopage. Todos os direitos reservados.",
+      "tagline": "Um link para tudo que você cria.",
+      "ctaFooter": "Comece grátis"
     },
     "nav": {
       "login": "Entrar",
@@ -598,5 +600,123 @@
     "supportLink": "Fale com o suporte",
     "error": "Algo deu errado. Tente novamente.",
     "errorCheckout": "Não foi possível criar o checkout. Tente novamente."
+  },
+  "terms": {
+    "title": "Termos de Uso",
+    "lastUpdated": "Última atualização: 28 de março de 2026",
+    "intro": "Bem-vindo ao Viopage. Ao acessar ou utilizar nossa plataforma em viopage.com (o \"Serviço\"), você concorda em se vincular a estes Termos de Uso (\"Termos\"). Se você não concordar com estes Termos, não utilize o Serviço.",
+    "eligibility": {
+      "heading": "1. Elegibilidade",
+      "content": "Você deve ter pelo menos 13 anos de idade para utilizar o Viopage. Ao criar uma conta, você declara que tem pelo menos 13 anos e capacidade legal para celebrar este contrato. Se você for menor de 18 anos, confirma que seu pai, mãe ou responsável legal revisou e concordou com estes Termos em seu nome."
+    },
+    "accountResponsibility": {
+      "heading": "2. Responsabilidade da Conta",
+      "content": "Você é responsável por manter a confidencialidade das credenciais da sua conta e por toda atividade que ocorra em sua conta. Você concorda em fornecer informações precisas, atuais e completas durante o cadastro e em manter suas informações atualizadas. Notifique-nos imediatamente caso suspeite de acesso não autorizado à sua conta."
+    },
+    "subscription": {
+      "heading": "3. Assinatura e Cobrança",
+      "content": "O Viopage oferece um plano de assinatura Pro pago. Novos usuários recebem um período de teste gratuito de 7 dias. Após o término do período de teste, o método de pagamento escolhido será cobrado automaticamente, a menos que você cancele antes do término do teste. Todo o processamento de pagamentos é realizado pela LemonSqueezy, nosso Merchant of Record (Comerciante Registrado), responsável pela cobrança, arrecadação de impostos, estornos e processamento de reembolsos. Ao assinar, você também concorda com os termos de serviço da LemonSqueezy."
+    },
+    "cancellation": {
+      "heading": "4. Cancelamento e Reembolsos",
+      "content": "Você pode cancelar sua assinatura a qualquer momento através do portal de clientes da LemonSqueezy. Após o cancelamento, você manterá acesso aos recursos Pro até o final do período de cobrança atual. Não são emitidos reembolsos parciais pelo tempo não utilizado dentro de um ciclo de cobrança. Todas as disputas de cobrança e solicitações de reembolso devem ser direcionadas à LemonSqueezy como Merchant of Record."
+    },
+    "acceptableUse": {
+      "heading": "5. Uso Aceitável",
+      "content": "Você concorda em não utilizar o Viopage para publicar, compartilhar ou vincular conteúdo que: (a) seja ilegal ou promova atividades ilegais; (b) contenha links de phishing, malware ou outros softwares maliciosos; (c) constitua spam, conteúdo enganoso ou práticas fraudulentas; (d) promova discurso de ódio, assédio, discriminação ou violência; (e) contenha material adulto explícito ou pornográfico; (f) se passe por outra pessoa, marca ou organização; (g) infrinja os direitos de propriedade intelectual de terceiros. O Viopage reserva-se o direito de determinar, a seu exclusivo critério, o que constitui violação desta política."
+    },
+    "contentOwnership": {
+      "heading": "6. Seu Conteúdo",
+      "content": "Você mantém a propriedade total do conteúdo que publica no Viopage, incluindo informações do perfil, links, imagens e descrições. Ao utilizar o Serviço, você concede ao Viopage uma licença mundial, não exclusiva e isenta de royalties para hospedar, exibir, reproduzir e distribuir seu conteúdo exclusivamente para fins de operação e fornecimento do Serviço. Esta licença é encerrada quando você exclui seu conteúdo ou conta."
+    },
+    "intellectualProperty": {
+      "heading": "7. Propriedade Intelectual",
+      "content": "O nome Viopage, logotipo, ativos da marca, design do site, código-fonte e toda a propriedade intelectual associada são de propriedade do Viopage e protegidos pelas leis de direitos autorais e marcas registradas aplicáveis. Você não pode copiar, modificar, distribuir ou criar obras derivadas baseadas em nossa plataforma sem consentimento prévio por escrito. Você não pode usar a marca Viopage de maneira enganosa ou não autorizada."
+    },
+    "removalAndTermination": {
+      "heading": "8. Remoção de Conteúdo e Encerramento de Conta",
+      "content": "O Viopage reserva-se o direito de remover qualquer conteúdo ou suspender ou encerrar qualquer conta que viole estes Termos, sem aviso prévio. Também podemos encerrar contas que permaneçam inativas por um período prolongado ou que acreditemos razoavelmente estarem sendo usadas para fins fraudulentos. Você pode excluir sua conta a qualquer momento através das configurações da conta."
+    },
+    "dataAfterTermination": {
+      "heading": "9. Dados Após o Encerramento",
+      "content": "Quando você exclui sua conta, excluiremos permanentemente seus dados pessoais, conteúdo do perfil, links e informações associadas dentro de 30 dias. Alguns dados de análise anonimizados podem ser retidos para fins de relatórios internos. Para mais detalhes sobre o tratamento de dados, consulte nossa Política de Privacidade."
+    },
+    "limitationOfLiability": {
+      "heading": "10. Limitação de Responsabilidade",
+      "content": "O Viopage é fornecido \"como está\" e \"conforme disponível\", sem garantias de qualquer tipo, expressas ou implícitas. Na extensão máxima permitida pela legislação aplicável, o Viopage não será responsável por quaisquer danos indiretos, incidentais, especiais, consequenciais ou punitivos, incluindo, mas não se limitando a, perda de lucros, dados ou oportunidades de negócios. O Viopage não é responsável por: (a) a disponibilidade ou conteúdo de sites de terceiros aos quais você vincula; (b) indisponibilidade ou interrupções do serviço; (c) perda de dados resultante de circunstâncias além do nosso controle razoável; (d) quaisquer ações tomadas por terceiros em conexão com seu perfil ou conteúdo."
+    },
+    "indemnification": {
+      "heading": "11. Indenização",
+      "content": "Você concorda em indenizar, defender e isentar o Viopage, seus proprietários, funcionários e afiliados de quaisquer reivindicações, danos, perdas, responsabilidades e despesas (incluindo honorários advocatícios razoáveis) decorrentes de: (a) seu uso do Serviço; (b) sua violação destes Termos; (c) seu conteúdo; (d) quaisquer reivindicações de terceiros relacionadas ao seu perfil ou conteúdo vinculado."
+    },
+    "changes": {
+      "heading": "12. Alterações nestes Termos",
+      "content": "Podemos atualizar estes Termos periodicamente. Quando fizermos alterações significativas, notificaremos você por email ou através do Serviço. O uso continuado do Viopage após a entrada em vigor das alterações constitui aceitação dos Termos atualizados. Se você não concordar com as alterações, deve parar de usar o Serviço e excluir sua conta."
+    },
+    "governingLaw": {
+      "heading": "13. Lei Aplicável e Jurisdição",
+      "content": "Estes Termos são regidos pelas leis da República Federativa do Brasil, incluindo o Código de Defesa do Consumidor (CDC) e o Código Civil Brasileiro. Quaisquer disputas decorrentes ou relacionadas a estes Termos serão submetidas ao foro do domicílio do usuário no Brasil, conforme previsto em lei. Para usuários internacionais, as disputas serão submetidas ao foro da Comarca de São Paulo, Estado de São Paulo, Brasil."
+    },
+    "contact": {
+      "heading": "14. Contato",
+      "content": "Se você tiver dúvidas sobre estes Termos, entre em contato conosco em legal@viopage.com."
+    }
+  },
+  "privacy": {
+    "title": "Política de Privacidade",
+    "lastUpdated": "Última atualização: 28 de março de 2026",
+    "intro": "No Viopage, estamos comprometidos em proteger sua privacidade. Esta Política de Privacidade explica quais informações coletamos, como as utilizamos e seus direitos em relação aos seus dados pessoais. Esta política se aplica a todos os usuários do viopage.com (o \"Serviço\").",
+    "dataWeCollect": {
+      "heading": "1. Informações que Você Fornece",
+      "content": "Quando você cria uma conta e utiliza o Viopage, coletamos as seguintes informações fornecidas voluntariamente por você: endereço de email, nome de usuário, nome de exibição, biografia, foto de perfil (avatar), links e seus títulos/URLs, e seleções de ícones de redes sociais."
+    },
+    "dataCollectedAutomatically": {
+      "heading": "2. Informações Coletadas Automaticamente",
+      "content": "Quando visitantes visualizam seu perfil público do Viopage, coletamos automaticamente: eventos de visualização de página e cliques em links, localização geográfica aproximada (nível de país, derivada do endereço IP), site de referência (como os visitantes encontraram sua página), tipo de navegador e informações do dispositivo (user agent), e data e hora das visitas. Endereços IP não são armazenados em nosso banco de dados de análise. Utilizamos dados anonimizados para fornecer insights de análise agregados."
+    },
+    "howWeUseData": {
+      "heading": "3. Como Utilizamos Suas Informações",
+      "content": "Utilizamos as informações coletadas para: (a) fornecer, operar e manter o Serviço; (b) exibir sua página de perfil público para visitantes; (c) fornecer análises e insights sobre o desempenho do seu perfil; (d) processar sua assinatura e pagamentos através do nosso provedor de pagamentos; (e) comunicar atualizações importantes sobre o Serviço, como alterações nestas políticas; (f) melhorar e desenvolver novos recursos para a plataforma; (g) prevenir fraudes, abusos e aplicar nossos Termos de Uso."
+    },
+    "cookies": {
+      "heading": "4. Cookies e Tecnologias de Rastreamento",
+      "content": "O Viopage utiliza os seguintes cookies e tecnologias similares: (a) Cookie de idioma — armazena sua preferência de idioma (Inglês ou Português); (b) Cookies de autenticação — gerenciados pelo Supabase para manter sua sessão de login. No futuro, poderemos implementar cookies de publicidade de serviços de terceiros, incluindo Google Ads e Meta (Facebook) Pixel para fins de marketing e retargeting. Quando implementados, esses cookies estarão sujeitos ao seu consentimento quando exigido por lei, e esta política será atualizada. Você pode gerenciar preferências de cookies através das configurações do seu navegador."
+    },
+    "thirdPartyServices": {
+      "heading": "5. Serviços de Terceiros",
+      "content": "Utilizamos os seguintes serviços de terceiros para operar o Viopage: (a) Supabase — hospedagem de banco de dados, autenticação de usuários e armazenamento de arquivos (supabase.com); (b) LemonSqueezy — processamento de pagamentos, gestão de assinaturas, gestão tributária e faturamento como nosso Merchant of Record (lemonsqueezy.com). No futuro, poderemos integrar: Google Analytics e Google Ads para análise e publicidade; Meta (Facebook) Pixel para publicidade e retargeting. Cada serviço de terceiro possui sua própria política de privacidade que rege o uso dos seus dados."
+    },
+    "dataSharing": {
+      "heading": "6. Compartilhamento de Dados",
+      "content": "Não vendemos, alugamos ou negociamos suas informações pessoais com terceiros. Compartilhamos seus dados apenas com os provedores de serviços de terceiros listados acima, exclusivamente para os fins descritos nesta política. Também podemos divulgar suas informações se exigido por lei, ordem judicial ou solicitação governamental, ou para proteger os direitos, propriedade ou segurança do Viopage, nossos usuários ou o público."
+    },
+    "dataRetention": {
+      "heading": "7. Retenção de Dados",
+      "content": "Retemos seus dados pessoais enquanto sua conta estiver ativa. Dados de análise são retidos por até 24 meses. Quando você exclui sua conta, seus dados pessoais, conteúdo do perfil e links são permanentemente excluídos dentro de 30 dias. Alguns dados anonimizados e agregados podem ser retidos indefinidamente para fins de análise interna e melhoria do serviço."
+    },
+    "yourRights": {
+      "heading": "8. Seus Direitos",
+      "content": "Sob a Lei Geral de Proteção de Dados (LGPD) do Brasil e, quando aplicável, o Regulamento Geral sobre a Proteção de Dados (GDPR) europeu, você tem o direito de: (a) Acesso — solicitar uma cópia dos dados pessoais que mantemos sobre você; (b) Correção — solicitar a correção de dados imprecisos ou incompletos; (c) Exclusão — solicitar a exclusão dos seus dados pessoais; (d) Portabilidade — solicitar seus dados em formato estruturado e legível por máquina; (e) Revogação do consentimento — revogar o consentimento para processamento de dados a qualquer momento; (f) Oposição — se opor a certos tipos de processamento de dados; (g) Reclamação — junto à Autoridade Nacional de Proteção de Dados (ANPD) do Brasil ou à autoridade supervisora local. Para exercer qualquer um desses direitos, entre em contato conosco em privacy@viopage.com."
+    },
+    "childrenPrivacy": {
+      "heading": "9. Privacidade de Crianças",
+      "content": "O Viopage não se destina a crianças menores de 13 anos. Não coletamos intencionalmente informações pessoais de crianças menores de 13 anos. Se descobrirmos que coletamos dados de uma criança menor de 13 anos, excluiremos prontamente essas informações. Se você é pai, mãe ou responsável e acredita que seu filho nos forneceu informações pessoais, entre em contato conosco em privacy@viopage.com."
+    },
+    "internationalTransfers": {
+      "heading": "10. Transferências Internacionais de Dados",
+      "content": "Seus dados podem ser processados e armazenados em servidores localizados fora do Brasil, incluindo nos Estados Unidos e outros países onde nossos provedores de serviço operam. Quando seus dados são transferidos internacionalmente, garantimos que salvaguardas adequadas estejam em vigor conforme exigido pela LGPD e outras leis de proteção de dados aplicáveis."
+    },
+    "security": {
+      "heading": "11. Segurança",
+      "content": "Implementamos medidas de segurança padrão da indústria para proteger seus dados pessoais, incluindo criptografia SSL/TLS para dados em trânsito, mecanismos de autenticação seguros e controles de acesso. No entanto, nenhum método de transmissão ou armazenamento é 100% seguro, e não podemos garantir a segurança absoluta dos seus dados."
+    },
+    "changes": {
+      "heading": "12. Alterações nesta Política",
+      "content": "Podemos atualizar esta Política de Privacidade periodicamente. Quando fizermos alterações significativas, notificaremos você por email ou através do Serviço. O uso continuado do Viopage após a entrada em vigor das alterações constitui aceitação da política atualizada."
+    },
+    "contact": {
+      "heading": "13. Contato",
+      "content": "Se você tiver dúvidas sobre esta Política de Privacidade ou deseja exercer seus direitos sobre dados, entre em contato conosco em privacy@viopage.com."
+    }
   }
 }

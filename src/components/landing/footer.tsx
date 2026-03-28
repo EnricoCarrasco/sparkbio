@@ -54,7 +54,7 @@ export function Footer() {
               />
             </Link>
             <p className="text-[14px] text-[#999] leading-relaxed max-w-[200px]">
-              One link for everything you create.
+              {t("tagline")}
             </p>
           </div>
 
@@ -89,7 +89,7 @@ export function Footer() {
             href="/register"
             className="text-[13px] font-semibold text-[#FF6B35] hover:text-[#e85a24] transition-colors duration-150"
           >
-            Get started free &rarr;
+            {t("ctaFooter")} &rarr;
           </Link>
         </div>
       </div>

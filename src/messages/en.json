@@ -264,7 +264,9 @@
       "blog": "Blog",
       "privacy": "Privacy",
       "terms": "Terms",
-      "copyright": "© {year} Viopage. All rights reserved."
+      "copyright": "© {year} Viopage. All rights reserved.",
+      "tagline": "One link for everything you create.",
+      "ctaFooter": "Get started free"
     },
     "nav": {
       "login": "Log in",
@@ -600,5 +602,123 @@
     "supportLink": "Contact support",
     "error": "Something went wrong. Please try again.",
     "errorCheckout": "Could not create checkout. Please try again."
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: March 28, 2026",
+    "intro": "Welcome to Viopage. By accessing or using our platform at viopage.com (the \"Service\"), you agree to be bound by these Terms of Service (\"Terms\"). If you do not agree to these Terms, do not use the Service.",
+    "eligibility": {
+      "heading": "1. Eligibility",
+      "content": "You must be at least 13 years old to use Viopage. By creating an account, you represent that you are at least 13 years of age and have the legal capacity to enter into this agreement. If you are under 18, you confirm that your parent or legal guardian has reviewed and agreed to these Terms on your behalf."
+    },
+    "accountResponsibility": {
+      "heading": "2. Account Responsibility",
+      "content": "You are responsible for maintaining the confidentiality of your account credentials and for all activity that occurs under your account. You agree to provide accurate, current, and complete information during registration and to keep your account information updated. Notify us immediately if you suspect unauthorized access to your account."
+    },
+    "subscription": {
+      "heading": "3. Subscription & Billing",
+      "content": "Viopage offers a paid Pro subscription plan. New users receive a 7-day free trial. After the trial period ends, your chosen payment method will be automatically charged unless you cancel before the trial expires. All payment processing is handled by LemonSqueezy, our Merchant of Record, which is responsible for billing, tax collection, chargebacks, and refund processing. By subscribing, you also agree to LemonSqueezy's terms of service."
+    },
+    "cancellation": {
+      "heading": "4. Cancellation & Refunds",
+      "content": "You may cancel your subscription at any time through LemonSqueezy's customer portal. Upon cancellation, you will retain access to Pro features until the end of your current billing period. No partial refunds are issued for unused time within a billing cycle. All billing disputes and refund requests must be directed to LemonSqueezy as the Merchant of Record."
+    },
+    "acceptableUse": {
+      "heading": "5. Acceptable Use",
+      "content": "You agree not to use Viopage to publish, share, or link to content that: (a) is illegal or promotes illegal activity; (b) contains phishing links, malware, or other harmful software; (c) constitutes spam, misleading content, or deceptive practices; (d) promotes hate speech, harassment, discrimination, or violence; (e) contains explicit adult or pornographic material; (f) impersonates another person, brand, or organization; (g) infringes on the intellectual property rights of others. Viopage reserves the right to determine, at its sole discretion, what constitutes a violation of this policy."
+    },
+    "contentOwnership": {
+      "heading": "6. Your Content",
+      "content": "You retain full ownership of the content you publish on Viopage, including your profile information, links, images, and descriptions. By using the Service, you grant Viopage a worldwide, non-exclusive, royalty-free license to host, display, reproduce, and distribute your content solely for the purpose of operating and providing the Service. This license terminates when you delete your content or account."
+    },
+    "intellectualProperty": {
+      "heading": "7. Intellectual Property",
+      "content": "The Viopage name, logo, brand assets, website design, source code, and all associated intellectual property are owned by Viopage and protected by applicable copyright and trademark laws. You may not copy, modify, distribute, or create derivative works based on our platform without prior written consent. You may not use the Viopage brand in any misleading or unauthorized manner."
+    },
+    "removalAndTermination": {
+      "heading": "8. Content Removal & Account Termination",
+      "content": "Viopage reserves the right to remove any content or suspend or terminate any account that violates these Terms, without prior notice. We may also terminate accounts that remain inactive for an extended period or that we reasonably believe are being used for fraudulent purposes. You may delete your account at any time through your account settings."
+    },
+    "dataAfterTermination": {
+      "heading": "9. Data After Termination",
+      "content": "When you delete your account, we will permanently delete your personal data, profile content, links, and associated information within 30 days. Some anonymized analytics data may be retained for internal reporting purposes. For more details on data handling, please refer to our Privacy Policy."
+    },
+    "limitationOfLiability": {
+      "heading": "10. Limitation of Liability",
+      "content": "Viopage is provided on an \"as is\" and \"as available\" basis without warranties of any kind, either express or implied. To the maximum extent permitted by applicable law, Viopage shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or business opportunities. Viopage is not responsible for: (a) the availability or content of third-party websites you link to; (b) service downtime or interruptions; (c) data loss resulting from circumstances beyond our reasonable control; (d) any actions taken by third parties in connection with your profile or content."
+    },
+    "indemnification": {
+      "heading": "11. Indemnification",
+      "content": "You agree to indemnify, defend, and hold harmless Viopage, its owners, employees, and affiliates from any claims, damages, losses, liabilities, and expenses (including reasonable legal fees) arising from: (a) your use of the Service; (b) your violation of these Terms; (c) your content; (d) any third-party claims related to your profile or linked content."
+    },
+    "changes": {
+      "heading": "12. Changes to These Terms",
+      "content": "We may update these Terms from time to time. When we make material changes, we will notify you by email or through the Service. Your continued use of Viopage after changes take effect constitutes acceptance of the updated Terms. If you do not agree with the changes, you must stop using the Service and delete your account."
+    },
+    "governingLaw": {
+      "heading": "13. Governing Law & Jurisdiction",
+      "content": "These Terms are governed by the laws of the Federative Republic of Brazil, including the Brazilian Consumer Protection Code (CDC) and the Brazilian Civil Code. Any disputes arising from or related to these Terms shall be submitted to the courts of the user's domicile in Brazil, as provided by law. For international users, disputes shall be submitted to the courts of São Paulo, State of São Paulo, Brazil."
+    },
+    "contact": {
+      "heading": "14. Contact",
+      "content": "If you have questions about these Terms, please contact us at legal@viopage.com."
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: March 28, 2026",
+    "intro": "At Viopage, we are committed to protecting your privacy. This Privacy Policy explains what information we collect, how we use it, and your rights regarding your personal data. This policy applies to all users of viopage.com (the \"Service\").",
+    "dataWeCollect": {
+      "heading": "1. Information You Provide",
+      "content": "When you create an account and use Viopage, we collect the following information that you voluntarily provide: email address, username, display name, bio, profile photo (avatar), links and their titles/URLs, and social media icon selections."
+    },
+    "dataCollectedAutomatically": {
+      "heading": "2. Information Collected Automatically",
+      "content": "When visitors view your public Viopage profile, we automatically collect: page view and link click events, approximate geographic location (country-level, derived from IP address), referring website (how visitors found your page), browser type and device information (user agent), and the date and time of visits. IP addresses are not stored in our analytics database. We use anonymized data to provide you with aggregated analytics insights."
+    },
+    "howWeUseData": {
+      "heading": "3. How We Use Your Information",
+      "content": "We use the information we collect to: (a) provide, operate, and maintain the Service; (b) display your public profile page to visitors; (c) provide analytics and insights about your profile performance; (d) process your subscription and payments through our payment provider; (e) communicate important updates about the Service, such as changes to these policies; (f) improve and develop new features for the platform; (g) prevent fraud, abuse, and enforce our Terms of Service."
+    },
+    "cookies": {
+      "heading": "4. Cookies & Tracking Technologies",
+      "content": "Viopage uses the following cookies and similar technologies: (a) Locale cookie — stores your language preference (English or Portuguese); (b) Authentication cookies — managed by Supabase to maintain your login session. In the future, we may implement advertising cookies from third-party services including Google Ads and Meta (Facebook) Pixel for marketing and retargeting purposes. When implemented, these cookies will be subject to your consent where required by law, and this policy will be updated accordingly. You can manage cookie preferences through your browser settings."
+    },
+    "thirdPartyServices": {
+      "heading": "5. Third-Party Services",
+      "content": "We use the following third-party services to operate Viopage: (a) Supabase — database hosting, user authentication, and file storage (supabase.com); (b) LemonSqueezy — payment processing, subscription management, tax handling, and invoicing as our Merchant of Record (lemonsqueezy.com). In the future, we may integrate: Google Analytics and Google Ads for analytics and advertising; Meta (Facebook) Pixel for advertising and retargeting. Each third-party service has its own privacy policy governing their use of your data."
+    },
+    "dataSharing": {
+      "heading": "6. Data Sharing",
+      "content": "We do not sell, rent, or trade your personal information to third parties. We only share your data with the third-party service providers listed above, solely for the purposes described in this policy. We may also disclose your information if required by law, court order, or governmental request, or to protect the rights, property, or safety of Viopage, our users, or the public."
+    },
+    "dataRetention": {
+      "heading": "7. Data Retention",
+      "content": "We retain your personal data for as long as your account is active. Analytics data is retained for up to 24 months. When you delete your account, your personal data, profile content, and links are permanently deleted within 30 days. Some anonymized, aggregated data may be retained indefinitely for internal analytics and service improvement purposes."
+    },
+    "yourRights": {
+      "heading": "8. Your Rights",
+      "content": "Under the Brazilian General Data Protection Law (LGPD) and, where applicable, the European General Data Protection Regulation (GDPR), you have the right to: (a) Access — request a copy of the personal data we hold about you; (b) Correction — request correction of inaccurate or incomplete data; (c) Deletion — request deletion of your personal data; (d) Portability — request your data in a structured, machine-readable format; (e) Withdrawal of consent — withdraw consent for data processing at any time; (f) Objection — object to certain types of data processing; (g) File a complaint — with the Brazilian National Data Protection Authority (ANPD) or your local supervisory authority. To exercise any of these rights, contact us at privacy@viopage.com."
+    },
+    "childrenPrivacy": {
+      "heading": "9. Children's Privacy",
+      "content": "Viopage is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If we discover that we have collected data from a child under 13, we will promptly delete it. If you are a parent or guardian and believe your child has provided us with personal information, please contact us at privacy@viopage.com."
+    },
+    "internationalTransfers": {
+      "heading": "10. International Data Transfers",
+      "content": "Your data may be processed and stored on servers located outside of Brazil, including in the United States and other countries where our service providers operate. When your data is transferred internationally, we ensure appropriate safeguards are in place as required by the LGPD and other applicable data protection laws."
+    },
+    "security": {
+      "heading": "11. Security",
+      "content": "We implement industry-standard security measures to protect your personal data, including SSL/TLS encryption for data in transit, secure authentication mechanisms, and access controls. However, no method of transmission or storage is 100% secure, and we cannot guarantee absolute security of your data."
+    },
+    "changes": {
+      "heading": "12. Changes to This Policy",
+      "content": "We may update this Privacy Policy from time to time. When we make material changes, we will notify you by email or through the Service. Your continued use of Viopage after changes take effect constitutes acceptance of the updated policy."
+    },
+    "contact": {
+      "heading": "13. Contact",
+      "content": "If you have questions about this Privacy Policy or wish to exercise your data rights, please contact us at privacy@viopage.com."
+    }
   }
 }
