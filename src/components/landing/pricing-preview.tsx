@@ -2,11 +2,20 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
-import { motion, useInView, type Variants } from "framer-motion";
+import { motion, useInView, AnimatePresence, type Variants } from "framer-motion";
 import { CheckIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
+
+// ── Animation constants ───────────────────────────────────────────────────────
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
+
+const stagger: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.1, delayChildren: 0.05 },
+  },
+};
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 28 },
@@ -17,31 +26,45 @@ const fadeUp: Variants = {
   },
 };
 
-const stagger: Variants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
-  },
-};
+// ── Sub-components ────────────────────────────────────────────────────────────
 
-const FREE_FEATURES = [
-  "unlimitedLinks",
-  "customThemes",
-  "basicAnalytics",
-  "socialIcons",
-] as const;
+function CheckItem({ children }: { children: React.ReactNode }) {
+  return (
+    <li className="flex items-center gap-2.5">
+      <CheckIcon
+        className="h-4 w-4 shrink-0 text-[#FF6B35]"
+        strokeWidth={2.5}
+        aria-hidden="true"
+      />
+      <span className="text-[14px] text-[#555]">{children}</span>
+    </li>
+  );
+}
 
-const PRO_FEATURES = ["everythingInFree", "hideBranding"] as const;
+// ── Main export ───────────────────────────────────────────────────────────────
 
 export function PricingPreview() {
-  const t = useTranslations("landing.pricing");
-  const tNew = useTranslations("landing.pricingNew");
+  const t = useTranslations("landing.pricingPreview");
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: "-60px" });
-  const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
+  const [isYearly, setIsYearly] = useState(false);
+
+  const PRO_FEATURES = [
+    t("proFeature1"),
+    t("proFeature2"),
+    t("proFeature3"),
+    t("proFeature4"),
+    t("proFeature5"),
+    t("proFeature6"),
+  ] as const;
 
   return (
-    <section ref={sectionRef} className="bg-white py-20 md:py-28" id="pricing">
+    <section
+      ref={sectionRef}
+      id="pricing"
+      className="bg-white py-20 md:py-28"
+      aria-label="Pricing"
+    >
       <div className="mx-auto max-w-4xl px-6 lg:px-8">
         <motion.div
           variants={stagger}
@@ -49,155 +72,136 @@ export function PricingPreview() {
           animate={inView ? "visible" : "hidden"}
           className="flex flex-col items-center"
         >
-          {/* Eyebrow */}
+          {/* ── Eyebrow ── */}
           <motion.span
             variants={fadeUp}
-            className="text-[13px] font-semibold uppercase tracking-[0.15em] text-[#FF6B35]"
+            className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#FF6B35]"
           >
-            {tNew("eyebrow")}
+            {t("eyebrow")}
           </motion.span>
 
-          {/* Heading */}
+          {/* ── Heading ── */}
           <motion.h2
             variants={fadeUp}
-            className="mt-4 text-center text-[36px] md:text-[48px] leading-[1.1] tracking-[-0.02em] text-[#111113]"
-            style={{
-              fontFamily:
-                "var(--font-display), 'Instrument Serif', Georgia, serif",
-            }}
+            className="mt-4 text-center text-[34px] md:text-[46px] leading-[1.1] tracking-[-0.025em] text-[#1b1b1d]"
+            style={{ fontFamily: "var(--font-sans), 'Poppins', sans-serif" }}
           >
-            {tNew("heading")
-              .split(tNew("headingHighlight"))
-              .map((part, i, arr) =>
-                i < arr.length - 1 ? (
-                  <span key={i}>
-                    {part}
-                    <em className="italic">{tNew("headingHighlight")}</em>
-                  </span>
-                ) : (
-                  <span key={i}>{part}</span>
-                )
-              )}
+            {t("heading")}{" "}
+            <em
+              style={{
+                fontFamily:
+                  "var(--font-display), 'Instrument Serif', Georgia, serif",
+                fontStyle: "italic",
+              }}
+            >
+              {t("headingHighlight")}
+            </em>{" "}
+            {t("headingAfter")}
           </motion.h2>
 
-          {/* Monthly / Yearly toggle */}
-          <motion.div variants={fadeUp} className="mt-6">
-            <div className="inline-flex rounded-full bg-[#f0f0f0] p-[3px]">
+          {/* ── Monthly / Yearly toggle ── */}
+          <motion.div variants={fadeUp} className="mt-8">
+            <div
+              className="inline-flex items-center rounded-full p-1"
+              style={{ backgroundColor: "#F0EDF0" }}
+              role="group"
+              aria-label="Billing frequency"
+            >
               <button
                 type="button"
-                onClick={() => setBilling("monthly")}
-                className={`rounded-full px-4 py-2 text-[14px] font-medium transition-all duration-200 ${
-                  billing === "monthly"
-                    ? "bg-[#111113] text-white"
-                    : "text-[#999]"
+                onClick={() => setIsYearly(false)}
+                className={`rounded-full px-5 py-2 text-[14px] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-1 ${
+                  !isYearly
+                    ? "bg-white font-semibold text-[#1b1b1d] shadow-sm"
+                    : "font-medium text-[#594139]"
                 }`}
+                aria-pressed={!isYearly}
               >
-                {tNew("monthly")}
+                {t("monthly")}
               </button>
               <button
                 type="button"
-                onClick={() => setBilling("yearly")}
-                className={`rounded-full px-4 py-2 text-[14px] font-medium transition-all duration-200 ${
-                  billing === "yearly"
-                    ? "bg-[#111113] text-white"
-                    : "text-[#999]"
+                onClick={() => setIsYearly(true)}
+                className={`flex items-center gap-2 rounded-full px-5 py-2 text-[14px] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-1 ${
+                  isYearly
+                    ? "bg-white font-semibold text-[#1b1b1d] shadow-sm"
+                    : "font-medium text-[#594139]"
                 }`}
+                aria-pressed={isYearly}
               >
-                {tNew("yearly")}{" "}
-                <span className="font-bold text-[#FF6B35]">
-                  {tNew("discount")}
+                {t("yearly")}
+                <span className="rounded-full bg-[#FF6B35]/10 px-2 py-0.5 text-[11px] font-semibold text-[#FF6B35]">
+                  {t("savePercent")}
                 </span>
               </button>
             </div>
           </motion.div>
 
-          {/* Pricing cards */}
+          {/* ── Pricing card ── */}
           <motion.div
             variants={stagger}
-            className="mt-10 flex w-full flex-col gap-4 sm:flex-row md:gap-6"
+            className="mt-10 w-full max-w-md mx-auto"
           >
-            {/* Free card */}
-            <motion.div variants={fadeUp} className="flex-1">
-              <div className="rounded-[20px] border border-[#eee] bg-white p-6 md:p-8">
-                <h3 className="text-[18px] font-bold text-[#111113]">
-                  {t("free")}
-                </h3>
-
-                <div className="mt-4">
-                  <span className="text-[48px] font-bold leading-none text-[#111113]">
-                    $0
-                  </span>
-                </div>
-
-                <ul className="mt-6 flex flex-col gap-3">
-                  {FREE_FEATURES.map((key) => (
-                    <li key={key} className="flex items-center gap-2.5">
-                      <CheckIcon
-                        className="h-4 w-4 shrink-0 text-[#00D4AA]"
-                        strokeWidth={2.5}
-                      />
-                      <span className="text-[14px] text-[#666]">
-                        {t(key)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  href="/register"
-                  className="mt-6 block w-full rounded-xl bg-[#f0f0f0] py-3 text-center text-[14px] font-semibold text-[#111113] transition-colors duration-150 hover:bg-[#e5e5e5] active:scale-[0.98]"
-                >
-                  {t("getStarted")}
-                </Link>
-              </div>
-            </motion.div>
-
             {/* Pro card */}
-            <motion.div variants={fadeUp} className="relative flex-1">
-              <div className="rounded-[20px] border-2 border-[#FF6B35] bg-[#FFFAF5] p-6 md:p-8">
+            <motion.div variants={fadeUp} className="relative">
+              <div className="flex h-full flex-col rounded-2xl border-2 border-[#FF6B35] bg-[#FFF8F5] p-8">
                 {/* Most Popular badge */}
-                <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2">
-                  <span className="inline-block rounded-full bg-[#FF6B35] px-3 py-1 text-[12px] font-semibold text-white">
-                    {t("mostPopular")}
+                <span className="absolute right-5 top-5 rounded-full bg-[#FF6B35] px-3 py-1 text-[12px] font-semibold text-white">
+                  {t("proBadge")}
+                </span>
+
+                <p className="text-[17px] font-semibold text-[#1b1b1d]">{t("proName")}</p>
+
+                {/* Price with smooth swap animation */}
+                <div className="mt-3 flex items-baseline gap-1.5">
+                  <span className="relative overflow-hidden text-5xl font-bold leading-none text-[#1b1b1d]">
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={isYearly ? "yearly" : "monthly"}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2, ease: EASE }}
+                        className="block"
+                      >
+                        {isYearly ? t("proYearlyPrice") : t("proMonthlyPrice")}
+                      </motion.span>
+                    </AnimatePresence>
                   </span>
+                  <span className="text-[14px] text-[#999]">{t("proPeriod")}</span>
                 </div>
 
-                <h3 className="mt-1 text-[18px] font-bold text-[#FF6B35]">
-                  {t("pro")}
-                </h3>
+                <AnimatePresence>
+                  {isYearly && (
+                    <motion.p
+                      initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                      animate={{ opacity: 1, height: "auto", marginTop: 4 }}
+                      exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                      transition={{ duration: 0.2, ease: EASE }}
+                      className="overflow-hidden text-[13px] text-[#999]"
+                    >
+                      {t("proBilledYearly")}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
 
-                <div className="mt-4 flex items-baseline gap-1">
-                  <span className="text-[48px] font-bold leading-none text-[#111113]">
-                    {billing === "monthly" ? "$9" : "$7"}
-                  </span>
-                  <span className="text-[16px] text-[#999]">{t("perMonth")}</span>
-                </div>
+                <p className="mt-3 text-[14px] leading-relaxed text-[#777]">
+                  {t("proDesc")}
+                </p>
 
-                {billing === "yearly" && (
-                  <p className="mt-1 text-[13px] text-[#999]">
-                    {tNew("billedYearly")}
-                  </p>
-                )}
+                <hr className="my-6 border-[#FF6B35]/15" />
 
-                <ul className="mt-6 flex flex-col gap-3">
-                  {PRO_FEATURES.map((key) => (
-                    <li key={key} className="flex items-center gap-2.5">
-                      <CheckIcon
-                        className="h-4 w-4 shrink-0 text-[#FF6B35]"
-                        strokeWidth={2.5}
-                      />
-                      <span className="text-[14px] text-[#666]">
-                        {t(key)}
-                      </span>
-                    </li>
+                <ul className="flex flex-1 flex-col gap-3">
+                  {PRO_FEATURES.map((feature) => (
+                    <CheckItem key={feature}>{feature}</CheckItem>
                   ))}
                 </ul>
 
                 <Link
                   href="/register"
-                  className="mt-6 block w-full rounded-xl bg-[#FF6B35] py-3 text-center text-[14px] font-semibold text-white transition-colors duration-150 hover:bg-[#e85a24] active:scale-[0.98]"
+                  className="mt-8 block w-full rounded-full bg-[#FF6B35] py-3 text-center text-[14px] font-semibold text-white transition-all duration-150 hover:bg-[#e85a24] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-2"
                 >
-                  {t("startTrial")} &rarr;
+                  {t("proButton")}
                 </Link>
               </div>
             </motion.div>

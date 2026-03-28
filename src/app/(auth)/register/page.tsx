@@ -85,7 +85,8 @@ export default function RegisterPage() {
         .eq("id", user.id);
     }
 
-    router.push("/dashboard");
+    // Redirect to in-app trial page where user picks plan + starts checkout overlay
+    router.push("/trial");
     router.refresh();
   };
 
@@ -107,7 +108,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <Link href="/" className="text-2xl font-bold text-[#1E1E2E]">
-            sparkbio
+            viopage
           </Link>
           <h1 className="mt-6 text-3xl font-bold text-[#1E1E2E]">{t("title")}</h1>
           <p className="mt-2 text-sm text-gray-500">{t("subtitle")}</p>

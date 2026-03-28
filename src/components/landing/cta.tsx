@@ -2,8 +2,10 @@
 
 import { useRef } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
 import { motion, useInView, type Variants } from "framer-motion";
+import { useTranslations } from "next-intl";
+
+// ── Animation constants ───────────────────────────────────────────────────────
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -23,6 +25,8 @@ const fadeUp: Variants = {
   },
 };
 
+// ── Main export ───────────────────────────────────────────────────────────────
+
 export function CTA() {
   const t = useTranslations("landing.cta");
   const sectionRef = useRef<HTMLElement>(null);
@@ -31,63 +35,69 @@ export function CTA() {
   return (
     <section
       ref={sectionRef}
-      style={{
-        background: "linear-gradient(135deg, #FF6B35, #ff8c5a, #FFD700)",
-      }}
       className="py-24 md:py-32"
+      style={{
+        background:
+          "linear-gradient(135deg, #FF6B35 0%, #C74B15 55%, #8B2500 100%)",
+      }}
+      aria-label="Call to action"
     >
-      <div className="mx-auto max-w-3xl px-6 lg:px-8 text-center">
+      <div className="mx-auto max-w-3xl px-6 text-center lg:px-8">
         <motion.div
           variants={stagger}
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
           className="flex flex-col items-center"
         >
-          {/* Headline */}
+          {/* ── Main headline ── */}
           <motion.h2
             variants={fadeUp}
-            className="text-[36px] md:text-[52px] lg:text-[60px] leading-[1.08] tracking-[-0.03em] text-white"
-            style={{
-              fontFamily:
-                "var(--font-display), 'Instrument Serif', Georgia, serif",
-            }}
+            className="text-[38px] md:text-[54px] lg:text-[62px] leading-[1.07] tracking-[-0.03em] text-white"
+            style={{ fontFamily: "var(--font-sans), 'Poppins', sans-serif" }}
           >
-            {t("title")
-              .split(t("titleHighlight"))
-              .map((part, i, arr) =>
-                i < arr.length - 1 ? (
-                  <span key={i}>
-                    {part}
-                    <em className="italic">{t("titleHighlight")}</em>
-                  </span>
-                ) : (
-                  <span key={i}>{part}</span>
-                )
-              )}
+            {t("heading")}{" "}
+            <em
+              style={{
+                fontFamily:
+                  "var(--font-display), 'Instrument Serif', Georgia, serif",
+                fontStyle: "italic",
+              }}
+            >
+              {t("headingHighlight")}
+            </em>
           </motion.h2>
 
-          {/* Subtitle */}
+          {/* ── Subtitle ── */}
           <motion.p
             variants={fadeUp}
-            className="mt-4 text-[16px] md:text-[18px] text-white/85 leading-relaxed"
+            className="mt-5 max-w-xl text-[16px] md:text-[18px] leading-relaxed text-white/80"
           >
             {t("subtitle")}
           </motion.p>
 
-          {/* Button */}
-          <motion.div variants={fadeUp} className="mt-8">
-            <Link
-              href="/register"
-              className="inline-block rounded-xl bg-white px-8 py-4 text-[16px] font-bold text-[#FF6B35] shadow-sm transition-all duration-200 hover:scale-[1.03] hover:shadow-lg active:scale-[0.98]"
+          {/* ── CTA button with scale hover animation ── */}
+          <motion.div
+            variants={fadeUp}
+            className="mt-10"
+          >
+            <motion.div
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 22 }}
             >
-              {t("button")} &rarr;
-            </Link>
+              <Link
+                href="/register"
+                className="inline-block rounded-full bg-white px-9 py-4 text-[16px] font-semibold text-[#FF6B35] shadow-sm transition-shadow duration-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#C74B15]"
+              >
+                {t("button")}
+              </Link>
+            </motion.div>
           </motion.div>
 
-          {/* Trust line */}
+          {/* ── Trust line ── */}
           <motion.p
             variants={fadeUp}
-            className="mt-6 text-[13px] text-white/70"
+            className="mt-5 text-[13px] text-white/60"
           >
             {t("trustLine")}
           </motion.p>

@@ -20,11 +20,11 @@ const instrumentSerif = Instrument_Serif({
 
 export const metadata: Metadata = {
   title: {
-    default: "Sparkbio — Everything you are. One simple link.",
-    template: "%s | Sparkbio",
+    default: "Viopage — Everything you are. One simple link.",
+    template: "%s | Viopage",
   },
   description:
-    "Join millions of creators using Sparkbio to share everything they create, curate and sell — all from one link in bio.",
+    "Join millions of creators using Viopage to share everything they create, curate and sell — all from one link in bio.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
 };
 

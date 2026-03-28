@@ -157,16 +157,16 @@ export function ProfilePage({ data }: ProfilePageProps) {
           </div>
         )}
 
-        {/* Sparkbio branding footer */}
+        {/* Viopage branding footer */}
         {showFooter && (
           <a
-            href="https://sparkbio.co"
+            href="https://viopage.com"
             target="_blank"
             rel="noopener noreferrer"
             className="mt-4 text-xs font-medium tracking-wide opacity-40 hover:opacity-70 transition-opacity"
             style={{ color: theme.text_color }}
           >
-            Made with Sparkbio
+            Made with Viopage
           </a>
         )}
       </main>

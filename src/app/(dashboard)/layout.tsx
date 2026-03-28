@@ -4,7 +4,7 @@ import React, { useEffect, useState, lazy, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Menu } from "lucide-react";
+import { Menu, Crown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -41,6 +41,95 @@ function TabFallback() {
   );
 }
 
+function TrialGate() {
+  const t = useTranslations("billing");
+  const [isLoading, setIsLoading] = useState(false);
+  const [interval, setInterval] = useState<"monthly" | "yearly">("yearly");
+
+  const handleStartTrial = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ interval }),
+      });
+      const { url } = await res.json();
+      if (url) {
+        window.location.href = url;
+        return;
+      }
+      toast.error(t("checkoutError"));
+    } catch {
+      toast.error(t("checkoutError"));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA] px-4">
+      <div className="w-full max-w-md text-center space-y-6">
+        <div className="flex justify-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100">
+            <Crown className="size-7 text-amber-600" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-[#1b1b1d]">{t("trialGateTitle")}</h1>
+          <p className="text-sm text-[#777] leading-relaxed">{t("trialGateDesc")}</p>
+        </div>
+
+        {/* Interval toggle */}
+        <div className="inline-flex items-center rounded-full p-1 bg-[#F0EDF0]">
+          <button
+            type="button"
+            onClick={() => setInterval("monthly")}
+            className={`rounded-full px-4 py-2 text-sm transition-all ${
+              interval === "monthly"
+                ? "bg-white font-semibold text-[#1b1b1d] shadow-sm"
+                : "font-medium text-[#777]"
+            }`}
+          >
+            {t("monthly")} — €9
+          </button>
+          <button
+            type="button"
+            onClick={() => setInterval("yearly")}
+            className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm transition-all ${
+              interval === "yearly"
+                ? "bg-white font-semibold text-[#1b1b1d] shadow-sm"
+                : "font-medium text-[#777]"
+            }`}
+          >
+            {t("yearly")} — €7
+            <span className="rounded-full bg-[#FF6B35]/10 px-2 py-0.5 text-[10px] font-semibold text-[#FF6B35]">
+              {t("yearlySavings")}
+            </span>
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          <Button
+            onClick={handleStartTrial}
+            disabled={isLoading}
+            className="w-full h-12 rounded-full bg-[#FF6B35] hover:bg-[#e85a24] text-white font-semibold text-[15px] gap-2"
+          >
+            {isLoading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Crown className="size-4" />
+            )}
+            {isLoading ? t("redirecting") : t("startTrial")}
+          </Button>
+          <p className="text-xs text-[#aaa]">{t("trialDisclaimer")}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardLayout({
   children,
 }: {
@@ -54,6 +143,9 @@ export default function DashboardLayout({
   const fetchTheme = useThemeStore((s) => s.fetchTheme);
   const fetchSocialIcons = useSocialStore((s) => s.fetchSocialIcons);
   const fetchSubscription = useSubscriptionStore((s) => s.fetchSubscription);
+  const isPro = useSubscriptionStore((s) => s.isPro);
+  const subLoading = useSubscriptionStore((s) => s.loading);
+  const subscription = useSubscriptionStore((s) => s.subscription);
   const activeTab = useDashboardStore((s) => s.activeTab);
 
   useEffect(() => {
@@ -68,11 +160,35 @@ export default function DashboardLayout({
   const searchParams = useSearchParams();
   useEffect(() => {
     if (searchParams.get("upgraded") === "1") {
-      toast.success("Welcome to Sparkbio Pro!");
+      toast.success("Welcome to Viopage Pro!");
       fetchSubscription();
       window.history.replaceState({}, "", "/dashboard");
     }
   }, [searchParams, fetchSubscription]);
+
+  // Gate: show trial signup if no active subscription
+  // Wait for subscription store to finish loading before deciding
+  const needsTrial = !subLoading && !isPro && !subscription;
+
+  if (subLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
+        <Loader2 className="size-6 animate-spin text-[#FF6B35]" />
+      </div>
+    );
+  }
+
+  if (needsTrial) {
+    // Redirect to the in-app trial page — no dashboard access without a subscription
+    if (typeof window !== "undefined") {
+      window.location.href = "/trial";
+    }
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
+        <Loader2 className="size-6 animate-spin text-[#FF6B35]" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#FAFAFA]">
@@ -97,9 +213,9 @@ export default function DashboardLayout({
             </SheetContent>
           </Sheet>
 
-          {/* Sparkbio wordmark */}
+          {/* Viopage wordmark */}
           <span className="font-bold text-lg tracking-tight" style={{ color: "#FF6B35" }}>
-            Sparkbio
+            Viopage
           </span>
         </header>
 

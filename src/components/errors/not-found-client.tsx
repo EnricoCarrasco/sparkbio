@@ -20,7 +20,7 @@ export function NotFoundClient({ title, description, backHome }: NotFoundClientP
       >
         {/* Wordmark */}
         <Link href="/" className="mb-10 font-bold text-2xl tracking-tight" style={{ color: "#FF6B35" }}>
-          Sparkbio
+          Viopage
         </Link>
 
         {/* Large 404 */}

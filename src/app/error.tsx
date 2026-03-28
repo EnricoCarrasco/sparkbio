@@ -28,7 +28,7 @@ export default function GlobalError({ error, reset }: ErrorPageProps) {
       >
         {/* Wordmark */}
         <Link href="/" className="mb-10 font-bold text-2xl tracking-tight" style={{ color: "#FF6B35" }}>
-          Sparkbio
+          Viopage
         </Link>
 
         {/* Icon */}

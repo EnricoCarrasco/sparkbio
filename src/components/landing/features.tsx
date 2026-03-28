@@ -166,7 +166,7 @@ function ShareVisual({ t }: { t: (key: string) => string }) {
       <div className="flex items-center gap-3 rounded-[10px] bg-white/[0.07] px-4 py-3">
         <div className="h-2 w-2 rounded-full bg-[#FF6B35]" />
         <span className="text-[13px] font-medium text-white/60 tracking-[-0.01em]">
-          sparkbio.com/
+          viopage.com/
           <span className="text-white/90">yourname</span>
         </span>
       </div>

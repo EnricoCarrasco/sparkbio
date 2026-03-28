@@ -149,7 +149,7 @@ export default async function OgImage({ params }: Props) {
           </div>
         )}
 
-        {/* Sparkbio branding */}
+        {/* Viopage branding */}
         <div
           style={{
             position: "absolute",
@@ -176,7 +176,7 @@ export default async function OgImage({ params }: Props) {
               textTransform: "lowercase",
             }}
           >
-            sparkbio.co
+            viopage.com
           </div>
         </div>
       </div>

@@ -91,7 +91,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
 
       {/* Bottom actions */}
       <div className="flex flex-col items-center gap-1 px-1 mt-auto">
-        {/* View my Sparkbio */}
+        {/* View my Viopage */}
         {profile?.username && (
           <a
             href={`/${profile.username}`}

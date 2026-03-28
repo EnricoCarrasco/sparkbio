@@ -44,12 +44,12 @@ export function Footer() {
         <div className="grid grid-cols-2 gap-10 md:grid-cols-4 mb-14">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1 flex flex-col gap-4">
-            <Link href="/" className="flex items-center gap-2.5 group" aria-label="Sparkbio home">
+            <Link href="/" className="flex items-center gap-2.5 group" aria-label="Viopage home">
               <div className="flex h-7 w-7 items-center justify-center rounded-[8px] bg-[#111113]">
                 <ZapIcon className="h-3.5 w-3.5 text-[#FF6B35]" strokeWidth={2.5} />
               </div>
               <span className="text-[17px] font-bold text-[#111113] tracking-[-0.02em]">
-                sparkbio
+                viopage
               </span>
             </Link>
             <p className="text-[14px] text-[#999] leading-relaxed max-w-[200px]">

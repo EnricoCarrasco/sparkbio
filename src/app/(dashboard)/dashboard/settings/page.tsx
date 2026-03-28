@@ -77,8 +77,8 @@ function ProfileUrlSection() {
   const [copied, setCopied] = useState(false);
 
   const profileUrl = profile?.username
-    ? `sparkbio.com/${profile.username}`
-    : "sparkbio.com/—";
+    ? `viopage.com/${profile.username}`
+    : "viopage.com/—";
 
   const handleCopy = useCallback(async () => {
     if (!profile?.username) return;
@@ -99,7 +99,7 @@ function ProfileUrlSection() {
           <CardTitle>{t("profileUrl")}</CardTitle>
         </div>
         <CardDescription>
-          Share this link with your audience to send them to your Sparkbio page.
+          Share this link with your audience to send them to your Viopage page.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -223,7 +223,7 @@ function ChangeUsernameSection() {
           <span className="font-medium text-foreground">
             @{profile?.username ?? "—"}
           </span>
-          . Changing it will update your Sparkbio URL.
+          . Changing it will update your Viopage URL.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -232,7 +232,7 @@ function ChangeUsernameSection() {
             <Label htmlFor="new-username">{t("newUsername")}</Label>
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground select-none">
-                sparkbio.com/
+                viopage.com/
               </span>
               <Input
                 id="new-username"

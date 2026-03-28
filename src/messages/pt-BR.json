@@ -1,20 +1,27 @@
 {
   "landing": {
     "hero": {
-      "title": "Tudo o que voc\u00ea \u00e9. Em um simples link.",
-      "titleLine1": "Tudo",
-      "titleLine1b": "o que você é.",
-      "titleLine2a": "Em um simples",
-      "trustLine1": "Grátis para sempre",
+      "title": "O Palco Digital para Criadores.",
+      "titleLine1": "O Palco Digital",
+      "titleLine1Connector": "para",
+      "titleLine2": "Criadores.",
+      "subtitle": "Crie um link-in-bio profissional com aparência de galeria editorial de alto nível. Mostre seu trabalho, redes sociais e produtos com estilo.",
+      "eyebrow": "O link na bio para criadores",
+      "ctaPrimary": "Reivindique seu link →",
+      "ctaSecondary": "Ver Temas",
+      "trustLine": "Mais de 2 mil criadores esta semana",
+      "statCreators": "Criadores Ativos",
+      "statLinks": "Links Gerados",
+      "statUptime": "Disponibilidade Garantida",
+      "freeNote": "Teste grátis de 7 dias · Pronto em 60 segundos",
+      "claim": "Crie seu link",
+      "placeholder": "viopage.co/seunome",
+      "getStarted": "Iniciar teste grátis",
+      "eyebrowOld": "Teste grátis de 7 dias — pronto em 60 segundos",
+      "inputHint": "Comece seu teste grátis de 7 dias. Configure em menos de 60 segundos.",
+      "trustLine1": "Teste grátis de 7 dias",
       "trustLine2": "Pronto em 60 seg",
-      "trustLine3": "Teste Pro de 7 dias",
-      "titleLine2b": "link.",
-      "subtitle": "Junte-se a milhões de criadores usando o Sparkbio para compartilhar tudo o que criam, curam e vendem — tudo a partir de um link na bio.",
-      "claim": "Crie seu Sparkbio",
-      "placeholder": "sparkbio.com/seunome",
-      "getStarted": "Comece gratuitamente",
-      "eyebrow": "Grátis para sempre — pronto em 60 segundos",
-      "inputHint": "Plano grátis para sempre. Configure em menos de 60 segundos.",
+      "trustLine3": "Cancele a qualquer momento",
       "marquee": {
         "creators": "Criadores",
         "influencers": "Influenciadores",
@@ -29,6 +36,27 @@
         "brands": "Marcas",
         "freelancers": "Freelancers"
       }
+    },
+    "socialProof": {
+      "headingBefore": "O link na bio em que confiam",
+      "headingCount": "60.000+",
+      "headingAfter": "criadores",
+      "marqueeArtists": "Artistas",
+      "marqueeMusicians": "Músicos",
+      "marqueeDevelopers": "Desenvolvedores",
+      "marqueePodcasters": "Podcasters",
+      "marqueeWriters": "Escritores",
+      "marqueeDesigners": "Designers",
+      "marqueePhotographers": "Fotógrafos",
+      "marqueeCoaches": "Coaches",
+      "marqueeCreators": "Criadores",
+      "marqueeInfluencers": "Influenciadores",
+      "statCreatorsValue": "60K+",
+      "statCreatorsLabel": "Criadores Ativos",
+      "statLinksValue": "1M+",
+      "statLinksLabel": "Links Gerados",
+      "statUptimeValue": "99,9%",
+      "statUptimeLabel": "Disponibilidade Garantida"
     },
     "features": {
       "title": "A maneira mais fácil de conectar seu público a tudo o que você é.",
@@ -68,38 +96,68 @@
         "tiktokBio": "Bio do TikTok",
         "youtubeAbout": "Sobre do YouTube",
         "emailSignature": "Assinatura de email"
+      },
+      "customize": {
+        "eyebrow": "PERSONALIZAR",
+        "heading": "Crie e personalize em minutos",
+        "headingHighlight": "personalize",
+        "description": "Nosso editor arrasta-e-solta facilita adicionar links, ícones sociais e embeds. Sem código, apenas criatividade pura.",
+        "check1": "Pré-visualização ao vivo enquanto constrói",
+        "check2": "Tipografia premium incluída"
+      },
+      "share": {
+        "eyebrow": "COMPARTILHAR",
+        "heading": "Compartilhe seu Viopage em todo lugar",
+        "headingHighlight": "em todo lugar",
+        "description": "Um link para dominar todos. Use no Instagram, TikTok, Twitter e até na sua assinatura de email.",
+        "qrTitle": "QR Codes",
+        "qrDesc": "Baixe QR codes em alta resolução para impressão.",
+        "emailTagsTitle": "Email Tags",
+        "emailTagsDesc": "Snippets elegantes para o rodapé do seu email."
+      },
+      "analyticsBlock": {
+        "eyebrow": "ANÁLISES",
+        "heading": "Acompanhe o que está funcionando",
+        "headingHighlight": "funcionando",
+        "description": "Análises detalhadas sem complicação. Veja de onde seu público vem e quais links eles mais gostam.",
+        "viewReport": "Ver Relatório Exemplo",
+        "weeklyGrowth": "Crescimento Semanal +14,2%",
+        "totalViews": "Total de Visualizações",
+        "clickThroughRate": "Taxa de Cliques",
+        "viewsThisWeek": "Visualizações esta semana"
       }
     },
     "pricing": {
       "eyebrow": "Preços",
-      "title": "Grátis para sempre. Faça upgrade quando precisar.",
-      "subtitle": "Comece a construir seu público gratuitamente. Sem cartão de crédito.",
-      "free": "Grátis",
-      "freePlan": "Plano grátis",
-      "freeDesc": "Tudo o que você precisa para começar",
-      "getStarted": "Começar",
-      "getStartedFree": "Começar — é grátis",
+      "title": "Simples e transparente.",
+      "subtitle": "Comece com um teste grátis de 7 dias. Cancele a qualquer momento.",
       "perMonth": "/ mês",
-      "active": "Ativo",
-      "unlimitedLinks": "Links ilimitados",
-      "customThemes": "Temas e cores personalizados",
-      "basicAnalytics": "Análise básica de cliques",
-      "socialIcons": "Ícones de redes sociais",
       "pro": "Pro",
-      "proPrice": "R$9",
-      "proYearlyPrice": "R$7",
+      "proPrice": "€9",
+      "proYearlyPrice": "€7",
       "proBilledYearly": "cobrado anualmente",
       "startTrial": "Iniciar teste grátis de 7 dias",
-      "hideBranding": "Ocultar marca Sparkbio",
-      "everythingInFree": "Tudo do plano Grátis, mais",
+      "hideBranding": "Ocultar marca Viopage",
+      "unlimitedLinks": "Links ilimitados",
+      "customThemes": "Todos os 12 temas premium",
+      "advancedAnalytics": "Análises e insights avançados",
+      "customDomains": "Suporte a domínio personalizado",
+      "prioritySupport": "Suporte prioritário",
       "mostPopular": "Mais popular",
-      "proDesc": "Destaque-se com uma página limpa, sem marca"
+      "proDesc": "Tudo que você precisa para crescer seu público"
     },
     "themeGallery": {
       "eyebrow": "Personalização",
       "heading": "Deixe com a sua cara.",
       "headingHighlight": "sua cara.",
       "subheading": "12 temas incríveis para combinar com seu estilo. Personalize cores, fontes e mais."
+    },
+    "themes": {
+      "eyebrow": "TEMAS",
+      "headingLine1": "12 temas incríveis.",
+      "headingLine1Highlight": "temas incríveis.",
+      "headingLine2": "Um clique para aplicar.",
+      "subtitle": "Troque todo o visual instantaneamente sem perder nenhum conteúdo."
     },
     "howItWorks": {
       "eyebrow": "Como funciona",
@@ -145,12 +203,48 @@
       "links": "Links criados",
       "uptime": "Disponibilidade"
     },
+    "testimonials": {
+      "heading": "Amado por",
+      "headingHighlight": "criadores",
+      "headingAfter": "do mundo todo",
+      "quote1": "O Viopage transformou minha lista caótica de links em um portfólio digital de alto nível. A taxa de conversão da minha loja aumentou 30% na primeira semana.",
+      "role1": "Influenciadora de Lifestyle",
+      "quote2": "Os temas são incomparáveis. Já testei todas as outras ferramentas, mas o Viopage é a única que parece intencional e premium.",
+      "role2": "Artista Visual",
+      "quote3": "Finalmente, uma ferramenta de link-in-bio que trata minha marca com respeito. As análises são claras e a personalização é infinita.",
+      "role3": "Podcaster de Tecnologia",
+      "photoAlt": "Foto de {name}",
+      "featuredIn": "Como visto em"
+    },
+    "pricingPreview": {
+      "eyebrow": "PREÇOS",
+      "heading": "Preços simples e",
+      "headingHighlight": "transparentes",
+      "headingAfter": ".",
+      "monthly": "Mensal",
+      "yearly": "Anual",
+      "savePercent": "Economize 22%",
+      "proName": "Pro",
+      "proBadge": "Teste grátis de 7 dias",
+      "proMonthlyPrice": "€9",
+      "proYearlyPrice": "€7",
+      "proPeriod": "/mês",
+      "proBilledYearly": "Cobrado anualmente (€84/ano)",
+      "proDesc": "Tudo que você precisa para crescer seu público. Comece com um teste grátis de 7 dias.",
+      "proFeature1": "Links e ícones sociais ilimitados",
+      "proFeature2": "Todos os 12 temas premium",
+      "proFeature3": "Remover marca Viopage",
+      "proFeature4": "Análises e insights avançados",
+      "proFeature5": "Suporte a domínio personalizado",
+      "proFeature6": "Suporte prioritário",
+      "proButton": "Iniciar teste grátis"
+    },
     "cta": {
-      "title": "Seu público está esperando.",
-      "titleHighlight": "esperando",
-      "subtitle": "Crie sua página Sparkbio em 60 segundos.",
-      "button": "Comece gratuitamente",
-      "trustLine": "Grátis para sempre · Pronto em 60 segundos"
+      "heading": "Seu público está",
+      "headingHighlight": "esperando.",
+      "subtitle": "Junte-se a mais de 60.000 criadores que confiam no Viopage para fortalecer sua presença online. Configure em menos de 5 minutos.",
+      "button": "Iniciar teste grátis",
+      "trustLine": "Teste grátis de 7 dias · Configure em 60 segundos"
     },
     "pricingNew": {
       "eyebrow": "Preços",
@@ -171,17 +265,20 @@
       "blog": "Blog",
       "privacy": "Privacidade",
       "terms": "Termos",
-      "copyright": "© {year} Sparkbio. Todos os direitos reservados."
+      "copyright": "© {year} Viopage. Todos os direitos reservados."
     },
     "nav": {
       "login": "Entrar",
-      "signup": "Cadastre-se grátis"
+      "signup": "Cadastre-se grátis",
+      "features": "Recursos",
+      "themes": "Temas",
+      "pricing": "Preços"
     }
   },
   "auth": {
     "login": {
       "title": "Bem-vindo de volta",
-      "subtitle": "Faça login na sua conta Sparkbio",
+      "subtitle": "Faça login na sua conta Viopage",
       "email": "Email",
       "password": "Senha",
       "submit": "Entrar",
@@ -193,7 +290,7 @@
       "error": "Email ou senha inválidos"
     },
     "register": {
-      "title": "Crie seu Sparkbio",
+      "title": "Crie seu Viopage",
       "subtitle": "Junte-se a milhões de criadores e construa seu link na bio",
       "username": "Nome de usuário",
       "usernamePlaceholder": "seunome",
@@ -206,7 +303,7 @@
       "logIn": "Entrar",
       "orContinue": "Ou continue com",
       "google": "Continuar com Google",
-      "usernameHelp": "sparkbio.com/{username}",
+      "usernameHelp": "viopage.com/{username}",
       "usernameTaken": "Este nome de usuário já está em uso",
       "usernameInvalid": "O nome de usuário deve ter 3-30 caracteres, apenas letras minúsculas, números e hifens"
     },
@@ -236,7 +333,7 @@
       "appearance": "Aparência",
       "analytics": "Analytics",
       "settings": "Configurações",
-      "viewProfile": "Ver meu Sparkbio",
+      "viewProfile": "Ver meu Viopage",
       "signOut": "Sair"
     },
     "links": {
@@ -338,8 +435,8 @@
       "colorsSection": "Cores",
       "colorsDesc": "Todas as configurações de cor em um só lugar",
       "footerSection": "Rodapé",
-      "hideFooter": "Ocultar rodapé Sparkbio",
-      "hideFooterDesc": "Remover o texto 'Made with Sparkbio' da sua página",
+      "hideFooter": "Ocultar rodapé Viopage",
+      "hideFooterDesc": "Remover o texto 'Made with Viopage' da sua página",
       "enhance": "Melhorar",
       "wallpaperStyle": "Estilo do papel de parede",
       "gradientStyle": "Estilo do gradiente",
@@ -372,11 +469,11 @@
       "last30days": "Últimos 30 dias",
       "allTime": "Todo o período",
       "noData": "Sem dados de analytics ainda",
-      "noDataDesc": "Compartilhe seu link Sparkbio para começar a acompanhar visualizações e cliques."
+      "noDataDesc": "Compartilhe seu link Viopage para começar a acompanhar visualizações e cliques."
     },
     "settings": {
       "title": "Configurações",
-      "profileUrl": "Sua URL Sparkbio",
+      "profileUrl": "Sua URL Viopage",
       "copy": "Copiar",
       "copied": "Copiado!",
       "changeUsername": "Alterar nome de usuário",
@@ -403,7 +500,7 @@
     "billedYearly": "Cobrado anualmente por R${total}",
     "upgrade": "Fazer upgrade para Pro",
     "upgradeToPro": "Fazer upgrade para Pro",
-    "upgradeDesc": "Remova a marca Sparkbio da sua página de perfil.",
+    "upgradeDesc": "Remova a marca Viopage da sua página de perfil.",
     "manageSub": "Gerenciar assinatura",
     "cancelSub": "Cancelar assinatura",
     "resubscribe": "Reassinar",
@@ -419,10 +516,10 @@
     "trialBadge": "Teste grátis de 7 dias",
     "save": "Economize {percent}%",
     "proFeature": "Recurso Pro",
-    "hideBranding": "Ocultar marca Sparkbio",
+    "hideBranding": "Ocultar marca Viopage",
     "everythingInFree": "Tudo do plano Grátis, mais:",
     "checkout": "Continuar para pagamento",
-    "welcomePro": "Bem-vindo ao Sparkbio Pro!",
+    "welcomePro": "Bem-vindo ao Viopage Pro!",
     "billing": "Faturamento",
     "billingDesc": "Gerencie sua assinatura e plano.",
     "proBadge": "Pro",
@@ -431,13 +528,15 @@
     "monthlyPrice": "R$45/mês",
     "yearlyPrice": "R$35/mês",
     "yearlySavings": "Economize 22%",
-    "dialogTitle": "Faça upgrade para o Sparkbio Pro",
-    "dialogSubtitle": "Desbloqueie a experiência completa do Sparkbio com uma assinatura Pro.",
+    "dialogTitle": "Faça upgrade para o Viopage Pro",
+    "dialogSubtitle": "Desbloqueie a experiência completa do Viopage com uma assinatura Pro.",
     "redirecting": "Redirecionando\u2026",
     "checkoutError": "Não foi possível iniciar o pagamento. Tente novamente.",
     "trialDisclaimer": "Sem cobrança durante o teste. Cancele a qualquer momento.",
+    "trialGateTitle": "Comece seu teste grátis de 7 dias",
+    "trialGateDesc": "Insira seus dados de pagamento para desbloquear todos os recursos do Viopage. Você não será cobrado durante o período de teste.",
     "manageSubscription": "Gerenciar assinatura",
-    "feature_hideFooter": "Ocultar marca Sparkbio",
+    "feature_hideFooter": "Ocultar marca Viopage",
     "billedYearlyAmount": "Cobrado R$420 / ano"
   },
   "common": {
@@ -453,7 +552,7 @@
     "next": "Próximo",
     "close": "Fechar",
     "or": "ou",
-    "sparkbio": "Sparkbio"
+    "viopage": "Viopage"
   },
   "errors": {
     "notFound": {
@@ -466,5 +565,38 @@
       "description": "Ocorreu um erro inesperado. Tente novamente.",
       "retry": "Tentar novamente"
     }
+  },
+  "trial": {
+    "heading": "Comece seu teste grátis de",
+    "headingHighlight": "7 dias.",
+    "subtitle": "Insira seus dados de pagamento para desbloquear todos os recursos do Viopage. Você não será cobrado durante o período de teste.",
+    "security": "Criptografia SSL 256 bits · Cancele a qualquer momento",
+    "yearlyPlan": "Plano Anual",
+    "yearlyBadge": "Economize 22%",
+    "yearlyDetail": "€84/ano · cobrado anualmente",
+    "yearlyPrice": "€7/mês",
+    "monthlyPlan": "Plano Mensal",
+    "monthlyDetail": "Cobrado mensalmente",
+    "monthlyPrice": "€9/mês",
+    "cta": "Iniciar teste grátis",
+    "loading": "Carregando...",
+    "trustText": "Você não será cobrado até o fim do período de teste. Cancele a qualquer momento.",
+    "skip": "",
+    "proHeading": "Tudo no Pro",
+    "feature1": "Links ilimitados",
+    "feature2": "Todos os 12 temas premium",
+    "feature3": "Análises e insights avançados",
+    "feature4": "Suporte a domínio personalizado",
+    "feature5": "Remover marca Viopage",
+    "feature6": "Suporte prioritário",
+    "feature7": "Estilos de botão e fontes personalizados",
+    "feature8": "Ferramentas de otimização SEO",
+    "testimonial": "O Viopage Pro transformou minha presença online. Só os temas já valem a pena.",
+    "testimonialName": "Sarah J.",
+    "testimonialRole": "Criadora de Conteúdo",
+    "support": "Dúvidas?",
+    "supportLink": "Fale com o suporte",
+    "error": "Algo deu errado. Tente novamente.",
+    "errorCheckout": "Não foi possível criar o checkout. Tente novamente."
   }
 }

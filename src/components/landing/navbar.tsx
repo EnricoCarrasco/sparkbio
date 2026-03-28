@@ -1,100 +1,176 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
-import { ZapIcon } from "lucide-react";
+import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LanguageSwitcher } from "@/components/language-switcher";
 
+const EASE = [0.25, 0.1, 0.25, 1] as const;
+
+const NAV_LINKS = [
+  { key: "features" as const, href: "#features" },
+  { key: "themes" as const, href: "#themes" },
+  { key: "pricing" as const, href: "#pricing" },
+] as const;
+
 export function Navbar() {
   const t = useTranslations("landing.nav");
-  const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const lastScrollY = useRef(0);
+  const { scrollY } = useScroll();
 
-  useEffect(() => {
-    function handleScroll() {
-      setScrolled(window.scrollY > 20);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const diff = latest - lastScrollY.current;
+    lastScrollY.current = latest;
+
+    // Hide on scroll down (past 100px), show on scroll up
+    if (latest < 100) {
+      setHidden(false);
+    } else if (diff > 5) {
+      setHidden(true);
+      setMobileOpen(false);
+    } else if (diff < -5) {
+      setHidden(false);
     }
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  });
+
+  function handleNavLinkClick() {
+    setMobileOpen(false);
+  }
 
   return (
     <motion.header
-      initial={{ opacity: 0, y: -12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        scrolled
-          ? "bg-white/95 backdrop-blur-md border-b border-black/[0.06]"
-          : "bg-transparent"
-      )}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: hidden ? -120 : 0 }}
+      transition={{ duration: 0.35, ease: EASE }}
+      className="fixed top-4 left-4 right-4 z-50"
     >
-      <nav className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="flex h-[68px] items-center justify-between">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 group"
-            aria-label="Sparkbio home"
-          >
-            <div
-              className={cn(
-                "flex h-7 w-7 items-center justify-center rounded-[8px] transition-colors duration-300",
-                scrolled ? "bg-[#111113]" : "bg-white"
-              )}
+      {/* Floating pill container */}
+      <div className="mx-auto max-w-6xl bg-white/90 backdrop-blur-xl rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.08)] border border-black/[0.06]">
+        <nav className="px-5 lg:px-8">
+          <div className="flex h-[64px] items-center justify-between">
+            {/* Logo */}
+            <Link
+              href="/"
+              className="flex items-center shrink-0"
+              aria-label="viopage home"
             >
-              <ZapIcon
-                className={cn(
-                  "h-3.5 w-3.5 transition-colors duration-300",
-                  scrolled ? "text-[#FF6B35]" : "text-[#FF6B35]"
-                )}
-                strokeWidth={2.5}
+              <Image
+                src="/images/landing/logo-viopage.png"
+                alt="viopage"
+                width={200}
+                height={44}
+                className="h-11 w-auto object-contain"
+                priority
               />
-            </div>
-            <span
-              className={cn(
-                "text-[17px] font-bold tracking-[-0.02em] transition-colors duration-300",
-                scrolled ? "text-[#111113]" : "text-white"
-              )}
-            >
-              sparkbio
-            </span>
-          </Link>
+            </Link>
 
-          {/* Right: language + auth */}
-          <div className="flex items-center gap-1.5">
-            <div className="mr-1 sm:mr-2">
-              <LanguageSwitcher variant={scrolled ? "dark" : "light"} />
+            {/* Center nav links — desktop only */}
+            <div className="hidden md:flex items-center gap-1">
+              {NAV_LINKS.map(({ key, href }) => (
+                <Link
+                  key={key}
+                  href={href}
+                  className="px-4 py-2 text-[14px] font-medium rounded-full transition-colors duration-200 text-[#555] hover:text-[#111113] hover:bg-black/[0.04]"
+                >
+                  {t(key)}
+                </Link>
+              ))}
             </div>
-            <Link
-              href="/login"
-              className={cn(
-                "hidden sm:inline-flex items-center px-4 py-2 text-[14px] font-medium transition-colors duration-300 rounded-full",
-                scrolled
-                  ? "text-[#555] hover:text-[#111113] hover:bg-black/[0.04]"
-                  : "text-white/85 hover:text-white hover:bg-white/[0.1]"
-              )}
-            >
-              {t("login")}
-            </Link>
-            <Link
-              href="/register"
-              className={cn(
-                "inline-flex items-center px-5 py-2.5 text-[14px] font-semibold rounded-full active:scale-[0.97] transition-all duration-300",
-                scrolled
-                  ? "text-white bg-[#FF6B35] hover:bg-[#e85a24]"
-                  : "text-[#FF6B35] bg-white hover:bg-white/90"
-              )}
-            >
-              {t("signup")}
-            </Link>
+
+            {/* Right: language switcher + auth buttons */}
+            <div className="flex items-center gap-1.5">
+              <div className="hidden sm:block mr-1">
+                <LanguageSwitcher variant="dark" />
+              </div>
+
+              {/* Log in */}
+              <Link
+                href="/login"
+                className="hidden sm:inline-flex items-center px-4 py-2 text-[14px] font-medium transition-colors duration-200 rounded-full text-[#555] hover:text-[#111113] hover:bg-black/[0.04]"
+              >
+                {t("login")}
+              </Link>
+
+              {/* Sign up pill */}
+              <Link
+                href="/register"
+                className="hidden sm:inline-flex items-center px-5 py-2.5 text-[14px] font-semibold rounded-full active:scale-[0.97] transition-all duration-200 text-white bg-[#111113] hover:bg-[#333]"
+              >
+                {t("signup")}
+              </Link>
+
+              {/* Mobile hamburger */}
+              <button
+                type="button"
+                onClick={() => setMobileOpen((v) => !v)}
+                aria-label={mobileOpen ? "Close menu" : "Open menu"}
+                aria-expanded={mobileOpen}
+                className="md:hidden flex items-center justify-center w-9 h-9 rounded-full transition-colors duration-200 text-[#333] hover:bg-black/[0.06]"
+              >
+                {mobileOpen ? (
+                  <X className="h-5 w-5" strokeWidth={2} />
+                ) : (
+                  <Menu className="h-5 w-5" strokeWidth={2} />
+                )}
+              </button>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+
+        {/* Mobile slide-down panel */}
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              key="mobile-menu"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.22, ease: EASE }}
+              className="md:hidden border-t border-black/[0.06] overflow-hidden"
+            >
+              <div className="px-5 py-4 flex flex-col gap-1">
+                {NAV_LINKS.map(({ key, href }) => (
+                  <Link
+                    key={key}
+                    href={href}
+                    onClick={handleNavLinkClick}
+                    className="px-4 py-3 text-[15px] font-medium rounded-xl transition-colors duration-200 text-[#333] hover:text-[#111] hover:bg-black/[0.04]"
+                  >
+                    {t(key)}
+                  </Link>
+                ))}
+
+                <div className="my-2 h-px bg-black/[0.06]" />
+
+                <div className="flex items-center gap-2 px-1 pb-1">
+                  <LanguageSwitcher variant="dark" />
+                  <div className="flex-1" />
+                  <Link
+                    href="/login"
+                    onClick={handleNavLinkClick}
+                    className="px-4 py-2.5 text-[14px] font-medium rounded-full transition-colors duration-200 text-[#555] hover:text-[#111] hover:bg-black/[0.04]"
+                  >
+                    {t("login")}
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={handleNavLinkClick}
+                    className="px-5 py-2.5 text-[14px] font-semibold rounded-full transition-all duration-200 active:scale-[0.97] text-white bg-[#111113] hover:bg-[#333]"
+                  >
+                    {t("signup")}
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.header>
   );
 }

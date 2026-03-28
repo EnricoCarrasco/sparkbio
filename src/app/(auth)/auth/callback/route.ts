@@ -29,6 +29,22 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
+      // Check if user has an active subscription
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: sub } = await supabase
+          .from("subscriptions")
+          .select("status")
+          .eq("user_id", user.id)
+          .in("status", ["on_trial", "active"])
+          .maybeSingle();
+
+        // No active subscription → send to trial page
+        if (!sub) {
+          return NextResponse.redirect(`${origin}/trial`);
+        }
+      }
+
       return NextResponse.redirect(`${origin}${next}`);
     }
   }

@@ -34,15 +34,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const displayName = profile.display_name ?? username;
   const description = profile.bio
     ? profile.bio.slice(0, 155)
-    : `Check out ${displayName}'s links on Sparkbio.`;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sparkbio.co";
+    : `Check out ${displayName}'s links on Viopage.`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://viopage.com";
   const profileUrl = `${siteUrl}/${username}`;
 
   return {
     title: displayName,
     description,
     openGraph: {
-      title: `${displayName} | Sparkbio`,
+      title: `${displayName} | Viopage`,
       description,
       url: profileUrl,
       type: "profile",
@@ -60,13 +60,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
               url: `${profileUrl}/opengraph-image`,
               width: 1200,
               height: 630,
-              alt: `${displayName} on Sparkbio`,
+              alt: `${displayName} on Viopage`,
             },
           ],
     },
     twitter: {
       card: "summary",
-      title: `${displayName} | Sparkbio`,
+      title: `${displayName} | Viopage`,
       description,
       images: profile.avatar_url ? [profile.avatar_url] : undefined,
     },
@@ -87,7 +87,7 @@ export default async function PublicProfilePage({ params }: Props) {
   }
 
   const { profile } = data;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sparkbio.co";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://viopage.com";
   const profileUrl = `${siteUrl}/${username}`;
   const displayName = profile.display_name ?? username;
 
