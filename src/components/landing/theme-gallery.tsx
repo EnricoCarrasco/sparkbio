@@ -111,7 +111,6 @@ const THEMES: ThemeCard[] = [
   },
 ];
 
-// Two rows for the grid display
 const ROW_1 = THEMES.slice(0, 4);
 const ROW_2 = THEMES.slice(4, 8);
 
@@ -119,16 +118,11 @@ const ROW_2 = THEMES.slice(4, 8);
 
 function ThemePhoneCard({ theme }: { theme: ThemeCard }) {
   return (
-    <motion.div
-      className="flex flex-col items-center gap-3 cursor-pointer"
-      whileHover={{ scale: 1.03 }}
-      transition={{ type: "spring", stiffness: 320, damping: 24 }}
-    >
-      {/* Phone frame */}
+    <div className="flex flex-col items-center gap-3 shrink-0">
       <div
         className="rounded-2xl overflow-hidden flex flex-col items-center"
         style={{
-          width: "clamp(140px, 13vw, 180px)",
+          width: "clamp(150px, 14vw, 190px)",
           aspectRatio: "9 / 16",
           backgroundColor: theme.bg,
           boxShadow:
@@ -137,7 +131,6 @@ function ThemePhoneCard({ theme }: { theme: ThemeCard }) {
           padding: "16px 14px 12px",
         }}
       >
-        {/* Avatar circle */}
         <div
           className="rounded-full shrink-0"
           style={{
@@ -149,8 +142,6 @@ function ThemePhoneCard({ theme }: { theme: ThemeCard }) {
             boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
           }}
         />
-
-        {/* Name bar */}
         <div
           className="rounded-full shrink-0"
           style={{
@@ -161,8 +152,6 @@ function ThemePhoneCard({ theme }: { theme: ThemeCard }) {
             marginBottom: "5px",
           }}
         />
-
-        {/* Bio line */}
         <div
           className="rounded-full shrink-0"
           style={{
@@ -173,8 +162,6 @@ function ThemePhoneCard({ theme }: { theme: ThemeCard }) {
             marginBottom: "14px",
           }}
         />
-
-        {/* Link buttons */}
         <div className="flex flex-col gap-[7px] w-full">
           {[1, 2, 3].map((i) => (
             <div
@@ -198,8 +185,6 @@ function ThemePhoneCard({ theme }: { theme: ThemeCard }) {
             </div>
           ))}
         </div>
-
-        {/* Footer branding */}
         <span
           className="mt-auto"
           style={{
@@ -213,15 +198,71 @@ function ThemePhoneCard({ theme }: { theme: ThemeCard }) {
           viopage
         </span>
       </div>
-
-      {/* Theme label */}
       <span
         className="text-[12px] font-medium tracking-tight"
         style={{ color: "#888" }}
       >
         {theme.label}
       </span>
-    </motion.div>
+    </div>
+  );
+}
+
+// ─── Marquee row ─────────────────────────────────────────────────────────────
+
+function MarqueeRow({
+  themes,
+  direction,
+  duration,
+}: {
+  themes: ThemeCard[];
+  direction: "left" | "right";
+  duration: number;
+}) {
+  // Duplicate items for seamless loop
+  const items = [...themes, ...themes, ...themes];
+
+  return (
+    <div className="relative overflow-hidden py-2">
+      {/* Fade edges */}
+      <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 md:w-28 z-10 bg-gradient-to-r from-[#F8F7F5] to-transparent" />
+      <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 md:w-28 z-10 bg-gradient-to-l from-[#F8F7F5] to-transparent" />
+
+      <div
+        className="flex gap-6 md:gap-8 w-max"
+        style={{
+          animation: `marquee-${direction} ${duration}s linear infinite`,
+        }}
+      >
+        {items.map((theme, i) => (
+          <ThemePhoneCard key={`${theme.id}-${i}`} theme={theme} />
+        ))}
+      </div>
+
+      <style jsx>{`
+        @keyframes marquee-right {
+          0% {
+            transform: translateX(-33.33%);
+          }
+          100% {
+            transform: translateX(0%);
+          }
+        }
+        @keyframes marquee-left {
+          0% {
+            transform: translateX(0%);
+          }
+          100% {
+            transform: translateX(-33.33%);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .flex {
+            animation: none !important;
+          }
+        }
+      `}</style>
+    </div>
   );
 }
 
@@ -232,7 +273,6 @@ export function ThemeGallery() {
   const inView = useInView(sectionRef, { once: true, margin: "-60px" });
   const t = useTranslations("landing.themes");
 
-  // Split headingLine1 around the highlighted portion
   const line1 = t("headingLine1");
   const line1Highlight = t("headingLine1Highlight");
   const line1Before = line1.replace(line1Highlight, "").trim();
@@ -250,7 +290,6 @@ export function ThemeGallery() {
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
         >
-          {/* Eyebrow */}
           <motion.span
             variants={fadeUp}
             className="inline-block text-[11px] font-semibold uppercase tracking-widest text-[#FF6B35] mb-5"
@@ -258,7 +297,6 @@ export function ThemeGallery() {
             {t("eyebrow")}
           </motion.span>
 
-          {/* Heading */}
           <motion.h2
             variants={fadeUp}
             className="text-[38px] sm:text-[48px] md:text-[56px] leading-[1.08] tracking-[-0.03em] font-bold text-[#1b1b1d]"
@@ -273,7 +311,6 @@ export function ThemeGallery() {
             {t("headingLine2")}
           </motion.h2>
 
-          {/* Subtitle */}
           <motion.p
             variants={fadeUp}
             className="mt-5 text-[16px] md:text-[17px] text-[#666] leading-relaxed max-w-md mx-auto"
@@ -283,35 +320,13 @@ export function ThemeGallery() {
         </motion.div>
       </div>
 
-      {/* ── Grid ── */}
-      <div className="mx-auto max-w-6xl px-6 lg:px-8">
-        {/* Row 1 */}
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          animate={inView ? "visible" : "hidden"}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-6 md:gap-8 mb-6 md:mb-8 justify-items-center"
-        >
-          {ROW_1.map((theme) => (
-            <motion.div key={theme.id} variants={fadeUp}>
-              <ThemePhoneCard theme={theme} />
-            </motion.div>
-          ))}
-        </motion.div>
+      {/* ── Scrolling rows ── */}
+      <div className="space-y-6 md:space-y-8">
+        {/* Row 1: scrolls right */}
+        <MarqueeRow themes={ROW_1} direction="right" duration={30} />
 
-        {/* Row 2 */}
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          animate={inView ? "visible" : "hidden"}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-6 md:gap-8 justify-items-center"
-        >
-          {ROW_2.map((theme) => (
-            <motion.div key={theme.id} variants={fadeUp}>
-              <ThemePhoneCard theme={theme} />
-            </motion.div>
-          ))}
-        </motion.div>
+        {/* Row 2: scrolls left */}
+        <MarqueeRow themes={ROW_2} direction="left" duration={35} />
       </div>
     </section>
   );
