@@ -53,9 +53,22 @@ export default function TrialPage() {
 
     // Listen for checkout events
     window.LemonSqueezy?.Setup({
-      eventHandler: (event) => {
-        if (event.event === "Checkout.Success") {
-          router.push("/dashboard?upgraded=1");
+      eventHandler: (event: { event: string }) => {
+        // LemonSqueezy fires these events from the overlay iframe
+        if (
+          event.event === "Checkout.Success" ||
+          event.event === "checkout.completed" ||
+          event.event === "PaymentMethodUpdate.Updated"
+        ) {
+          // Hard redirect — router.push doesn't work reliably from iframe events
+          window.location.href = "/dashboard?upgraded=1";
+        }
+        // Also redirect when overlay is closed after a successful checkout
+        if (event.event === "Checkout.Close" || event.event === "close") {
+          // Small delay to let webhook process
+          setTimeout(() => {
+            window.location.href = "/dashboard?upgraded=1";
+          }, 1500);
         }
       },
     });
