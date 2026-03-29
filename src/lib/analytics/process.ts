@@ -167,6 +167,96 @@ export function topCountries(events: AnalyticsEvent[]): CountryCount[] {
 }
 
 /**
+ * Counts link_click events per link_id, joins with the links array for titles,
+ * and returns ALL links sorted by click count descending (including zero-click links).
+ */
+export function allLinkClicks(
+  events: AnalyticsEvent[],
+  links: Pick<Link, "id" | "title">[]
+): LinkClick[] {
+  const clicks = events.filter((e) => e.event_type === "link_click");
+
+  const counts: Record<string, number> = {};
+  for (const event of clicks) {
+    if (!event.link_id) continue;
+    counts[event.link_id] = (counts[event.link_id] ?? 0) + 1;
+  }
+
+  return links
+    .map((l) => ({
+      id: l.id,
+      title: l.title,
+      count: counts[l.id] ?? 0,
+    }))
+    .sort((a, b) => b.count - a.count);
+}
+
+/**
+ * Groups link_click events for a specific link by calendar day,
+ * returning a sorted array for line charts.
+ */
+export function linkClicksOverTime(
+  events: AnalyticsEvent[],
+  linkId: string
+): DayCount[] {
+  const clicks = events.filter(
+    (e) => e.event_type === "link_click" && e.link_id === linkId
+  );
+
+  const counts: Record<string, number> = {};
+  for (const event of clicks) {
+    const day = format(startOfDay(parseISO(event.created_at)), "yyyy-MM-dd");
+    counts[day] = (counts[day] ?? 0) + 1;
+  }
+
+  return Object.entries(counts)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([isoDate, count]) => ({
+      date: format(parseISO(isoDate), "MMM d"),
+      count,
+    }));
+}
+
+/**
+ * Device breakdown filtered to a single link's click events.
+ */
+export function linkDeviceBreakdown(
+  events: AnalyticsEvent[],
+  linkId: string
+): DeviceCount[] {
+  const clicks = events.filter(
+    (e) => e.event_type === "link_click" && e.link_id === linkId
+  );
+  return deviceBreakdown(clicks);
+}
+
+/**
+ * Referrers filtered to a single link's click events.
+ */
+export function linkReferrers(
+  events: AnalyticsEvent[],
+  linkId: string
+): ReferrerCount[] {
+  const clicks = events.filter(
+    (e) => e.event_type === "link_click" && e.link_id === linkId
+  );
+  return topReferrers(clicks);
+}
+
+/**
+ * Countries filtered to a single link's click events.
+ */
+export function linkCountries(
+  events: AnalyticsEvent[],
+  linkId: string
+): CountryCount[] {
+  const clicks = events.filter(
+    (e) => e.event_type === "link_click" && e.link_id === linkId
+  );
+  return topCountries(clicks);
+}
+
+/**
  * Runs all processors over the raw events and links and returns a single
  * ProcessedAnalytics object for the charts component.
  */

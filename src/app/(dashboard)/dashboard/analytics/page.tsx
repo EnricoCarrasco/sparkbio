@@ -8,9 +8,12 @@ import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import {
   processAnalytics,
+  allLinkClicks,
   type ProcessedAnalytics,
+  type LinkClick,
 } from "@/lib/analytics/process";
 import { AnalyticsCharts } from "@/components/dashboard/analytics-charts";
+import { useDashboardStore } from "@/lib/stores/dashboard-store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { AnalyticsEvent, Link } from "@/types/database";
@@ -120,7 +123,11 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [analytics, setAnalytics] = useState<ProcessedAnalytics | null>(null);
+  const [allLinksData, setAllLinksData] = useState<LinkClick[]>([]);
+  const [rawEvents, setRawEvents] = useState<AnalyticsEvent[]>([]);
   const [hasEvents, setHasEvents] = useState(false);
+  const selectedLinkId = useDashboardStore((s) => s.selectedLinkId);
+  const setSelectedLinkId = useDashboardStore((s) => s.setSelectedLinkId);
 
   const fetchAnalytics = useCallback(async (range: TimeRange) => {
     setLoading(true);
@@ -173,6 +180,8 @@ export default function AnalyticsPage() {
       const rawLinks = (links ?? []) as Pick<Link, "id" | "title">[];
 
       setHasEvents(rawEvents.length > 0);
+      setRawEvents(rawEvents);
+      setAllLinksData(allLinkClicks(rawEvents, rawLinks));
       setAnalytics(processAnalytics(rawEvents, rawLinks));
     } catch (err) {
       console.error("Analytics fetch error:", err);
@@ -185,6 +194,11 @@ export default function AnalyticsPage() {
   useEffect(() => {
     fetchAnalytics(timeRange);
   }, [fetchAnalytics, timeRange]);
+
+  // Clear selected link when leaving the page
+  useEffect(() => {
+    return () => setSelectedLinkId(null);
+  }, [setSelectedLinkId]);
 
   function handleRangeChange(value: string) {
     setTimeRange(value as TimeRange);
@@ -245,7 +259,12 @@ export default function AnalyticsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
         >
-          <AnalyticsCharts data={analytics} />
+          <AnalyticsCharts
+            data={analytics}
+            allLinks={allLinksData}
+            rawEvents={rawEvents}
+            initialSelectedLinkId={selectedLinkId}
+          />
         </motion.div>
       ) : null}
     </div>

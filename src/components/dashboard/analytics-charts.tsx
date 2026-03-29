@@ -17,14 +17,22 @@ import {
   Cell,
   Legend,
 } from "recharts";
-import { Eye, MousePointerClick, TrendingUp, BarChart3 } from "lucide-react";
+import {
+  Eye,
+  MousePointerClick,
+  TrendingUp,
+  BarChart3,
+  ChevronRight,
+} from "lucide-react";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { ProcessedAnalytics } from "@/lib/analytics/process";
+import { LinkAnalyticsDetail } from "@/components/dashboard/link-analytics-detail";
+import type { ProcessedAnalytics, LinkClick } from "@/lib/analytics/process";
+import type { AnalyticsEvent } from "@/types/database";
 
 // ─── Brand tokens ─────────────────────────────────────────────────────────────
 
@@ -105,10 +113,38 @@ function SummaryCard({
 
 interface AnalyticsChartsProps {
   data: ProcessedAnalytics;
+  allLinks?: LinkClick[];
+  rawEvents?: AnalyticsEvent[];
+  initialSelectedLinkId?: string | null;
 }
 
-export function AnalyticsCharts({ data }: AnalyticsChartsProps) {
+export function AnalyticsCharts({
+  data,
+  allLinks = [],
+  rawEvents = [],
+  initialSelectedLinkId,
+}: AnalyticsChartsProps) {
   const t = useTranslations("dashboard.analytics");
+  const [selectedLink, setSelectedLink] = React.useState<LinkClick | null>(
+    null
+  );
+  const [detailOpen, setDetailOpen] = React.useState(false);
+
+  // Open detail for initially selected link (from Content tab navigation)
+  React.useEffect(() => {
+    if (initialSelectedLinkId && allLinks.length > 0) {
+      const link = allLinks.find((l) => l.id === initialSelectedLinkId);
+      if (link) {
+        setSelectedLink(link);
+        setDetailOpen(true);
+      }
+    }
+  }, [initialSelectedLinkId, allLinks]);
+
+  function handleLinkClick(link: LinkClick) {
+    setSelectedLink(link);
+    setDetailOpen(true);
+  }
 
   const {
     totalViews,
@@ -330,6 +366,81 @@ export function AnalyticsCharts({ data }: AnalyticsChartsProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* ── Link Performance ── */}
+      {allLinks.length > 0 && (
+        <Card className="bg-white">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+              <MousePointerClick
+                className="size-4"
+                style={{ color: BRAND_ORANGE }}
+              />
+              {t("linkPerformance")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-0">
+              {allLinks.map((link, i) => {
+                const pct =
+                  totalClicks > 0
+                    ? Math.round((link.count / totalClicks) * 100)
+                    : 0;
+                return (
+                  <button
+                    key={link.id}
+                    type="button"
+                    onClick={() => handleLinkClick(link)}
+                    className="flex items-center justify-between w-full py-2.5 border-b border-border last:border-0 hover:bg-muted/30 rounded-md px-2 -mx-2 transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="shrink-0 text-xs font-medium text-muted-foreground w-4 text-right">
+                        {i + 1}
+                      </span>
+                      <span
+                        className="text-sm text-foreground truncate max-w-[200px]"
+                        title={link.title}
+                      >
+                        {link.title}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0 ml-4">
+                      <div className="hidden sm:block h-1.5 w-20 rounded-full bg-muted overflow-hidden">
+                        <div
+                          className="h-full rounded-full"
+                          style={{
+                            width: `${Math.max(pct, 2)}%`,
+                            backgroundColor: BRAND_ORANGE,
+                          }}
+                        />
+                      </div>
+                      <span className="text-sm font-medium text-foreground tabular-nums">
+                        {link.count}
+                      </span>
+                      <ChevronRight className="size-3.5 text-muted-foreground/50" />
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Link detail modal */}
+      {selectedLink && (
+        <LinkAnalyticsDetail
+          open={detailOpen}
+          onOpenChange={(open) => {
+            setDetailOpen(open);
+            if (!open) setSelectedLink(null);
+          }}
+          linkId={selectedLink.id}
+          linkTitle={selectedLink.title}
+          totalClicks={selectedLink.count}
+          events={rawEvents}
+        />
+      )}
     </div>
   );
 }

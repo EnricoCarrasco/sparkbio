@@ -20,7 +20,11 @@ import {
 import { LinkCard } from "@/components/dashboard/link-card";
 import { useLinkStore } from "@/lib/stores/link-store";
 
-export function LinkList() {
+interface LinkListProps {
+  clickCounts?: Map<string, number>;
+}
+
+export function LinkList({ clickCounts }: LinkListProps) {
   const t = useTranslations("dashboard.links");
   const links = useLinkStore((s) => s.links);
   const reorderLinks = useLinkStore((s) => s.reorderLinks);
@@ -68,7 +72,11 @@ export function LinkList() {
         >
           <div className="space-y-3">
             {links.map((link) => (
-              <LinkCard key={link.id} link={link} />
+              <LinkCard
+                key={link.id}
+                link={link}
+                clickCount={clickCounts?.get(link.id) ?? 0}
+              />
             ))}
           </div>
         </SortableContext>

@@ -27,17 +27,22 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useLinkStore } from "@/lib/stores/link-store";
+import { useDashboardStore } from "@/lib/stores/dashboard-store";
 import { LinkFormDialog } from "@/components/dashboard/link-form-dialog";
 import type { Link } from "@/types";
 
 interface LinkCardProps {
   link: Link;
+  clickCount?: number;
 }
 
-export function LinkCard({ link }: LinkCardProps) {
+export function LinkCard({ link, clickCount = 0 }: LinkCardProps) {
   const t = useTranslations("dashboard.links");
   const toggleLink = useLinkStore((s) => s.toggleLink);
   const deleteLink = useLinkStore((s) => s.deleteLink);
+  const navigateToLinkAnalytics = useDashboardStore(
+    (s) => s.navigateToLinkAnalytics
+  );
 
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -137,6 +142,12 @@ export function LinkCard({ link }: LinkCardProps) {
                 <Pencil className="size-2.5" />
               </button>
             </div>
+            <div className="flex items-center gap-1 mt-1">
+              <BarChart3 className="size-3 text-muted-foreground/50" />
+              <span className="text-[11px] text-muted-foreground/70 tabular-nums">
+                {clickCount} {t("clicks")}
+              </span>
+            </div>
           </div>
 
           {/* Right side: share + toggle */}
@@ -192,7 +203,8 @@ export function LinkCard({ link }: LinkCardProps) {
               variant="ghost"
               size="icon"
               className="size-7 text-muted-foreground/40 hover:text-muted-foreground"
-              title="Analytics"
+              title={t("viewAnalytics")}
+              onClick={() => navigateToLinkAnalytics(link.id)}
             >
               <BarChart3 className="size-3.5" />
             </Button>
