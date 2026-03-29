@@ -140,8 +140,8 @@ export function ProfilePage({ data }: ProfilePageProps) {
       {/* Non-rendering analytics tracker */}
       <AnalyticsTracker profileId={profile.id} />
 
-      {/* Centered content column — justify-center so sparse content doesn't hug the top */}
-      <main className="w-full max-w-[680px] mx-auto flex flex-col items-center justify-center gap-6 px-4 py-12 md:py-16 relative z-10 min-h-screen">
+      {/* Content column — footer pushed to bottom via flex-grow spacer */}
+      <main className="w-full max-w-[680px] mx-auto flex flex-col items-center gap-6 px-4 py-12 md:py-16 relative z-10 min-h-screen">
         {/* Profile header */}
         <ProfileHeader profile={profile} textColor={theme.text_color} theme={theme} />
 
@@ -182,6 +182,9 @@ export function ProfilePage({ data }: ProfilePageProps) {
             ))}
           </div>
         )}
+
+        {/* Spacer — pushes footer to bottom when content is sparse */}
+        <div className="flex-1" />
 
         {/* Viopage branding footer */}
         {showFooter && (

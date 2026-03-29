@@ -364,7 +364,8 @@
       "avatar": "Profile Photo",
       "avatarUpload": "Upload photo",
       "avatarRemove": "Remove photo",
-      "save": "Save profile"
+      "save": "Save profile",
+      "editTitleBio": "Title and bio"
     },
     "appearance": {
       "title": "Appearance",

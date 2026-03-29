@@ -4,10 +4,6 @@ import React, { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   Plus,
-  Sparkles,
-  FolderPlus,
-  Archive,
-  ChevronRight,
   Camera,
   Trash2,
   Pencil,
@@ -28,6 +24,7 @@ import { useSocialStore } from "@/lib/stores/social-store";
 import { LinkFormDialog } from "@/components/dashboard/link-form-dialog";
 import { AddContentModal } from "@/components/dashboard/add-content-modal";
 import { SmartSocialLinkInput } from "@/components/dashboard/smart-social-link-input";
+import { ProfileEditDialog } from "@/components/dashboard/profile-edit-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getIconForPlatform, getPlatformLabel } from "@/lib/social-icon-map";
 import { AVATAR_MAX_SIZE, AVATAR_ACCEPTED_TYPES } from "@/lib/constants";
@@ -70,7 +67,7 @@ function ContentSkeleton() {
 // Compact profile header (Linktree-style inline)
 // ---------------------------------------------------------------------------
 
-function CompactProfileHeader() {
+function CompactProfileHeader({ onEditProfile }: { onEditProfile: () => void }) {
   const profile = useProfileStore((s) => s.profile);
   const uploadAvatar = useProfileStore((s) => s.uploadAvatar);
   const socialIcons = useSocialStore((s) => s.socialIcons);
@@ -137,16 +134,26 @@ function CompactProfileHeader() {
         />
       </div>
 
-      {/* Name + bio + social icons */}
+      {/* Name + bio (clickable to edit) + social icons */}
       <div className="flex-1 min-w-0 pt-1">
-        <h2 className="text-base font-bold text-foreground leading-tight truncate">
-          {profile?.display_name || profile?.username || "Your Name"}
-        </h2>
-        {profile?.bio && (
-          <p className="text-sm text-muted-foreground leading-snug mt-0.5 line-clamp-2">
-            {profile.bio}
-          </p>
-        )}
+        <button
+          type="button"
+          onClick={onEditProfile}
+          className="text-left w-full group"
+        >
+          <h2 className="text-base font-bold text-foreground leading-tight truncate group-hover:text-primary transition-colors cursor-pointer">
+            {profile?.display_name || profile?.username || "Your Name"}
+          </h2>
+          {profile?.bio ? (
+            <p className="text-sm text-muted-foreground leading-snug mt-0.5 line-clamp-2 group-hover:text-foreground/70 transition-colors cursor-pointer">
+              {profile.bio}
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground/40 leading-snug mt-0.5 italic cursor-pointer">
+              + Add bio
+            </p>
+          )}
+        </button>
 
         {/* Social icons row */}
         {activeSocials.length > 0 && (
@@ -421,6 +428,7 @@ export function ContentTab() {
   const [smartInputOpen, setSmartInputOpen] = useState(false);
   const [smartInputPlatform, setSmartInputPlatform] =
     useState<SocialPlatform | null>(null);
+  const [profileEditOpen, setProfileEditOpen] = useState(false);
 
   const isLoading = profileLoading || linksLoading || socialLoading;
 
@@ -430,7 +438,7 @@ export function ContentTab() {
 
   return (
     <div className="max-w-[680px] mx-auto px-4 py-6 space-y-5">
-      {/* ── Top bar: Links / Shop tabs + Enhance button ── */}
+      {/* ── Top bar: Links tab ── */}
       <div className="flex items-center">
         <div className="flex items-center gap-5">
           <button
@@ -439,28 +447,11 @@ export function ContentTab() {
           >
             {t("linksTab")}
           </button>
-          <button
-            type="button"
-            className="text-base font-medium text-muted-foreground pb-0.5 cursor-not-allowed"
-            disabled
-          >
-            {t("shopTab")}
-          </button>
-        </div>
-        <div className="ml-auto flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-full gap-1.5 text-xs font-medium"
-          >
-            <Sparkles className="size-3.5" />
-            {t("enhance")}
-          </Button>
         </div>
       </div>
 
-      {/* ── Compact profile section ── */}
-      <CompactProfileHeader />
+      {/* ── Compact profile section (click name/bio to edit) ── */}
+      <CompactProfileHeader onEditProfile={() => setProfileEditOpen(true)} />
 
       {/* ── Big purple "+ Add" button ── */}
       <button
@@ -474,26 +465,6 @@ export function ContentTab() {
         <Plus className="size-4" strokeWidth={2.5} />
         {t("addLink")}
       </button>
-
-      {/* ── Add collection + View archive row ── */}
-      <div className="flex items-center justify-between">
-        <Button
-          variant="outline"
-          size="sm"
-          className="rounded-full gap-1.5 text-xs font-medium text-muted-foreground"
-        >
-          <FolderPlus className="size-3.5" />
-          {t("addCollection")}
-        </Button>
-        <button
-          type="button"
-          className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <Archive className="size-3.5" />
-          {t("viewArchive")}
-          <ChevronRight className="size-3" />
-        </button>
-      </div>
 
       {/* ── Social icons management section ── */}
       <SocialIconsList />
@@ -523,6 +494,12 @@ export function ContentTab() {
         onOpenChange={setSmartInputOpen}
         platform={smartInputPlatform}
         onBack={() => setAddModalOpen(true)}
+      />
+
+      {/* Profile title/bio edit dialog */}
+      <ProfileEditDialog
+        open={profileEditOpen}
+        onOpenChange={setProfileEditOpen}
       />
     </div>
   );

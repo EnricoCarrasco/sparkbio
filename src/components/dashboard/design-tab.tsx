@@ -20,7 +20,7 @@ import {
   Type,
   RectangleHorizontal,
   Palette,
-  Sparkles,
+  PanelBottom,
 } from "lucide-react";
 
 const SUB_TABS: { key: DesignSubTab; labelKey: string; icon: React.ReactNode }[] = [
@@ -57,7 +57,7 @@ const SUB_TABS: { key: DesignSubTab; labelKey: string; icon: React.ReactNode }[]
   {
     key: "footer",
     labelKey: "footerTab",
-    icon: <Sparkles className="size-4 shrink-0" />,
+    icon: <PanelBottom className="size-4 shrink-0" />,
   },
 ];
 
@@ -119,18 +119,7 @@ export function DesignTab() {
 
       {/* Active sub-tab content */}
       <div className="flex-1 overflow-y-auto bg-[#FAFAFA]">
-        {/* Enhance pill button at the top */}
-        <div className="flex justify-center pt-4 pb-2 px-6">
-          <button
-            type="button"
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-border bg-white text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shadow-sm"
-          >
-            <Sparkles className="size-3.5 text-[#FF6B35]" />
-            {t("enhance")}
-          </button>
-        </div>
-
-        <div className="px-6 pb-6">
+        <div className="px-6 pt-4 pb-6">
           {activeSubTab === "header" && <HeaderPanel />}
           {activeSubTab === "theme" && <ThemePanel />}
           {activeSubTab === "wallpaper" && <WallpaperPanel />}
