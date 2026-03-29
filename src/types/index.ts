@@ -17,5 +17,6 @@ export type {
   TitleSize,
   WallpaperStyle,
   SocialPlatform,
+  SocialDisplayMode,
   EventType,
 } from "./database";

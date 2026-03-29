@@ -27,6 +27,8 @@ export type SocialPlatform =
   | "email"
   | "website";
 
+export type SocialDisplayMode = "icon" | "button" | "grid";
+
 export type EventType = "page_view" | "link_click";
 
 export interface Profile {
@@ -87,6 +89,8 @@ export interface SocialIcon {
   url: string;
   position: number;
   is_active: boolean;
+  display_mode: SocialDisplayMode;
+  display_title: string | null;
 }
 
 export interface AnalyticsEvent {

@@ -5,6 +5,8 @@ import type { PublicProfile } from "@/types";
 import { ProfileHeader } from "./profile-header";
 import { ProfileLink } from "./profile-link";
 import { SocialIconsBar } from "./social-icons-bar";
+import { SocialButton } from "./social-button";
+import { SocialGrid } from "./social-grid";
 import { AnalyticsTracker } from "./analytics-tracker";
 
 interface ProfilePageProps {
@@ -75,6 +77,12 @@ export function ProfilePage({ data }: ProfilePageProps) {
     .filter((link) => link.is_active)
     .sort((a, b) => a.position - b.position);
 
+  // Split social icons by display mode
+  const activeSocialIcons = (social_icons ?? []).filter((s) => s.is_active);
+  const bubbleIcons = activeSocialIcons.filter((s) => s.display_mode === "icon");
+  const gridIcons = activeSocialIcons.filter((s) => s.display_mode === "grid");
+  const buttonIcons = activeSocialIcons.filter((s) => s.display_mode === "button");
+
   const isProActive = subscription?.status === "on_trial" || subscription?.status === "active";
   const showFooter = !(theme.hide_footer && isProActive);
 
@@ -132,26 +140,44 @@ export function ProfilePage({ data }: ProfilePageProps) {
       {/* Non-rendering analytics tracker */}
       <AnalyticsTracker profileId={profile.id} />
 
-      {/* Centered content column */}
-      <main className="w-full max-w-[680px] mx-auto flex flex-col items-center gap-6 px-4 py-12 md:py-16 relative z-10">
+      {/* Centered content column — justify-center so sparse content doesn't hug the top */}
+      <main className="w-full max-w-[680px] mx-auto flex flex-col items-center justify-center gap-6 px-4 py-12 md:py-16 relative z-10 min-h-screen">
         {/* Profile header */}
         <ProfileHeader profile={profile} textColor={theme.text_color} theme={theme} />
 
-        {/* Social icons row */}
-        {(social_icons ?? []).length > 0 && (
-          <SocialIconsBar socialIcons={social_icons} textColor={theme.text_color} />
+        {/* Social icons row (icon-mode only) */}
+        {bubbleIcons.length > 0 && (
+          <SocialIconsBar socialIcons={bubbleIcons} textColor={theme.text_color} />
         )}
 
-        {/* Link buttons */}
-        {activeLinks.length > 0 && (
+        {/* Grid-mode social icons — large brand circles */}
+        {gridIcons.length > 0 && (
+          <SocialGrid icons={gridIcons} />
+        )}
+
+        {/* Link buttons + button-mode social icons */}
+        {(activeLinks.length > 0 || buttonIcons.length > 0) && (
           <div className="w-full flex flex-col gap-3">
+            {/* Button-mode social icons first */}
+            {buttonIcons
+              .sort((a, b) => a.position - b.position)
+              .map((si, index) => (
+                <SocialButton
+                  key={si.id}
+                  icon={si}
+                  profileId={profile.id}
+                  theme={theme}
+                  index={index}
+                />
+              ))}
+            {/* Regular links */}
             {activeLinks.map((link, index) => (
               <ProfileLink
                 key={link.id}
                 link={link}
                 profileId={profile.id}
                 theme={theme}
-                index={index}
+                index={buttonIcons.length + index}
               />
             ))}
           </div>

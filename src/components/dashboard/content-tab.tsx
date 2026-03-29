@@ -9,19 +9,31 @@ import {
   Archive,
   ChevronRight,
   Camera,
+  Trash2,
+  Pencil,
+  Share2,
+  ExternalLink,
+  Circle,
+  RectangleHorizontal,
+  LayoutGrid,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { LinkList } from "@/components/dashboard/link-list";
 import { useLinkStore } from "@/lib/stores/link-store";
 import { useProfileStore } from "@/lib/stores/profile-store";
 import { useSocialStore } from "@/lib/stores/social-store";
 import { LinkFormDialog } from "@/components/dashboard/link-form-dialog";
+import { AddContentModal } from "@/components/dashboard/add-content-modal";
+import { SmartSocialLinkInput } from "@/components/dashboard/smart-social-link-input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getIconForPlatform } from "@/lib/social-icon-map";
+import { getIconForPlatform, getPlatformLabel } from "@/lib/social-icon-map";
 import { AVATAR_MAX_SIZE, AVATAR_ACCEPTED_TYPES } from "@/lib/constants";
-import type { SocialIcon } from "@/types";
+import { BrandIcon } from "@/components/ui/brand-icon";
+import { cn } from "@/lib/utils";
+import type { SocialIcon, SocialPlatform, SocialDisplayMode } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Skeleton
@@ -155,10 +167,239 @@ function CompactProfileHeader() {
 }
 
 function SocialIconBubble({ icon }: { icon: SocialIcon }) {
-  const IconComponent = getIconForPlatform(icon.platform);
   return (
-    <div className="flex items-center justify-center size-7 rounded-full bg-muted text-muted-foreground hover:bg-foreground hover:text-white transition-colors cursor-default">
-      <IconComponent size={13} strokeWidth={2} />
+    <BrandIcon
+      platform={icon.platform}
+      size={28}
+      iconSize={14}
+      rounded="rounded-full"
+      className="transition-transform hover:scale-110 cursor-default"
+    />
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Social icon card (editable row in the social links section)
+// ---------------------------------------------------------------------------
+
+function SocialIconCard({ icon }: { icon: SocialIcon }) {
+  const tSmart = useTranslations("dashboard.smartInput");
+  const toggleSocialIcon = useSocialStore((s) => s.toggleSocialIcon);
+  const deleteSocialIcon = useSocialStore((s) => s.deleteSocialIcon);
+  const updateSocialIcon = useSocialStore((s) => s.updateSocialIcon);
+  const [editing, setEditing] = useState(false);
+  const [urlValue, setUrlValue] = useState(icon.url);
+  const [titleValue, setTitleValue] = useState(icon.display_title || "");
+
+  const label = getPlatformLabel(icon.platform);
+
+  function truncateUrl(url: string): string {
+    try {
+      const { host, pathname } = new URL(url);
+      const path =
+        pathname.length > 25 ? pathname.slice(0, 25) + "..." : pathname;
+      return `${host}${path}`;
+    } catch {
+      return url.length > 40 ? url.slice(0, 40) + "..." : url;
+    }
+  }
+
+  async function handleSaveUrl() {
+    if (urlValue.trim() && urlValue !== icon.url) {
+      await updateSocialIcon(icon.id, { url: urlValue.trim() });
+      toast.success("URL updated");
+    }
+    setEditing(false);
+  }
+
+  async function handleDisplayModeChange(mode: SocialDisplayMode) {
+    await updateSocialIcon(icon.id, { display_mode: mode });
+  }
+
+  async function handleSaveTitle() {
+    const newTitle = titleValue.trim() || null;
+    if (newTitle !== icon.display_title) {
+      await updateSocialIcon(icon.id, { display_title: newTitle });
+    }
+  }
+
+  return (
+    <div className="rounded-2xl bg-white border border-border/60 shadow-sm">
+      <div className="flex items-center gap-3 p-3.5">
+        {/* Platform icon with brand colors */}
+        <BrandIcon platform={icon.platform} size={36} iconSize={18} />
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold text-foreground">{label}</p>
+            {/* Display mode indicator */}
+            <span className="text-[10px] font-medium text-muted-foreground bg-muted rounded px-1.5 py-0.5">
+              {icon.display_mode === "button"
+                ? tSmart("displayButton")
+                : icon.display_mode === "grid"
+                  ? tSmart("displayGrid")
+                  : tSmart("displayIcon")}
+            </span>
+          </div>
+          {editing ? (
+            <input
+              type="text"
+              value={urlValue}
+              onChange={(e) => setUrlValue(e.target.value)}
+              onBlur={handleSaveUrl}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSaveUrl();
+                if (e.key === "Escape") {
+                  setUrlValue(icon.url);
+                  setEditing(false);
+                }
+              }}
+              className="w-full text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1 mt-0.5 outline-none focus:ring-1 focus:ring-primary/30"
+              autoFocus
+            />
+          ) : (
+            <div className="flex items-center gap-1 mt-0.5">
+              <p className="text-xs text-muted-foreground truncate">
+                {truncateUrl(icon.url)}
+              </p>
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="shrink-0 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+              >
+                <Pencil className="size-2.5" />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 shrink-0">
+          <Switch
+            checked={icon.is_active}
+            onCheckedChange={() => toggleSocialIcon(icon.id)}
+          />
+        </div>
+      </div>
+
+      {/* Display mode toggle + title */}
+      <div className="px-3.5 pb-2.5 space-y-2">
+        {/* Display mode toggle */}
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+            {tSmart("displayAs")}
+          </span>
+          <div className="flex rounded-md border border-border overflow-hidden">
+            <button
+              type="button"
+              onClick={() => handleDisplayModeChange("icon")}
+              className={cn(
+                "flex items-center gap-1 px-2 py-1 text-[10px] font-medium transition-colors",
+                icon.display_mode === "icon"
+                  ? "bg-foreground text-white"
+                  : "text-muted-foreground hover:bg-muted"
+              )}
+            >
+              <Circle className="size-3" />
+              {tSmart("displayIcon")}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDisplayModeChange("button")}
+              className={cn(
+                "flex items-center gap-1 px-2 py-1 text-[10px] font-medium transition-colors",
+                icon.display_mode === "button"
+                  ? "bg-foreground text-white"
+                  : "text-muted-foreground hover:bg-muted"
+              )}
+            >
+              <RectangleHorizontal className="size-3" />
+              {tSmart("displayButton")}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDisplayModeChange("grid")}
+              className={cn(
+                "flex items-center gap-1 px-2 py-1 text-[10px] font-medium transition-colors",
+                icon.display_mode === "grid"
+                  ? "bg-foreground text-white"
+                  : "text-muted-foreground hover:bg-muted"
+              )}
+            >
+              <LayoutGrid className="size-3" />
+              {tSmart("displayGrid")}
+            </button>
+          </div>
+        </div>
+
+        {/* Button title input (only when button mode) */}
+        {icon.display_mode === "button" && (
+          <input
+            type="text"
+            value={titleValue}
+            onChange={(e) => setTitleValue(e.target.value)}
+            onBlur={handleSaveTitle}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSaveTitle();
+            }}
+            placeholder={label}
+            className="w-full text-xs text-foreground bg-muted/40 border border-border/50 rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-primary/30 placeholder:text-muted-foreground/50"
+          />
+        )}
+      </div>
+
+      {/* Bottom action bar */}
+      <div className="flex items-center justify-between px-3.5 pb-2.5 pt-0">
+        <a
+          href={icon.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+        >
+          <ExternalLink className="size-3.5" />
+        </a>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={async () => {
+            await deleteSocialIcon(icon.id);
+            toast.success("Social link removed");
+          }}
+          className="size-7 text-muted-foreground/40 hover:text-destructive"
+        >
+          <Trash2 className="size-3.5" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Social icons list section
+// ---------------------------------------------------------------------------
+
+function SocialIconsList() {
+  const socialIcons = useSocialStore((s) => s.socialIcons);
+  const tLinks = useTranslations("dashboard.links");
+
+  if (socialIcons.length === 0) return null;
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <Share2 className="size-3.5 text-muted-foreground" />
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          {tLinks("socialLinks")}
+        </span>
+        <div className="flex-1 h-px bg-border" />
+      </div>
+      {socialIcons
+        .sort((a, b) => a.position - b.position)
+        .map((icon) => (
+          <SocialIconCard key={icon.id} icon={icon} />
+        ))}
     </div>
   );
 }
@@ -174,7 +415,12 @@ export function ContentTab() {
   const linksLoading = useLinkStore((s) => s.loading);
   const socialLoading = useSocialStore((s) => s.loading);
 
-  const [addOpen, setAddOpen] = useState(false);
+  // Modal states
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [linkFormOpen, setLinkFormOpen] = useState(false);
+  const [smartInputOpen, setSmartInputOpen] = useState(false);
+  const [smartInputPlatform, setSmartInputPlatform] =
+    useState<SocialPlatform | null>(null);
 
   const isLoading = profileLoading || linksLoading || socialLoading;
 
@@ -184,7 +430,7 @@ export function ContentTab() {
 
   return (
     <div className="max-w-[680px] mx-auto px-4 py-6 space-y-5">
-      {/* ── Top bar: Links tab + Enhance button ── */}
+      {/* ── Top bar: Links / Shop tabs + Enhance button ── */}
       <div className="flex items-center">
         <div className="flex items-center gap-5">
           <button
@@ -192,6 +438,13 @@ export function ContentTab() {
             className="text-base font-bold text-foreground border-b-2 border-foreground pb-0.5"
           >
             {t("linksTab")}
+          </button>
+          <button
+            type="button"
+            className="text-base font-medium text-muted-foreground pb-0.5 cursor-not-allowed"
+            disabled
+          >
+            {t("shopTab")}
           </button>
         </div>
         <div className="ml-auto flex items-center gap-2">
@@ -212,7 +465,7 @@ export function ContentTab() {
       {/* ── Big purple "+ Add" button ── */}
       <button
         type="button"
-        onClick={() => setAddOpen(true)}
+        onClick={() => setAddModalOpen(true)}
         className="w-full flex items-center justify-center gap-2 py-3.5 rounded-full text-white font-semibold text-sm transition-all hover:opacity-90 active:scale-[0.98]"
         style={{
           background: "linear-gradient(135deg, #8B5CF6, #7C3AED)",
@@ -242,11 +495,35 @@ export function ContentTab() {
         </button>
       </div>
 
+      {/* ── Social icons management section ── */}
+      <SocialIconsList />
+
       {/* ── Link list (drag-and-drop cards) ── */}
       <LinkList />
 
-      {/* Add link dialog */}
-      <LinkFormDialog open={addOpen} onOpenChange={setAddOpen} />
+      {/* ── Modals ── */}
+
+      {/* Add content modal (the popup with categories + platforms) */}
+      <AddContentModal
+        open={addModalOpen}
+        onOpenChange={setAddModalOpen}
+        onOpenLinkForm={() => setLinkFormOpen(true)}
+        onOpenSmartInput={(platform) => {
+          setSmartInputPlatform(platform);
+          setSmartInputOpen(true);
+        }}
+      />
+
+      {/* Standard link form dialog */}
+      <LinkFormDialog open={linkFormOpen} onOpenChange={setLinkFormOpen} />
+
+      {/* Smart social link input */}
+      <SmartSocialLinkInput
+        open={smartInputOpen}
+        onOpenChange={setSmartInputOpen}
+        platform={smartInputPlatform}
+        onBack={() => setAddModalOpen(true)}
+      />
     </div>
   );
 }

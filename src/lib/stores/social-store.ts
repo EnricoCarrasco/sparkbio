@@ -1,12 +1,17 @@
 import { create } from "zustand";
-import type { SocialIcon, SocialPlatform } from "@/types";
+import type { SocialIcon, SocialPlatform, SocialDisplayMode } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 
 interface SocialState {
   socialIcons: SocialIcon[];
   loading: boolean;
   fetchSocialIcons: () => Promise<void>;
-  addSocialIcon: (platform: SocialPlatform, url: string) => Promise<void>;
+  addSocialIcon: (
+    platform: SocialPlatform,
+    url: string,
+    displayMode?: SocialDisplayMode,
+    displayTitle?: string | null
+  ) => Promise<void>;
   updateSocialIcon: (id: string, updates: Partial<SocialIcon>) => Promise<void>;
   deleteSocialIcon: (id: string) => Promise<void>;
   toggleSocialIcon: (id: string) => Promise<void>;
@@ -38,7 +43,7 @@ export const useSocialStore = create<SocialState>((set, get) => ({
     set({ socialIcons: data || [], loading: false });
   },
 
-  addSocialIcon: async (platform, url) => {
+  addSocialIcon: async (platform, url, displayMode = "icon", displayTitle = null) => {
     const supabase = createClient();
     const {
       data: { user },
@@ -50,7 +55,15 @@ export const useSocialStore = create<SocialState>((set, get) => ({
 
     const { data, error } = await supabase
       .from("social_icons")
-      .insert({ user_id: user.id, platform, url, position, is_active: true })
+      .insert({
+        user_id: user.id,
+        platform,
+        url,
+        position,
+        is_active: true,
+        display_mode: displayMode,
+        display_title: displayTitle || null,
+      })
       .select()
       .single();
 

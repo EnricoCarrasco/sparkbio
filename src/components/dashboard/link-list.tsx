@@ -43,37 +43,36 @@ export function LinkList() {
 
   // Empty state
   if (links.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-3 py-14 px-4 border border-dashed border-border rounded-2xl text-center bg-white">
-        <div className="flex size-12 items-center justify-center rounded-full bg-muted">
-          <Link2 className="size-5 text-muted-foreground" />
-        </div>
-        <div>
-          <p className="text-sm font-medium text-foreground">{t("empty")}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {t("emptyDesc")}
-          </p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext
-        items={links.map((l) => l.id)}
-        strategy={verticalListSortingStrategy}
+    <>
+      {/* Links section header */}
+      <div className="flex items-center gap-2">
+        <Link2 className="size-3.5 text-muted-foreground" />
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          {t("regularLinks")}
+        </span>
+        <div className="flex-1 h-px bg-border" />
+      </div>
+
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
       >
-        <div className="space-y-3">
-          {links.map((link) => (
-            <LinkCard key={link.id} link={link} />
-          ))}
-        </div>
-      </SortableContext>
-    </DndContext>
+        <SortableContext
+          items={links.map((l) => l.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="space-y-3">
+            {links.map((link) => (
+              <LinkCard key={link.id} link={link} />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
+    </>
   );
 }

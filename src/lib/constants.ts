@@ -69,6 +69,29 @@ export const SOCIAL_PLATFORMS: {
   { platform: "website", label: "Website", urlPrefix: "", icon: "globe" },
 ];
 
+export const PLATFORM_BRAND_COLORS: Record<
+  import("@/types").SocialPlatform,
+  { bg: string; text: string }
+> = {
+  whatsapp: { bg: "#25D366", text: "#fff" },
+  instagram: { bg: "linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)", text: "#fff" },
+  tiktok: { bg: "#000000", text: "#fff" },
+  youtube: { bg: "#FF0000", text: "#fff" },
+  x: { bg: "#000000", text: "#fff" },
+  facebook: { bg: "#1877F2", text: "#fff" },
+  linkedin: { bg: "#0A66C2", text: "#fff" },
+  github: { bg: "#333333", text: "#fff" },
+  twitch: { bg: "#9146FF", text: "#fff" },
+  snapchat: { bg: "#FFFC00", text: "#000" },
+  pinterest: { bg: "#E60023", text: "#fff" },
+  spotify: { bg: "#1DB954", text: "#fff" },
+  soundcloud: { bg: "#FF5500", text: "#fff" },
+  discord: { bg: "#5865F2", text: "#fff" },
+  telegram: { bg: "#26A5E4", text: "#fff" },
+  email: { bg: "#EA4335", text: "#fff" },
+  website: { bg: "#333333", text: "#fff" },
+};
+
 export const THEME_FONTS = [
   { value: "Inter", label: "Inter" },
   { value: "Poppins", label: "Poppins" },

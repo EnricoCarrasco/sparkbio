@@ -2,7 +2,17 @@
 
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
-import { GripVertical, Pencil, Trash2, Share2 } from "lucide-react";
+import {
+  GripVertical,
+  Pencil,
+  Trash2,
+  Share2,
+  QrCode,
+  Image,
+  Star,
+  BarChart3,
+  Copy,
+} from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { toast } from "sonner";
@@ -149,8 +159,56 @@ export function LinkCard({ link }: LinkCardProps) {
 
         {/* Bottom action bar */}
         <div className="flex items-center justify-between px-4 pb-3 pt-0">
-          <div className="flex items-center gap-1">
-            {/* Placeholder action icons - matching Linktree's bottom row */}
+          <div className="flex items-center gap-0.5">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-7 text-muted-foreground/40 hover:text-muted-foreground"
+              title="QR Code"
+            >
+              <QrCode className="size-3.5" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-7 text-muted-foreground/40 hover:text-muted-foreground"
+              title="Thumbnail"
+            >
+              <Image className="size-3.5" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-7 text-muted-foreground/40 hover:text-muted-foreground"
+              title="Highlight"
+            >
+              <Star className="size-3.5" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-7 text-muted-foreground/40 hover:text-muted-foreground"
+              title="Analytics"
+            >
+              <BarChart3 className="size-3.5" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-7 text-muted-foreground/40 hover:text-muted-foreground"
+              title="Copy link"
+              onClick={() => {
+                navigator.clipboard.writeText(link.url);
+                toast.success("Link copied!");
+              }}
+            >
+              <Copy className="size-3.5" />
+            </Button>
           </div>
           <Button
             type="button"
