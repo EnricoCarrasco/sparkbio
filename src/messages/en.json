@@ -353,7 +353,9 @@
       "delete": "Delete link",
       "deleteConfirm": "Are you sure you want to delete this link?",
       "active": "Active",
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "clicks": "clicks",
+      "viewAnalytics": "View analytics"
     },
     "profile": {
       "title": "Profile",
@@ -516,7 +518,13 @@
       "last30days": "Last 30 days",
       "allTime": "All time",
       "noData": "No analytics data yet",
-      "noDataDesc": "Share your Viopage link to start tracking views and clicks."
+      "noDataDesc": "Share your Viopage link to start tracking views and clicks.",
+      "linkPerformance": "Link Performance",
+      "linkDetail": "Link Details",
+      "clicksOverTime": "Clicks over time",
+      "noClicks": "No clicks yet",
+      "activeDays": "Active days",
+      "peakDay": "Peak day"
     },
     "settings": {
       "title": "Settings",

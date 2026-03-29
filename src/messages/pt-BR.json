@@ -354,7 +354,9 @@
       "delete": "Excluir link",
       "deleteConfirm": "Tem certeza de que deseja excluir este link?",
       "active": "Ativo",
-      "inactive": "Inativo"
+      "inactive": "Inativo",
+      "clicks": "cliques",
+      "viewAnalytics": "Ver analytics"
     },
     "profile": {
       "title": "Perfil",
@@ -517,7 +519,13 @@
       "last30days": "Últimos 30 dias",
       "allTime": "Todo o período",
       "noData": "Sem dados de analytics ainda",
-      "noDataDesc": "Compartilhe seu link Viopage para começar a acompanhar visualizações e cliques."
+      "noDataDesc": "Compartilhe seu link Viopage para começar a acompanhar visualizações e cliques.",
+      "linkPerformance": "Desempenho dos Links",
+      "linkDetail": "Detalhes do Link",
+      "clicksOverTime": "Cliques ao longo do tempo",
+      "noClicks": "Nenhum clique ainda",
+      "activeDays": "Dias ativos",
+      "peakDay": "Dia de pico"
     },
     "settings": {
       "title": "Configurações",

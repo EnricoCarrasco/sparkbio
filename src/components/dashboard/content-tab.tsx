@@ -25,6 +25,7 @@ import { LinkFormDialog } from "@/components/dashboard/link-form-dialog";
 import { AddContentModal } from "@/components/dashboard/add-content-modal";
 import { SmartSocialLinkInput } from "@/components/dashboard/smart-social-link-input";
 import { ProfileEditDialog } from "@/components/dashboard/profile-edit-dialog";
+import { useClickCounts } from "@/hooks/use-click-counts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getIconForPlatform, getPlatformLabel } from "@/lib/social-icon-map";
 import { AVATAR_MAX_SIZE, AVATAR_ACCEPTED_TYPES } from "@/lib/constants";
@@ -430,6 +431,8 @@ export function ContentTab() {
     useState<SocialPlatform | null>(null);
   const [profileEditOpen, setProfileEditOpen] = useState(false);
 
+  const { clickCounts } = useClickCounts();
+
   const isLoading = profileLoading || linksLoading || socialLoading;
 
   if (isLoading) {
@@ -470,7 +473,7 @@ export function ContentTab() {
       <SocialIconsList />
 
       {/* ── Link list (drag-and-drop cards) ── */}
-      <LinkList />
+      <LinkList clickCounts={clickCounts} />
 
       {/* ── Modals ── */}
 
