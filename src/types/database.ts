@@ -29,7 +29,8 @@ export type SocialPlatform =
   | "telegram"
   | "whatsapp"
   | "email"
-  | "website";
+  | "website"
+  | "pix";
 
 export type SocialDisplayMode = "icon" | "button" | "grid";
 

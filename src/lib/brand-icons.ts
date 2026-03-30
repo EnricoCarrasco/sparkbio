@@ -22,6 +22,7 @@ const BRAND_ICON_MAP: Record<SocialPlatform, string> = {
   telegram: "/icons/social/telegram.svg",
   email: "/icons/social/gmail.svg",
   website: "/icons/social/googlechrome.svg",
+  pix: "/icons/social/pix.png",
 };
 
 export function getBrandIconPath(platform: SocialPlatform): string {

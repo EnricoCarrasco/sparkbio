@@ -1,7 +1,7 @@
 import { SOCIAL_PLATFORMS } from "@/lib/constants";
 import type { SocialPlatform } from "@/types";
 
-export type InputType = "phone" | "username" | "email" | "url" | "channel" | "handle";
+export type InputType = "phone" | "username" | "email" | "url" | "channel" | "handle" | "pix_key";
 
 const PLATFORM_INPUT_MAP: Record<SocialPlatform, InputType> = {
   whatsapp: "phone",
@@ -21,6 +21,7 @@ const PLATFORM_INPUT_MAP: Record<SocialPlatform, InputType> = {
   telegram: "username",
   email: "email",
   website: "url",
+  pix: "pix_key",
 };
 
 export function getInputType(platform: SocialPlatform): InputType {
@@ -42,6 +43,8 @@ export function getInputLabel(platform: SocialPlatform): string {
       return "Handle";
     case "url":
       return "URL";
+    case "pix_key":
+      return "Pix key";
   }
 }
 
@@ -81,6 +84,8 @@ export function getInputPlaceholder(platform: SocialPlatform): string {
       return "you@example.com";
     case "website":
       return "https://example.com";
+    case "pix":
+      return "CPF, e-mail, phone, or random key";
     default:
       return "";
   }
@@ -92,6 +97,11 @@ export function buildPlatformUrl(platform: SocialPlatform, input: string): strin
 
   const trimmed = input.trim();
   if (!trimmed) return "";
+
+  // Pix: store the raw key as-is (not a URL)
+  if (platform === "pix") {
+    return trimmed;
+  }
 
   // For URL-type inputs (spotify, discord, website), return as-is if it looks like a URL
   const inputType = getInputType(platform);

@@ -506,6 +506,7 @@
       "social": "Social",
       "media": "Mídia",
       "contact": "Contato",
+      "payment": "Pagamento",
       "events": "Eventos",
       "text": "Texto",
       "viewAll": "Ver tudo",
@@ -521,6 +522,7 @@
       "channelLabel": "Nome do canal",
       "handleLabel": "Handle",
       "urlLabel": "URL",
+      "pixKeyLabel": "Chave Pix",
       "phonePlaceholder": "5511999999999",
       "usernamePlaceholder": "nomedeusuario",
       "emailPlaceholder": "voce@exemplo.com",
@@ -586,11 +588,75 @@
     "share": {
       "title": "Compartilhar",
       "copy": "Copiar",
+      "copied": "Copiado!",
       "linkCopied": "Link copiado!",
       "myPlatforms": "Minhas plataformas",
       "shareTo": "Compartilhar em",
+      "addToSocials": "Adicionar nas suas redes",
       "qrCode": "QR Code",
-      "nativeShare": "Mais..."
+      "nativeShare": "Mais...",
+      "downloadPng": "Baixar PNG",
+      "downloadSvg": "Baixar SVG",
+      "highQuality": "Imagem de alta qualidade",
+      "scalableVector": "Gráfico vetorial escalável",
+      "goTo": "Ir para meu {platform}",
+      "youllNeedPhone": "Você vai precisar do seu celular.",
+      "tutorials": {
+        "instagram": {
+          "title": "Instagram",
+          "step1": "Abra o app do Instagram e vá para seu perfil",
+          "step2": "Toque em \"Editar perfil\"",
+          "step3": "Cole a URL do Viopage no campo \"Site\"",
+          "step4": "Salve suas alterações",
+          "step5": "Toque no link na bio para testar",
+          "note": "Às vezes o campo \"Links\" substitui o campo \"Site\". Use o que estiver disponível."
+        },
+        "youtube": {
+          "title": "YouTube",
+          "step1": "Vá para Seu canal clicando na foto de perfil",
+          "step2": "Clique em Personalizar canal",
+          "step3": "Na aba Perfil, role até Links",
+          "step4": "Em Links, clique em Adicionar Link e cole a URL do Viopage",
+          "step5": "Clique em Publicar",
+          "step6": "Clique no link na bio para testar"
+        },
+        "facebook": {
+          "title": "Perfil do Facebook",
+          "step1": "Vá para a página Sobre no seu perfil",
+          "step2": "Clique em Informações de contato e básicas",
+          "step3": "Selecione + Adicionar um site",
+          "step4": "Cole a URL do Viopage no campo de endereço",
+          "step5": "Clique em Salvar",
+          "step6": "Clique no link na bio para testar"
+        },
+        "tiktok": {
+          "title": "TikTok",
+          "step1": "No app do TikTok, toque em Perfil na parte inferior",
+          "step2": "Toque em Editar perfil",
+          "step3": "Ao lado de Links, toque em Adicionar",
+          "step4": "Siga os passos para adicionar a URL do Viopage",
+          "step5": "Toque no link da bio para testar",
+          "note": "Você pode adicionar um link no TikTok se tiver 1.000+ seguidores ou uma Conta Business registrada.",
+          "requirement": "Requer 1.000+ seguidores ou Conta Business"
+        },
+        "x": {
+          "title": "X",
+          "step1": "Vá para seu perfil",
+          "step2": "Clique em Editar perfil",
+          "step3": "Cole a URL do Viopage na seção Site",
+          "step4": "Salve suas alterações",
+          "step5": "Clique no link na bio para testar"
+        },
+        "pinterest": {
+          "title": "Pinterest",
+          "step1": "Vá para sua página de perfil no Pinterest",
+          "step2": "Clique em \"Editar perfil\"",
+          "step3": "Role até Site",
+          "step4": "Cole a URL do Viopage",
+          "step5": "Clique em Salvar",
+          "step6": "Clique no link para ver se está funcionando"
+        }
+      }
     }
   },
   "billing": {

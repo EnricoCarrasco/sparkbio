@@ -34,6 +34,7 @@ const INPUT_LABELS: Record<string, string> = {
   channel: "channelLabel",
   handle: "handleLabel",
   url: "urlLabel",
+  pix_key: "pixKeyLabel",
 };
 
 export function SmartSocialLinkInput({
@@ -152,8 +153,8 @@ export function SmartSocialLinkInput({
             </div>
           </div>
 
-          {/* Generated URL preview */}
-          {generatedUrl && (
+          {/* Generated URL preview (hide for Pix since it's not a URL) */}
+          {generatedUrl && inputType !== "pix_key" && (
             <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-muted/50 border border-border/50">
               <Check className="size-3.5 text-green-600 shrink-0" />
               <p className="text-xs text-muted-foreground truncate font-mono">

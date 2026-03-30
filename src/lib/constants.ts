@@ -67,6 +67,7 @@ export const SOCIAL_PLATFORMS: {
   { platform: "whatsapp", label: "WhatsApp", urlPrefix: "https://wa.me/", icon: "phone" },
   { platform: "email", label: "Email", urlPrefix: "mailto:", icon: "mail" },
   { platform: "website", label: "Website", urlPrefix: "", icon: "globe" },
+  { platform: "pix", label: "Pix", urlPrefix: "", icon: "qr-code" },
 ];
 
 export const PLATFORM_BRAND_COLORS: Record<
@@ -90,6 +91,7 @@ export const PLATFORM_BRAND_COLORS: Record<
   telegram: { bg: "#26A5E4", text: "#fff" },
   email: { bg: "#EA4335", text: "#fff" },
   website: { bg: "#333333", text: "#fff" },
+  pix: { bg: "#4BB8A9", text: "#fff" },
 };
 
 export const THEME_FONTS = [

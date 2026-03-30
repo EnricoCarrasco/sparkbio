@@ -505,6 +505,7 @@
       "social": "Social",
       "media": "Media",
       "contact": "Contact",
+      "payment": "Payment",
       "events": "Events",
       "text": "Text",
       "viewAll": "View all",
@@ -520,6 +521,7 @@
       "channelLabel": "Channel name",
       "handleLabel": "Handle",
       "urlLabel": "URL",
+      "pixKeyLabel": "Pix key",
       "phonePlaceholder": "5511999999999",
       "usernamePlaceholder": "username",
       "emailPlaceholder": "you@example.com",
@@ -585,11 +587,75 @@
     "share": {
       "title": "Share",
       "copy": "Copy",
+      "copied": "Copied!",
       "linkCopied": "Link copied!",
       "myPlatforms": "My platforms",
       "shareTo": "Share to",
+      "addToSocials": "Add to your socials",
       "qrCode": "QR Code",
-      "nativeShare": "More..."
+      "nativeShare": "More...",
+      "downloadPng": "Download PNG",
+      "downloadSvg": "Download SVG",
+      "highQuality": "High quality image",
+      "scalableVector": "Scalable vector graphic",
+      "goTo": "Go to my {platform}",
+      "youllNeedPhone": "You'll need your phone.",
+      "tutorials": {
+        "instagram": {
+          "title": "Instagram",
+          "step1": "Navigate to your profile page on the Instagram app",
+          "step2": "Hit \"Edit Profile\"",
+          "step3": "Paste your Viopage URL into the \"Website\" field",
+          "step4": "Save your changes",
+          "step5": "Click on the link in your bio to test it is working",
+          "note": "Sometimes a \"Links field\" replaces the \"Website\" field. Use whichever field is available."
+        },
+        "youtube": {
+          "title": "YouTube",
+          "step1": "Go to Your channel by clicking on your profile pic",
+          "step2": "Hit Customize channel",
+          "step3": "On the Profile tab, scroll down to Links",
+          "step4": "Under Links, click Add Link, and paste your Viopage URL",
+          "step5": "Hit Publish",
+          "step6": "Click on the link in your bio to test it is working"
+        },
+        "facebook": {
+          "title": "Facebook Profile",
+          "step1": "Navigate to the About page on your profile",
+          "step2": "Hit Contact and basic info section",
+          "step3": "Select + Add a website",
+          "step4": "Paste your Viopage URL into the Website address field",
+          "step5": "Hit Save",
+          "step6": "Click on the link in your bio to test it is working"
+        },
+        "tiktok": {
+          "title": "TikTok",
+          "step1": "In the TikTok app, tap Profile at the bottom",
+          "step2": "Tap Edit profile",
+          "step3": "Next to Links, tap Add",
+          "step4": "Follow the steps to add your Viopage URL",
+          "step5": "Tap your bio link to test it is working",
+          "note": "You can add a website link on TikTok if you have 1,000+ followers or a registered Business Account.",
+          "requirement": "Requires 1,000+ followers or Business Account"
+        },
+        "x": {
+          "title": "X",
+          "step1": "Navigate to your profile",
+          "step2": "Hit Edit Profile",
+          "step3": "Paste your Viopage URL into the Website section",
+          "step4": "Save your changes",
+          "step5": "Click on the link in your bio to test it is working"
+        },
+        "pinterest": {
+          "title": "Pinterest",
+          "step1": "Go to your Pinterest profile page",
+          "step2": "Click \"Edit Profile\"",
+          "step3": "Scroll down to Website",
+          "step4": "Paste your Viopage URL",
+          "step5": "Click Save",
+          "step6": "Click your link to see if it is working"
+        }
+      }
     }
   },
   "billing": {

@@ -16,6 +16,7 @@ import {
   Phone,
   Mail,
   Globe,
+  QrCode,
   type LucideIcon,
 } from "lucide-react";
 import { SOCIAL_PLATFORMS } from "@/lib/constants";
@@ -42,6 +43,7 @@ export const LUCIDE_ICON_MAP: Record<string, LucideIcon> = {
   phone: Phone,
   mail: Mail,
   globe: Globe,
+  "qr-code": QrCode,
 };
 
 /**

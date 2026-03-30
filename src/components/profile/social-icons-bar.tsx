@@ -19,6 +19,7 @@ import {
   Phone,
   Mail,
   Globe,
+  QrCode,
   type LucideIcon,
 } from "lucide-react";
 import { SOCIAL_PLATFORMS } from "@/lib/constants";
@@ -48,6 +49,7 @@ const LUCIDE_ICON_MAP: Record<string, LucideIcon> = {
   phone: Phone,
   mail: Mail,
   globe: Globe,
+  "qr-code": QrCode,
 };
 
 function getIconForPlatform(platform: SocialPlatform): LucideIcon {
@@ -78,21 +80,38 @@ export function SocialIconsBar({ socialIcons, textColor }: SocialIconsBarProps) 
         const IconComponent = getIconForPlatform(icon.platform);
         const label = getPlatformLabel(icon.platform);
 
+        const isPix = icon.platform === "pix";
+        const motionProps = {
+          key: icon.id,
+          "aria-label": label,
+          title: label,
+          style: { color: textColor } as React.CSSProperties,
+          className: "opacity-70 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 rounded",
+          initial: { opacity: 0, scale: 0.8 },
+          animate: { opacity: 0.7, scale: 1 },
+          transition: { duration: 0.3, ease: "easeOut" as const, delay: 0.55 + i * 0.04 },
+          whileHover: { scale: 1.15, opacity: 1 },
+          whileTap: { scale: 0.92 },
+        };
+
+        if (isPix) {
+          return (
+            <motion.button
+              type="button"
+              {...motionProps}
+              onClick={() => navigator.clipboard.writeText(icon.url)}
+            >
+              <IconComponent size={24} strokeWidth={1.75} />
+            </motion.button>
+          );
+        }
+
         return (
           <motion.a
-            key={icon.id}
             href={icon.url}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={label}
-            title={label}
-            style={{ color: textColor }}
-            className="opacity-70 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 rounded"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 0.7, scale: 1 }}
-            transition={{ duration: 0.3, ease: "easeOut", delay: 0.55 + i * 0.04 }}
-            whileHover={{ scale: 1.15, opacity: 1 }}
-            whileTap={{ scale: 0.92 }}
+            {...motionProps}
           >
             <IconComponent size={24} strokeWidth={1.75} />
           </motion.a>

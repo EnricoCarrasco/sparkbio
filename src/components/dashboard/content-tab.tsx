@@ -13,7 +13,24 @@ import {
   RectangleHorizontal,
   LayoutGrid,
   BarChart3,
+  GripVertical,
 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -242,9 +259,40 @@ function SocialIconCard({
     }
   }
 
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: icon.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
   return (
-    <div className="rounded-2xl bg-white border border-border/60 shadow-sm">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "rounded-2xl bg-white border border-border/60 shadow-sm",
+        isDragging && "shadow-lg opacity-80 z-50"
+      )}
+    >
       <div className="flex items-center gap-3 p-3.5">
+        {/* Drag handle */}
+        <button
+          type="button"
+          className="cursor-grab active:cursor-grabbing touch-none text-muted-foreground/40 hover:text-muted-foreground transition-colors shrink-0 -ml-1"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="size-4" />
+        </button>
+
         {/* Platform icon with brand colors */}
         <BrandIcon platform={icon.platform} size={36} iconSize={18} />
 
@@ -421,12 +469,29 @@ function SocialIconCard({
 
 function SocialIconsList() {
   const socialIcons = useSocialStore((s) => s.socialIcons);
+  const reorderSocialIcons = useSocialStore((s) => s.reorderSocialIcons);
   const tLinks = useTranslations("dashboard.links");
   const { counts } = useLinkClickCounts();
 
   // Insights modal state
   const [insightsOpen, setInsightsOpen] = useState(false);
   const [selectedIconId, setSelectedIconId] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      reorderSocialIcons(String(active.id), String(over.id));
+    }
+  }
 
   // Build a Link-shaped object for the modal (it expects a Link)
   const selectedIcon = selectedIconId
@@ -453,6 +518,8 @@ function SocialIconsList() {
 
   if (socialIcons.length === 0) return null;
 
+  const sorted = [...socialIcons].sort((a, b) => a.position - b.position);
+
   return (
     <>
       <div className="space-y-3">
@@ -463,16 +530,27 @@ function SocialIconsList() {
           </span>
           <div className="flex-1 h-px bg-border" />
         </div>
-        {socialIcons
-          .sort((a, b) => a.position - b.position)
-          .map((icon) => (
-            <SocialIconCard
-              key={icon.id}
-              icon={icon}
-              clickCount={counts[icon.id] ?? 0}
-              onOpenInsights={handleOpenInsights}
-            />
-          ))}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={sorted.map((i) => i.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="space-y-3">
+              {sorted.map((icon) => (
+                <SocialIconCard
+                  key={icon.id}
+                  icon={icon}
+                  clickCount={counts[icon.id] ?? 0}
+                  onOpenInsights={handleOpenInsights}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
       </div>
 
       <LinkInsightsModal

@@ -1,10 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { Share2 } from "lucide-react";
 import { usePreviewIframe } from "@/lib/hooks/use-preview-iframe";
+import { ShareModal } from "@/components/dashboard/share-modal";
+
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://viopage.com";
 
 export function PreviewPanel() {
   const { iframeSrc, refreshKey, username } = usePreviewIframe();
+  const [shareOpen, setShareOpen] = useState(false);
+
+  const displayUrl = username
+    ? `${SITE_URL}/${username}`.replace(/^https?:\/\//, "")
+    : "";
 
   return (
     <div className="flex flex-col h-full">
@@ -24,6 +34,22 @@ export function PreviewPanel() {
           </a>
         )}
       </div>
+
+      {/* Share URL bar */}
+      {username && (
+        <div className="px-4 pt-3 shrink-0">
+          <button
+            type="button"
+            onClick={() => setShareOpen(true)}
+            className="w-full flex items-center gap-2.5 rounded-full border border-border bg-[#F5F5F5] dark:bg-[#1a1a1a] px-4 py-2.5 transition-colors hover:bg-[#EBEBEB] dark:hover:bg-[#252525] active:bg-[#E0E0E0] dark:active:bg-[#333]"
+          >
+            <span className="flex-1 text-sm text-[#1b1b1d] dark:text-white font-medium truncate text-left">
+              {displayUrl}
+            </span>
+            <Share2 className="size-4 text-[#999] shrink-0" />
+          </button>
+        </div>
+      )}
 
       {/* Phone frame wrapper */}
       <div className="flex-1 flex items-start justify-center py-6 px-3 overflow-y-auto">
@@ -68,6 +94,15 @@ export function PreviewPanel() {
           </div>
         </div>
       </div>
+
+      {/* Share modal */}
+      {username && (
+        <ShareModal
+          open={shareOpen}
+          onOpenChange={setShareOpen}
+          username={username}
+        />
+      )}
     </div>
   );
 }

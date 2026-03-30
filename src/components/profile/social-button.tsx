@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { SOCIAL_PLATFORMS, PLATFORM_BRAND_COLORS } from "@/lib/constants";
@@ -33,6 +34,8 @@ interface SocialButtonProps {
 }
 
 export function SocialButton({ icon, profileId, theme, index }: SocialButtonProps) {
+  const [copied, setCopied] = useState(false);
+  const isPix = icon.platform === "pix";
   const { button_color, button_text_color, button_style_v2, button_corner, button_shadow } = theme;
   const brand = PLATFORM_BRAND_COLORS[icon.platform];
   const iconPath = getBrandIconPath(icon.platform);
@@ -81,7 +84,7 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
       break;
   }
 
-  function handleClick() {
+  function fireAnalytics() {
     const payload = JSON.stringify({
       profile_id: profileId,
       link_id: icon.id,
@@ -97,6 +100,40 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
     }
   }
 
+  async function handlePixCopy() {
+    fireAnalytics();
+    try {
+      await navigator.clipboard.writeText(icon.url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback: select text approach
+    }
+  }
+
+  const innerContent = (
+    <>
+      {/* Brand icon square */}
+      <div
+        className="size-8 rounded-lg flex items-center justify-center shrink-0"
+        style={{ background: brand.bg }}
+      >
+        <Image
+          src={iconPath}
+          alt={platformLabel}
+          width={16}
+          height={16}
+          className={brand.text === "#fff" ? "brightness-0 invert" : "brightness-0"}
+        />
+      </div>
+
+      {/* Title text */}
+      <span className="flex-1 text-center pr-8">
+        {isPix && copied ? "Copied!" : title}
+      </span>
+    </>
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -108,34 +145,33 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
       }}
       className="w-full"
     >
-      <motion.a
-        href={icon.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={title}
-        style={outerStyle}
-        onClick={handleClick}
-        whileHover={{ scale: 1.02, opacity: 0.92 }}
-        whileTap={{ scale: 0.97, opacity: 0.85 }}
-        transition={{ duration: 0.15, ease: "easeOut" }}
-      >
-        {/* Brand icon square */}
-        <div
-          className="size-8 rounded-lg flex items-center justify-center shrink-0"
-          style={{ background: brand.bg }}
+      {isPix ? (
+        <motion.button
+          type="button"
+          aria-label={title}
+          style={outerStyle}
+          onClick={handlePixCopy}
+          whileHover={{ scale: 1.02, opacity: 0.92 }}
+          whileTap={{ scale: 0.97, opacity: 0.85 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
         >
-          <Image
-            src={iconPath}
-            alt={platformLabel}
-            width={16}
-            height={16}
-            className={brand.text === "#fff" ? "brightness-0 invert" : "brightness-0"}
-          />
-        </div>
-
-        {/* Title text */}
-        <span className="flex-1 text-center pr-8">{title}</span>
-      </motion.a>
+          {innerContent}
+        </motion.button>
+      ) : (
+        <motion.a
+          href={icon.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={title}
+          style={outerStyle}
+          onClick={fireAnalytics}
+          whileHover={{ scale: 1.02, opacity: 0.92 }}
+          whileTap={{ scale: 0.97, opacity: 0.85 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
+        >
+          {innerContent}
+        </motion.a>
+      )}
     </motion.div>
   );
 }

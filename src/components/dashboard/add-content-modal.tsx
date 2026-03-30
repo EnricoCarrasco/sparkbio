@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
-import { useTranslations } from "next-intl";
+import React, { useState, useMemo } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import {
   Search,
   Lightbulb,
   Heart,
   PlayCircle,
   Contact,
+  Banknote,
   Link2,
   ChevronRight,
 } from "lucide-react";
@@ -23,14 +24,18 @@ import { getPlatformLabel } from "@/lib/social-icon-map";
 import { BrandIcon } from "@/components/ui/brand-icon";
 import type { SocialPlatform } from "@/types";
 
-type Category = "suggested" | "social" | "media" | "contact";
+type Category = "suggested" | "social" | "media" | "contact" | "payment";
 
-const CATEGORIES: { key: Category; icon: React.ElementType }[] = [
+const BASE_CATEGORIES: { key: Category; icon: React.ElementType }[] = [
   { key: "suggested", icon: Lightbulb },
   { key: "social", icon: Heart },
   { key: "media", icon: PlayCircle },
   { key: "contact", icon: Contact },
 ];
+
+const PAYMENT_CATEGORY: { key: Category; icon: React.ElementType } = {
+  key: "payment", icon: Banknote,
+};
 
 const PLATFORM_CATEGORIES: Record<Category, SocialPlatform[]> = {
   suggested: [
@@ -53,6 +58,7 @@ const PLATFORM_CATEGORIES: Record<Category, SocialPlatform[]> = {
   ],
   media: ["youtube", "spotify", "soundcloud", "twitch"],
   contact: ["whatsapp", "telegram", "email", "website"],
+  payment: ["pix"],
 };
 
 const PLATFORM_DESCRIPTIONS: Partial<Record<SocialPlatform, string>> = {
@@ -73,6 +79,11 @@ const PLATFORM_DESCRIPTIONS: Partial<Record<SocialPlatform, string>> = {
   telegram: "Let visitors reach you on Telegram",
   email: "Let visitors email you directly",
   website: "Link to your website",
+  pix: "Accept Pix payments",
+};
+
+const PLATFORM_DESCRIPTIONS_PTBR: Partial<Record<SocialPlatform, string>> = {
+  pix: "Receba pagamentos via Pix",
 };
 
 interface AddContentModalProps {
@@ -89,8 +100,17 @@ export function AddContentModal({
   onOpenSmartInput,
 }: AddContentModalProps) {
   const t = useTranslations("dashboard.addModal");
+  const locale = useLocale();
   const [activeCategory, setActiveCategory] = useState<Category>("suggested");
   const [search, setSearch] = useState("");
+
+  // Show Payment category only for PT-BR locale
+  const categories = useMemo(() => {
+    if (locale === "pt-BR") {
+      return [...BASE_CATEGORIES, PAYMENT_CATEGORY];
+    }
+    return BASE_CATEGORIES;
+  }, [locale]);
 
   const platforms = PLATFORM_CATEGORIES[activeCategory] || [];
 
@@ -136,7 +156,7 @@ export function AddContentModal({
         {/* Mobile: horizontal category chips */}
         <div className="md:hidden relative pb-3">
           <div className="flex gap-2 overflow-x-auto no-scrollbar px-5">
-            {CATEGORIES.map(({ key, icon: Icon }) => (
+            {categories.map(({ key, icon: Icon }) => (
               <button
                 key={key}
                 type="button"
@@ -168,7 +188,7 @@ export function AddContentModal({
         <div className="flex flex-col md:flex-row min-h-0 md:min-h-[400px] md:max-h-[500px] overflow-hidden">
           {/* Left sidebar - categories (desktop only) */}
           <div className="hidden md:block w-[180px] border-r py-3 px-2 shrink-0">
-            {CATEGORIES.map(({ key, icon: Icon }) => (
+            {categories.map(({ key, icon: Icon }) => (
               <button
                 key={key}
                 type="button"
@@ -218,7 +238,8 @@ export function AddContentModal({
               )}
               {filteredPlatforms.map((platform) => {
                 const label = getPlatformLabel(platform);
-                const desc = PLATFORM_DESCRIPTIONS[platform] || "";
+                const desc = (locale === "pt-BR" ? PLATFORM_DESCRIPTIONS_PTBR[platform] : undefined)
+                  ?? PLATFORM_DESCRIPTIONS[platform] ?? "";
                 return (
                   <button
                     key={platform}

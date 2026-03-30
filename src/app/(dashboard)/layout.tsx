@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState, lazy, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Menu, Crown, Loader2 } from "lucide-react";
+import { Menu, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -44,94 +44,6 @@ function TabFallback() {
   );
 }
 
-function TrialGate() {
-  const t = useTranslations("billing");
-  const [isLoading, setIsLoading] = useState(false);
-  const [interval, setInterval] = useState<"monthly" | "yearly">("yearly");
-
-  const handleStartTrial = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ interval }),
-      });
-      const { url } = await res.json();
-      if (url) {
-        window.location.href = url;
-        return;
-      }
-      toast.error(t("checkoutError"));
-    } catch {
-      toast.error(t("checkoutError"));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA] px-4">
-      <div className="w-full max-w-md text-center space-y-6">
-        <div className="flex justify-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100">
-            <Crown className="size-7 text-amber-600" />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-[#1b1b1d]">{t("trialGateTitle")}</h1>
-          <p className="text-sm text-[#777] leading-relaxed">{t("trialGateDesc")}</p>
-        </div>
-
-        {/* Interval toggle */}
-        <div className="inline-flex items-center rounded-full p-1 bg-[#F0EDF0]">
-          <button
-            type="button"
-            onClick={() => setInterval("monthly")}
-            className={`rounded-full px-4 py-2 text-sm transition-all ${
-              interval === "monthly"
-                ? "bg-white font-semibold text-[#1b1b1d] shadow-sm"
-                : "font-medium text-[#777]"
-            }`}
-          >
-            {t("monthly")} — €9
-          </button>
-          <button
-            type="button"
-            onClick={() => setInterval("yearly")}
-            className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm transition-all ${
-              interval === "yearly"
-                ? "bg-white font-semibold text-[#1b1b1d] shadow-sm"
-                : "font-medium text-[#777]"
-            }`}
-          >
-            {t("yearly")} — €7
-            <span className="rounded-full bg-[#FF6B35]/10 px-2 py-0.5 text-[10px] font-semibold text-[#FF6B35]">
-              {t("yearlySavings")}
-            </span>
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          <Button
-            onClick={handleStartTrial}
-            disabled={isLoading}
-            className="w-full h-12 rounded-full bg-[#FF6B35] hover:bg-[#e85a24] text-white font-semibold text-[15px] gap-2"
-          >
-            {isLoading ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Crown className="size-4" />
-            )}
-            {isLoading ? t("redirecting") : t("startTrial")}
-          </Button>
-          <p className="text-xs text-[#aaa]">{t("trialDisclaimer")}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function DashboardLayout({
   children,
@@ -168,17 +80,20 @@ export default function DashboardLayout({
     }
   }, [searchParams, fetchSubscription]);
 
-  // Gate: show trial signup if no active subscription
-  if (subLoading) {
+  // Gate: redirect to /trial if no active subscription
+  const router = useRouter();
+  useEffect(() => {
+    if (!subLoading && !isPro) {
+      router.replace("/trial");
+    }
+  }, [subLoading, isPro, router]);
+
+  if (subLoading || !isPro) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
         <Loader2 className="size-6 animate-spin text-[#FF6B35]" />
       </div>
     );
-  }
-
-  if (!isPro) {
-    return <TrialGate />;
   }
 
   return (
