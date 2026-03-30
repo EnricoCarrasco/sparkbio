@@ -24,10 +24,21 @@ export function DownloadBar({ cardRef }: DownloadBarProps) {
 
     setDownloading(true);
     try {
-      const dataUrl = await toPng(cardRef.current, {
-        pixelRatio: 2, // 2x for retina
+      // Temporarily remove the CSS scale transform so we capture at full 600px size
+      const el = cardRef.current;
+      const origTransform = el.style.transform;
+      const origTransformOrigin = el.style.transformOrigin;
+      el.style.transform = "none";
+      el.style.transformOrigin = "";
+
+      const dataUrl = await toPng(el, {
+        pixelRatio: 3, // 3x for crisp print-quality export (1800×1125)
         cacheBust: true,
       });
+
+      // Restore original transform
+      el.style.transform = origTransform;
+      el.style.transformOrigin = origTransformOrigin;
 
       // Create download link
       const link = document.createElement("a");

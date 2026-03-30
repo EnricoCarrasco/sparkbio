@@ -1,11 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { useBusinessCardStore } from "@/lib/stores/business-card-store";
 import { useProfileStore } from "@/lib/stores/profile-store";
 import { useSocialStore } from "@/lib/stores/social-store";
 import { Phone, Mail, Globe } from "lucide-react";
+
+// The card renders at a fixed internal width so fonts/elements stay crisp.
+// CSS scale() shrinks it to fit the container on any screen.
+const CARD_WIDTH = 600;
+const CARD_HEIGHT = CARD_WIDTH / 1.6; // 375px — standard business card ratio
 
 interface CardPreviewProps {
   cardRef: React.RefObject<HTMLDivElement | null>;
@@ -21,6 +26,8 @@ function isLightColor(hex: string) {
 
 export function CardPreview({ cardRef }: CardPreviewProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
   const store = useBusinessCardStore();
   const username = useProfileStore((s) => s.profile?.username);
   const socialIcons = useSocialStore((s) => s.socialIcons);
@@ -31,20 +38,35 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
   const logoSrc = store.aiLogoUrl || store.logoUrl;
   const isDark = !isLightColor(store.bgColor);
 
-  // Get active social icons (limit to 4 for card)
   const activeSocials = socialIcons
     .filter((s) => s.is_active)
     .slice(0, 4);
 
-  // Muted text color — slightly faded version of textColor
   const mutedText = isDark
     ? `${store.textColor}99`
     : `${store.textColor}88`;
 
+  // Scale the fixed-size card to fit the wrapper container
+  useEffect(() => {
+    function updateScale() {
+      if (!wrapperRef.current) return;
+      const containerWidth = wrapperRef.current.offsetWidth;
+      setScale(Math.min(containerWidth / CARD_WIDTH, 1));
+    }
+    updateScale();
+    const observer = new ResizeObserver(updateScale);
+    if (wrapperRef.current) observer.observe(wrapperRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div
-      className="w-full"
-      style={{ perspective: "1000px" }}
+      ref={wrapperRef}
+      className="w-full overflow-hidden"
+      style={{
+        height: CARD_HEIGHT * scale,
+        perspective: "1000px",
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -52,12 +74,12 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
         ref={cardRef}
         className="relative overflow-hidden"
         style={{
-          aspectRatio: "1.6 / 1",
-          borderRadius: "20px",
+          width: CARD_WIDTH,
+          height: CARD_HEIGHT,
+          borderRadius: 20,
           backgroundColor: store.bgColor,
-          transform: isHovered
-            ? "rotateY(0deg) rotateX(0deg)"
-            : "rotateY(-5deg) rotateX(5deg)",
+          transform: `scale(${scale}) ${isHovered ? "" : "rotateY(-5deg) rotateX(5deg)"}`,
+          transformOrigin: "top left",
           transition: "transform 700ms ease-out",
           boxShadow: "0 25px 60px -12px rgba(0,0,0,0.25)",
         }}
@@ -71,7 +93,7 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
           />
         )}
 
-        {/* Noise texture for premium feel */}
+        {/* Noise texture */}
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{
@@ -92,8 +114,9 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
         {/* Decorative border glow */}
         {isDark && (
           <div
-            className="absolute inset-0 rounded-[20px]"
+            className="absolute inset-0"
             style={{
+              borderRadius: 20,
               border: `1px solid ${store.accentColor}25`,
               boxShadow: `inset 0 0 60px ${store.accentColor}06`,
             }}
@@ -102,24 +125,26 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
 
         {/* Card content — split layout */}
         <div className="relative z-10 flex h-full">
-          {/* Left side (55%) — Logo, Contact, Social */}
-          <div className="flex flex-col justify-between w-[55%] p-6 sm:p-8">
+          {/* Left side (55%) */}
+          <div className="flex flex-col justify-between w-[55%] p-8">
             {/* Logo */}
             <div>
               {logoSrc ? (
                 <img
                   src={logoSrc}
                   alt="Logo"
-                  className="w-20 h-20 rounded-2xl object-cover"
-                  style={{
-                    boxShadow: `0 4px 24px ${store.accentColor}30`,
-                  }}
+                  style={{ width: 80, height: 80, borderRadius: 16 }}
+                  className="object-cover"
                   crossOrigin="anonymous"
                 />
               ) : (
                 <div
-                  className="w-20 h-20 rounded-2xl flex items-center justify-center text-white font-black text-2xl"
+                  className="flex items-center justify-center text-white font-black"
                   style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 16,
+                    fontSize: 28,
                     background: `linear-gradient(135deg, ${store.primaryColor}, ${store.primaryColor}cc)`,
                     boxShadow: `0 4px 24px ${store.primaryColor}40`,
                   }}
@@ -132,40 +157,40 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
             {/* Name, Title, Contact */}
             <div>
               <h2
-                className="text-2xl sm:text-3xl font-black leading-tight tracking-tight"
-                style={{ color: store.textColor }}
+                className="font-black leading-tight tracking-tight"
+                style={{ color: store.textColor, fontSize: 30 }}
               >
                 {store.fullName || "Your Name"}
               </h2>
               <p
-                className="text-sm font-semibold mt-1"
-                style={{ color: store.accentColor }}
+                className="font-semibold"
+                style={{ color: store.accentColor, fontSize: 14, marginTop: 4 }}
               >
                 {store.jobTitle || "Your Title"}
               </p>
 
               {/* Contact info */}
-              <div className="flex flex-col gap-1.5 mt-4">
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 16 }}>
                 {store.phone && (
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-3.5 h-3.5" style={{ color: store.accentColor }} />
-                    <span className="text-xs font-medium" style={{ color: mutedText }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <Phone style={{ width: 14, height: 14, color: store.accentColor }} />
+                    <span style={{ fontSize: 12, fontWeight: 500, color: mutedText }}>
                       {store.phone}
                     </span>
                   </div>
                 )}
                 {store.email && (
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-3.5 h-3.5" style={{ color: store.accentColor }} />
-                    <span className="text-xs font-medium" style={{ color: mutedText }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <Mail style={{ width: 14, height: 14, color: store.accentColor }} />
+                    <span style={{ fontSize: 12, fontWeight: 500, color: mutedText }}>
                       {store.email}
                     </span>
                   </div>
                 )}
                 {store.website && (
-                  <div className="flex items-center gap-2">
-                    <Globe className="w-3.5 h-3.5" style={{ color: store.accentColor }} />
-                    <span className="text-xs font-medium" style={{ color: mutedText }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <Globe style={{ width: 14, height: 14, color: store.accentColor }} />
+                    <span style={{ fontSize: 12, fontWeight: 500, color: mutedText }}>
                       {store.website}
                     </span>
                   </div>
@@ -174,12 +199,17 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
 
               {/* Social icons */}
               {activeSocials.length > 0 && (
-                <div className="flex items-center gap-2.5 mt-4">
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 16 }}>
                   {activeSocials.map((social) => (
                     <div
                       key={social.id}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center"
                       style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 8,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                         backgroundColor: `${store.accentColor}15`,
                         border: `1px solid ${store.accentColor}25`,
                       }}
@@ -187,8 +217,9 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
                       <img
                         src={`/icons/social/${social.platform}.svg`}
                         alt={social.platform}
-                        className="w-4 h-4"
                         style={{
+                          width: 16,
+                          height: 16,
                           filter: isDark ? "brightness(0) invert(1)" : "none",
                           opacity: isDark ? 0.8 : 0.7,
                         }}
@@ -200,22 +231,23 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
             </div>
           </div>
 
-          {/* Right side (45%) — Brand name + QR Code */}
-          <div className="flex flex-col items-center justify-between w-[45%] p-6 sm:p-8">
+          {/* Right side (45%) */}
+          <div className="flex flex-col items-center justify-between w-[45%] p-8">
             {/* Brand name */}
             <p
-              className="text-base sm:text-lg font-bold text-center leading-snug"
-              style={{ color: store.accentColor }}
+              className="font-bold text-center leading-snug"
+              style={{ color: store.accentColor, fontSize: 18 }}
             >
               {store.brandName || "Your Brand"}
             </p>
 
-            {/* QR Code with decorative frame */}
+            {/* QR Code */}
             {store.showQrCode && (
               <div className="flex flex-col items-center">
                 <div
-                  className="p-1 rounded-2xl"
                   style={{
+                    padding: 4,
+                    borderRadius: 16,
                     background: `linear-gradient(135deg, ${store.accentColor}60, ${store.accentColor}20, ${store.accentColor}60)`,
                     boxShadow: isDark
                       ? `0 0 30px ${store.accentColor}15, inset 0 0 20px ${store.accentColor}08`
@@ -223,12 +255,13 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
                   }}
                 >
                   <div
-                    className="p-0.5 rounded-xl"
                     style={{
+                      padding: 2,
+                      borderRadius: 12,
                       background: `linear-gradient(135deg, ${store.accentColor}80, ${store.accentColor}30)`,
                     }}
                   >
-                    <div className="bg-white rounded-lg p-2">
+                    <div style={{ backgroundColor: "#fff", borderRadius: 8, padding: 8 }}>
                       <QRCodeCanvas
                         value={qrValue}
                         size={140}
@@ -241,8 +274,8 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
                   </div>
                 </div>
                 <p
-                  className="text-[10px] font-medium mt-2 text-center"
-                  style={{ color: mutedText }}
+                  className="font-medium text-center"
+                  style={{ color: mutedText, fontSize: 10, marginTop: 8 }}
                 >
                   Scan to visit my page
                 </p>
@@ -255,16 +288,16 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
         {isDark && (
           <>
             <div
-              className="absolute top-4 right-4 w-1 h-1 rounded-full"
-              style={{ backgroundColor: store.accentColor, opacity: 0.6 }}
+              className="absolute"
+              style={{ top: 16, right: 16, width: 4, height: 4, borderRadius: 2, backgroundColor: store.accentColor, opacity: 0.6 }}
             />
             <div
-              className="absolute top-8 right-12 w-0.5 h-0.5 rounded-full"
-              style={{ backgroundColor: store.accentColor, opacity: 0.4 }}
+              className="absolute"
+              style={{ top: 32, right: 48, width: 2, height: 2, borderRadius: 1, backgroundColor: store.accentColor, opacity: 0.4 }}
             />
             <div
-              className="absolute bottom-6 left-[54%] w-1 h-1 rounded-full"
-              style={{ backgroundColor: store.accentColor, opacity: 0.5 }}
+              className="absolute"
+              style={{ bottom: 24, left: "54%", width: 4, height: 4, borderRadius: 2, backgroundColor: store.accentColor, opacity: 0.5 }}
             />
           </>
         )}

@@ -12,6 +12,30 @@ import { AiLogoGenerator } from "./ai-logo-generator";
 import { CardPreview } from "./card-preview";
 import { DownloadBar } from "./download-bar";
 
+function PreviewHeader() {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        Live Preview
+      </span>
+      <div className="flex items-center gap-2">
+        <span className="flex items-center gap-1">
+          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <span className="text-[10px] text-muted-foreground">Live</span>
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="w-2 h-2 rounded-full bg-[#8B5CF6]" />
+          <span className="text-[10px] text-muted-foreground">AI Assisted</span>
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="w-2 h-2 rounded-full bg-blue-500" />
+          <span className="text-[10px] text-muted-foreground">High DPI</span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function BusinessCardTab() {
   const cardRef = useRef<HTMLDivElement>(null);
   const profile = useProfileStore((s) => s.profile);
@@ -43,8 +67,19 @@ export function BusinessCardTab() {
         </p>
       </div>
 
-      {/* Two-column layout */}
+      {/* Mobile: Preview first, then editor. Desktop: side-by-side */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Mobile-only Preview (shown first on small screens, hidden on lg) */}
+        <div className="lg:hidden space-y-4">
+          <PreviewHeader />
+          <CardPreview cardRef={cardRef} />
+          {username && (
+            <p className="text-xs text-muted-foreground text-center">
+              {siteUrl}/{username}
+            </p>
+          )}
+        </div>
+
         {/* Left Column — Editor */}
         <div className="lg:col-span-7 space-y-6">
           <TemplateSelector />
@@ -54,34 +89,12 @@ export function BusinessCardTab() {
           <DownloadBar cardRef={cardRef} />
         </div>
 
-        {/* Right Column — Preview (sticky) */}
-        <div className="lg:col-span-5">
+        {/* Right Column — Preview (sticky, desktop only) */}
+        <div className="hidden lg:block lg:col-span-5">
           <div className="lg:sticky lg:top-24 space-y-5">
-            {/* Live preview header */}
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Live Preview
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-[10px] text-muted-foreground">Live</span>
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-[#8B5CF6]" />
-                  <span className="text-[10px] text-muted-foreground">AI Assisted</span>
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-blue-500" />
-                  <span className="text-[10px] text-muted-foreground">High DPI</span>
-                </span>
-              </div>
-            </div>
-
-            {/* Card Preview */}
+            <PreviewHeader />
             <CardPreview cardRef={cardRef} />
 
-            {/* Profile URL */}
             {username && (
               <p className="text-xs text-muted-foreground text-center">
                 {siteUrl}/{username}
