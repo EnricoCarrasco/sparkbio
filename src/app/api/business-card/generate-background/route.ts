@@ -1,0 +1,56 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import Replicate from "replicate";
+import { generateBackgroundSchema } from "@/lib/validators/business-card";
+
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  // Auth
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  // Parse body
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "invalid_json" }, { status: 400 });
+  }
+
+  // Validate
+  const parsed = generateBackgroundSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "validation_error", details: parsed.error.issues }, { status: 400 });
+  }
+
+  const { style, logoUrl } = parsed.data;
+
+  try {
+    const replicate = new Replicate();
+
+    const prompt = `${style}. Abstract background texture, artistic, high quality, 4k resolution. No text, no letters, no words, no numbers, no QR codes, no logos, no faces.`;
+
+    const input: Record<string, unknown> = {
+      prompt,
+    };
+
+    // If user has a logo, pass it as image_input for style reference
+    if (logoUrl) {
+      input.image_input = [logoUrl];
+    }
+
+    const output = await replicate.run("google/nano-banana", { input });
+
+    // output is a FileOutput — call .url() to get the URL string
+    const imageUrl = typeof output === "object" && output !== null && "url" in output
+      ? (output as { url: () => string }).url()
+      : String(output);
+
+    return NextResponse.json({ imageUrl });
+  } catch (error) {
+    console.error("Replicate background generation error:", error);
+    return NextResponse.json({ error: "generation_failed" }, { status: 500 });
+  }
+}
