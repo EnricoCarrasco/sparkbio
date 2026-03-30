@@ -543,6 +543,19 @@
       "deleteAccountDesc": "Exclua permanentemente sua conta e todos os dados. Esta ação não pode ser desfeita.",
       "deleteConfirm": "Tem certeza? Isso excluirá permanentemente sua conta.",
       "signOut": "Sair"
+    },
+    "preview": {
+      "livePreview": "Visualizar",
+      "loading": "Carregando..."
+    },
+    "share": {
+      "title": "Compartilhar",
+      "copy": "Copiar",
+      "linkCopied": "Link copiado!",
+      "myPlatforms": "Minhas plataformas",
+      "shareTo": "Compartilhar em",
+      "qrCode": "QR Code",
+      "nativeShare": "Mais..."
     }
   },
   "billing": {

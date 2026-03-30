@@ -542,6 +542,19 @@
       "deleteAccountDesc": "Permanently delete your account and all data. This action cannot be undone.",
       "deleteConfirm": "Are you sure? This will permanently delete your account.",
       "signOut": "Sign out"
+    },
+    "preview": {
+      "livePreview": "Live Preview",
+      "loading": "Loading preview..."
+    },
+    "share": {
+      "title": "Share",
+      "copy": "Copy",
+      "linkCopied": "Link copied!",
+      "myPlatforms": "My platforms",
+      "shareTo": "Share to",
+      "qrCode": "QR Code",
+      "nativeShare": "More..."
     }
   },
   "billing": {

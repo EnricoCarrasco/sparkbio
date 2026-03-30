@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sheet";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { PreviewPanel } from "@/components/dashboard/preview-panel";
+import { MobilePreviewFAB } from "@/components/dashboard/mobile-preview-fab";
 import { ContentTab } from "@/components/dashboard/content-tab";
 import { DesignTab } from "@/components/dashboard/design-tab";
 import { useLinkStore } from "@/lib/stores/link-store";
@@ -222,7 +223,7 @@ export default function DashboardLayout({
         {/* Content + preview row */}
         <div className="flex flex-1 overflow-hidden">
           {/* Main content — tab-based switching */}
-          <main className="flex-1 overflow-y-auto">
+          <main className="flex-1 overflow-y-auto pb-20 lg:pb-0">
             {activeTab === "content" && <ContentTab />}
             {activeTab === "design" && <DesignTab />}
             {activeTab === "analytics" && (
@@ -243,6 +244,9 @@ export default function DashboardLayout({
           </aside>
         </div>
       </div>
+
+      {/* Mobile preview FAB + bottom sheet */}
+      <MobilePreviewFAB />
     </div>
   );
 }

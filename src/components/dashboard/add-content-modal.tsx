@@ -41,7 +41,6 @@ type Category =
 
 const CATEGORIES: { key: Category; icon: React.ElementType }[] = [
   { key: "suggested", icon: Lightbulb },
-  { key: "commerce", icon: ShoppingCart },
   { key: "social", icon: Heart },
   { key: "media", icon: PlayCircle },
   { key: "contact", icon: Contact },
@@ -133,14 +132,14 @@ export function AddContentModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl p-0 gap-0 overflow-hidden">
+      <DialogContent className="!top-auto md:!top-1/2 !left-0 md:!left-1/2 !bottom-0 md:!bottom-auto !translate-x-0 md:!-translate-x-1/2 !translate-y-0 md:!-translate-y-1/2 !max-w-full md:!max-w-2xl !rounded-b-none md:!rounded-b-xl rounded-t-2xl p-0 gap-0 overflow-hidden max-h-[85dvh] md:max-h-none [&>*]:min-w-0">
         {/* Header */}
-        <DialogHeader className="px-6 pt-5 pb-0">
+        <DialogHeader className="px-5 md:px-6 pt-4 md:pt-5 pb-0">
           <DialogTitle className="text-lg font-bold">{t("title")}</DialogTitle>
         </DialogHeader>
 
         {/* Search bar */}
-        <div className="px-6 py-4">
+        <div className="px-5 md:px-6 py-3 md:py-4">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <input
@@ -148,17 +147,53 @@ export function AddContentModal({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t("searchPlaceholder")}
-              className="w-full h-12 pl-11 pr-4 rounded-full border-2 border-dashed border-border bg-muted/30 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 transition-colors"
+              className="w-full h-11 md:h-12 pl-11 pr-4 rounded-full border-2 border-dashed border-border bg-muted/30 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 transition-colors"
             />
           </div>
         </div>
 
+        {/* Mobile: horizontal category chips */}
+        <div className="md:hidden relative pb-3">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar px-5">
+            {CATEGORIES.map(({ key, icon: Icon }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => {
+                  setActiveCategory(key);
+                  setSearch("");
+                }}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors shrink-0",
+                  activeCategory === key && !search
+                    ? "bg-[#8B5CF6] text-white"
+                    : "bg-muted/50 text-muted-foreground"
+                )}
+              >
+                <Icon className="size-3.5" />
+                {t(key)}
+              </button>
+            ))}
+            <button
+              type="button"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-muted/50 text-muted-foreground shrink-0"
+            >
+              <MoreHorizontal className="size-3.5" />
+              {t("viewAll")}
+            </button>
+            {/* Spacer so last chip isn't flush with edge */}
+            <div className="shrink-0 w-1" aria-hidden="true" />
+          </div>
+          {/* Right fade to indicate scrollability */}
+          <div className="pointer-events-none absolute right-0 top-0 bottom-3 w-6 bg-gradient-to-l from-background to-transparent" />
+        </div>
+
         <div className="border-t" />
 
-        {/* Two-column: categories + content */}
-        <div className="flex min-h-[400px] max-h-[500px]">
-          {/* Left sidebar - categories */}
-          <div className="w-[180px] border-r py-3 px-2 shrink-0">
+        {/* Two-column on desktop, single column on mobile */}
+        <div className="flex flex-col md:flex-row min-h-0 md:min-h-[400px] md:max-h-[500px] overflow-hidden">
+          {/* Left sidebar - categories (desktop only) */}
+          <div className="hidden md:block w-[180px] border-r py-3 px-2 shrink-0">
             {CATEGORIES.map(({ key, icon: Icon }) => (
               <button
                 key={key}
@@ -188,9 +223,9 @@ export function AddContentModal({
           </div>
 
           {/* Right content */}
-          <div className="flex-1 overflow-y-auto py-4 px-5">
+          <div className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto py-3 px-4 md:py-4 md:px-5">
             {/* Type cards */}
-            <div className="grid grid-cols-4 gap-2 mb-5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4 md:mb-5">
               {[
                 {
                   key: "collection" as const,
@@ -223,16 +258,24 @@ export function AddContentModal({
                   onClick={onClick}
                   disabled={disabled}
                   className={cn(
-                    "flex flex-col items-start justify-between p-3 h-[76px] rounded-lg border bg-muted/30 transition-all text-left",
-                    disabled
-                      ? "opacity-50 cursor-not-allowed"
-                      : "hover:bg-muted/60 hover:border-foreground/20 cursor-pointer"
+                    "flex flex-col items-start justify-between px-4 py-3 h-[68px] rounded-full border transition-all text-left",
+                    key === "link"
+                      ? "bg-[#8B5CF6]/10 border-[#8B5CF6]/30 hover:bg-[#8B5CF6]/15 cursor-pointer"
+                      : disabled
+                        ? "bg-muted/30 opacity-50 cursor-not-allowed"
+                        : "bg-muted/30 hover:bg-muted/60 hover:border-foreground/20 cursor-pointer"
                   )}
                 >
-                  <span className="text-xs font-semibold text-foreground">
+                  <span className={cn(
+                    "text-xs font-semibold",
+                    key === "link" ? "text-[#8B5CF6]" : "text-foreground"
+                  )}>
                     {t(key)}
                   </span>
-                  <Icon className="size-5 text-muted-foreground" />
+                  <Icon className={cn(
+                    "size-4",
+                    key === "link" ? "text-[#8B5CF6]/60" : "text-muted-foreground"
+                  )} />
                 </button>
               ))}
             </div>
@@ -243,7 +286,7 @@ export function AddContentModal({
             </p>
 
             {/* Platform list */}
-            <div className="space-y-1">
+            <div className="space-y-0.5 md:space-y-1">
               {filteredPlatforms.length === 0 && (
                 <p className="text-sm text-muted-foreground py-6 text-center">
                   {activeCategory === "commerce" || activeCategory === "events" || activeCategory === "text"
@@ -259,7 +302,7 @@ export function AddContentModal({
                     key={platform}
                     type="button"
                     onClick={() => handlePlatformClick(platform)}
-                    className="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-muted/50 transition-colors group"
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-muted/50 active:bg-muted/60 transition-colors group"
                   >
                     <BrandIcon platform={platform} size={40} iconSize={20} rounded="rounded-xl" />
                     <div className="flex-1 text-left min-w-0">

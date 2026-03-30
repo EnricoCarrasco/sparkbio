@@ -1,59 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useProfileStore } from "@/lib/stores/profile-store";
-import { useLinkStore } from "@/lib/stores/link-store";
-import { useThemeStore } from "@/lib/stores/theme-store";
-import { useSocialStore } from "@/lib/stores/social-store";
+import React from "react";
+import { usePreviewIframe } from "@/lib/hooks/use-preview-iframe";
 
 export function PreviewPanel() {
-  const profile = useProfileStore((s) => s.profile);
-  const links = useLinkStore((s) => s.links);
-  const theme = useThemeStore((s) => s.theme);
-  const socialIcons = useSocialStore((s) => s.socialIcons);
-
-  // Force iframe refresh when any store data changes
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  useEffect(() => {
-    // Debounce iframe refresh to avoid excessive reloads
-    const timer = setTimeout(() => {
-      setRefreshKey((k) => k + 1);
-    }, 800);
-    return () => clearTimeout(timer);
-  }, [
-    profile?.display_name,
-    profile?.bio,
-    profile?.avatar_url,
-    links,
-    theme?.bg_color,
-    theme?.bg_gradient_from,
-    theme?.bg_gradient_to,
-    theme?.bg_gradient_direction,
-    theme?.text_color,
-    theme?.button_color,
-    theme?.button_text_color,
-    theme?.button_style,
-    theme?.button_style_v2,
-    theme?.button_corner,
-    theme?.button_shadow,
-    theme?.font_family,
-    theme?.profile_layout,
-    theme?.title_style,
-    theme?.title_size,
-    theme?.title_font_alt,
-    theme?.title_color,
-    theme?.wallpaper_style,
-    theme?.wallpaper_gradient_style,
-    theme?.wallpaper_gradient_preset,
-    theme?.wallpaper_animate,
-    theme?.wallpaper_noise,
-    theme?.hide_footer,
-    socialIcons,
-  ]);
-
-  const username = profile?.username;
-  const iframeSrc = username ? `/${username}?preview=1&t=${refreshKey}` : null;
+  const { iframeSrc, refreshKey, username } = usePreviewIframe();
 
   return (
     <div className="flex flex-col h-full">
@@ -96,10 +47,9 @@ export function PreviewPanel() {
                   title="Profile preview"
                   className="w-full h-full border-0"
                   style={{
-                    // Scale down the page to fit the phone frame
                     transform: "scale(0.65)",
                     transformOrigin: "top left",
-                    width: "154%", // 1/0.65 = ~154%
+                    width: "154%",
                     height: "154%",
                   }}
                   sandbox="allow-scripts allow-same-origin allow-popups"
