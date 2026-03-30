@@ -28,8 +28,8 @@ const NAV_ITEMS: { key: DashboardTab; labelKey: string; icon: React.ElementType 
   { key: "content", labelKey: "content", icon: FileText },
   { key: "design", labelKey: "design", icon: Paintbrush },
   { key: "analytics", labelKey: "analytics", icon: BarChart3 },
-  { key: "settings", labelKey: "settings", icon: Settings },
   { key: "card", labelKey: "card", icon: CreditCard },
+  { key: "settings", labelKey: "settings", icon: Settings },
 ];
 
 export function Sidebar({ onNavigate }: SidebarProps) {
