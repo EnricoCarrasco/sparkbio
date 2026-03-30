@@ -125,9 +125,6 @@ export function SmartSocialLinkInput({
         <div className="px-5 py-5 space-y-4">
           {/* Smart input */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
-              {t(labelKey)}
-            </label>
             <div className="relative">
               {inputType === "phone" && (
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
