@@ -12,6 +12,7 @@ import {
   Circle,
   RectangleHorizontal,
   LayoutGrid,
+  BarChart3,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -25,13 +26,14 @@ import { LinkFormDialog } from "@/components/dashboard/link-form-dialog";
 import { AddContentModal } from "@/components/dashboard/add-content-modal";
 import { SmartSocialLinkInput } from "@/components/dashboard/smart-social-link-input";
 import { ProfileEditDialog } from "@/components/dashboard/profile-edit-dialog";
-import { useClickCounts } from "@/hooks/use-click-counts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getIconForPlatform, getPlatformLabel } from "@/lib/social-icon-map";
 import { AVATAR_MAX_SIZE, AVATAR_ACCEPTED_TYPES } from "@/lib/constants";
 import { BrandIcon } from "@/components/ui/brand-icon";
 import { cn } from "@/lib/utils";
-import type { SocialIcon, SocialPlatform, SocialDisplayMode } from "@/types";
+import { useLinkClickCounts } from "@/lib/hooks/use-link-click-counts";
+import { LinkInsightsModal } from "@/components/dashboard/link-insights-modal";
+import type { SocialIcon, SocialPlatform, SocialDisplayMode, Link } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Skeleton
@@ -190,8 +192,17 @@ function SocialIconBubble({ icon }: { icon: SocialIcon }) {
 // Social icon card (editable row in the social links section)
 // ---------------------------------------------------------------------------
 
-function SocialIconCard({ icon }: { icon: SocialIcon }) {
+function SocialIconCard({
+  icon,
+  clickCount,
+  onOpenInsights,
+}: {
+  icon: SocialIcon;
+  clickCount: number;
+  onOpenInsights: (id: string) => void;
+}) {
   const tSmart = useTranslations("dashboard.smartInput");
+  const tLinks = useTranslations("dashboard.links");
   const toggleSocialIcon = useSocialStore((s) => s.toggleSocialIcon);
   const deleteSocialIcon = useSocialStore((s) => s.deleteSocialIcon);
   const updateSocialIcon = useSocialStore((s) => s.updateSocialIcon);
@@ -359,14 +370,34 @@ function SocialIconCard({ icon }: { icon: SocialIcon }) {
 
       {/* Bottom action bar */}
       <div className="flex items-center justify-between px-3.5 pb-2.5 pt-0">
-        <a
-          href={icon.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-muted-foreground/40 hover:text-muted-foreground transition-colors"
-        >
-          <ExternalLink className="size-3.5" />
-        </a>
+        <div className="flex items-center gap-1">
+          <a
+            href={icon.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground/40 hover:text-muted-foreground transition-colors p-1"
+          >
+            <ExternalLink className="size-3.5" />
+          </a>
+          <button
+            type="button"
+            onClick={() => onOpenInsights(icon.id)}
+            className={cn(
+              "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border transition-colors",
+              clickCount > 0
+                ? "bg-orange-50 border-orange-300 text-orange-600 hover:bg-[#FF6B35] hover:text-white hover:border-[#FF6B35]"
+                : "bg-slate-50 border-slate-200 text-muted-foreground hover:bg-slate-100 hover:border-slate-300"
+            )}
+            title={tSmart("displayIcon")}
+          >
+            <BarChart3 className="size-3" />
+            {clickCount === 1
+              ? tLinks("clickSingular")
+              : clickCount === 0
+                ? tLinks("clicksZero")
+                : tLinks("clicks", { count: clickCount })}
+          </button>
+        </div>
         <Button
           type="button"
           variant="ghost"
@@ -391,24 +422,65 @@ function SocialIconCard({ icon }: { icon: SocialIcon }) {
 function SocialIconsList() {
   const socialIcons = useSocialStore((s) => s.socialIcons);
   const tLinks = useTranslations("dashboard.links");
+  const { counts } = useLinkClickCounts();
+
+  // Insights modal state
+  const [insightsOpen, setInsightsOpen] = useState(false);
+  const [selectedIconId, setSelectedIconId] = useState<string | null>(null);
+
+  // Build a Link-shaped object for the modal (it expects a Link)
+  const selectedIcon = selectedIconId
+    ? socialIcons.find((i) => i.id === selectedIconId)
+    : null;
+  const selectedLink: Link | null = selectedIcon
+    ? {
+        id: selectedIcon.id,
+        user_id: selectedIcon.user_id,
+        title: getPlatformLabel(selectedIcon.platform),
+        url: selectedIcon.url,
+        thumbnail_url: null,
+        position: selectedIcon.position,
+        is_active: selectedIcon.is_active,
+        created_at: "",
+        updated_at: "",
+      }
+    : null;
+
+  function handleOpenInsights(iconId: string) {
+    setSelectedIconId(iconId);
+    setInsightsOpen(true);
+  }
 
   if (socialIcons.length === 0) return null;
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2">
-        <Share2 className="size-3.5 text-muted-foreground" />
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          {tLinks("socialLinks")}
-        </span>
-        <div className="flex-1 h-px bg-border" />
+    <>
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Share2 className="size-3.5 text-muted-foreground" />
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            {tLinks("socialLinks")}
+          </span>
+          <div className="flex-1 h-px bg-border" />
+        </div>
+        {socialIcons
+          .sort((a, b) => a.position - b.position)
+          .map((icon) => (
+            <SocialIconCard
+              key={icon.id}
+              icon={icon}
+              clickCount={counts[icon.id] ?? 0}
+              onOpenInsights={handleOpenInsights}
+            />
+          ))}
       </div>
-      {socialIcons
-        .sort((a, b) => a.position - b.position)
-        .map((icon) => (
-          <SocialIconCard key={icon.id} icon={icon} />
-        ))}
-    </div>
+
+      <LinkInsightsModal
+        open={insightsOpen}
+        onOpenChange={setInsightsOpen}
+        link={selectedLink}
+      />
+    </>
   );
 }
 
@@ -430,8 +502,6 @@ export function ContentTab() {
   const [smartInputPlatform, setSmartInputPlatform] =
     useState<SocialPlatform | null>(null);
   const [profileEditOpen, setProfileEditOpen] = useState(false);
-
-  const { clickCounts } = useClickCounts();
 
   const isLoading = profileLoading || linksLoading || socialLoading;
 
@@ -473,7 +543,7 @@ export function ContentTab() {
       <SocialIconsList />
 
       {/* ── Link list (drag-and-drop cards) ── */}
-      <LinkList clickCounts={clickCounts} />
+      <LinkList />
 
       {/* ── Modals ── */}
 

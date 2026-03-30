@@ -335,6 +335,7 @@
       "appearance": "Aparência",
       "analytics": "Analytics",
       "settings": "Configurações",
+      "card": "Cartão",
       "viewProfile": "Ver meu Viopage",
       "signOut": "Sair"
     },
@@ -355,8 +356,23 @@
       "deleteConfirm": "Tem certeza de que deseja excluir este link?",
       "active": "Ativo",
       "inactive": "Inativo",
-      "clicks": "cliques",
-      "viewAnalytics": "Ver analytics"
+      "clicks": "{count} cliques",
+      "clickSingular": "1 clique",
+      "clicksZero": "0 cliques",
+      "insights": "Informações",
+      "clicksOverTime": "Cliques",
+      "totalClicks": "Total de Cliques",
+      "lifetime": "Total",
+      "lastNDays": "Últimos {count} dias",
+      "allTime": "Todo o período",
+      "trafficSources": "Fontes de Tráfego",
+      "locations": "Localizações",
+      "devices": "Dispositivos",
+      "dateRange": "Período: {range}",
+      "noClicks": "Nenhum clique neste período",
+      "direct": "Direto",
+      "unknown": "Desconhecido",
+      "clickRate": "{rate}% Taxa de cliques"
     },
     "profile": {
       "title": "Perfil",

@@ -46,7 +46,7 @@ export interface ProcessedAnalytics {
  * Extracts the domain from a referrer URL string.
  * Falls back to the raw string when parsing fails.
  */
-function extractDomain(referrer: string | null): string {
+export function extractDomain(referrer: string | null): string {
   if (!referrer) return "Direct";
   try {
     const url = new URL(
@@ -278,5 +278,54 @@ export function processAnalytics(
     devices: deviceBreakdown(events),
     topReferrers: topReferrers(events),
     topCountries: topCountries(events),
+  };
+}
+
+// ─── Per-link analytics ──────────────────────────────────────────────────────
+
+export interface ProcessedLinkAnalytics {
+  totalClicks: number;
+  lifetimeClicks: number;
+  clicksOverTime: DayCount[];
+  trafficSources: ReferrerCount[];
+  locations: CountryCount[];
+  devices: DeviceCount[];
+}
+
+/**
+ * Groups link_click events by calendar day (same logic as groupByDay but for clicks).
+ */
+export function groupClicksByDay(events: AnalyticsEvent[]): DayCount[] {
+  const clicks = events.filter((e) => e.event_type === "link_click");
+
+  const counts: Record<string, number> = {};
+  for (const event of clicks) {
+    const day = format(startOfDay(parseISO(event.created_at)), "yyyy-MM-dd");
+    counts[day] = (counts[day] ?? 0) + 1;
+  }
+
+  return Object.entries(counts)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([isoDate, count]) => ({
+      date: format(parseISO(isoDate), "MMM d"),
+      count,
+    }));
+}
+
+/**
+ * Processes analytics events for a single link into all display sections.
+ * `periodEvents` are filtered by date range; `lifetimeCount` is the all-time total.
+ */
+export function processLinkAnalytics(
+  periodEvents: AnalyticsEvent[],
+  lifetimeCount: number
+): ProcessedLinkAnalytics {
+  return {
+    totalClicks: periodEvents.filter((e) => e.event_type === "link_click").length,
+    lifetimeClicks: lifetimeCount,
+    clicksOverTime: groupClicksByDay(periodEvents),
+    trafficSources: topReferrers(periodEvents),
+    locations: topCountries(periodEvents),
+    devices: deviceBreakdown(periodEvents),
   };
 }

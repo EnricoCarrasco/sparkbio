@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link2 } from "lucide-react";
 import {
@@ -18,16 +18,23 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { LinkCard } from "@/components/dashboard/link-card";
+import { LinkInsightsModal } from "@/components/dashboard/link-insights-modal";
 import { useLinkStore } from "@/lib/stores/link-store";
+import { useLinkClickCounts } from "@/lib/hooks/use-link-click-counts";
 
-interface LinkListProps {
-  clickCounts?: Map<string, number>;
-}
-
-export function LinkList({ clickCounts }: LinkListProps) {
+export function LinkList() {
   const t = useTranslations("dashboard.links");
   const links = useLinkStore((s) => s.links);
   const reorderLinks = useLinkStore((s) => s.reorderLinks);
+  const { counts } = useLinkClickCounts();
+
+  // Insights modal state
+  const [insightsOpen, setInsightsOpen] = useState(false);
+  const [selectedLinkId, setSelectedLinkId] = useState<string | null>(null);
+
+  const selectedLink = selectedLinkId
+    ? links.find((l) => l.id === selectedLinkId) ?? null
+    : null;
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -43,6 +50,11 @@ export function LinkList({ clickCounts }: LinkListProps) {
     if (over && active.id !== over.id) {
       reorderLinks(String(active.id), String(over.id));
     }
+  }
+
+  function handleOpenInsights(linkId: string) {
+    setSelectedLinkId(linkId);
+    setInsightsOpen(true);
   }
 
   // Empty state
@@ -75,12 +87,20 @@ export function LinkList({ clickCounts }: LinkListProps) {
               <LinkCard
                 key={link.id}
                 link={link}
-                clickCount={clickCounts?.get(link.id) ?? 0}
+                clickCount={counts[link.id] ?? 0}
+                onOpenInsights={handleOpenInsights}
               />
             ))}
           </div>
         </SortableContext>
       </DndContext>
+
+      {/* Link insights modal */}
+      <LinkInsightsModal
+        open={insightsOpen}
+        onOpenChange={setInsightsOpen}
+        link={selectedLink}
+      />
     </>
   );
 }

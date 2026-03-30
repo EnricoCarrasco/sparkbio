@@ -7,6 +7,7 @@ import {
   Paintbrush,
   BarChart3,
   Settings,
+  CreditCard,
   ExternalLink,
   LogOut,
   ChevronLeft,
@@ -28,6 +29,7 @@ const NAV_ITEMS: { key: DashboardTab; labelKey: string; icon: React.ElementType 
   { key: "design", labelKey: "design", icon: Paintbrush },
   { key: "analytics", labelKey: "analytics", icon: BarChart3 },
   { key: "settings", labelKey: "settings", icon: Settings },
+  { key: "card", labelKey: "card", icon: CreditCard },
 ];
 
 export function Sidebar({ onNavigate }: SidebarProps) {

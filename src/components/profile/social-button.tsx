@@ -84,7 +84,7 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
   function handleClick() {
     const payload = JSON.stringify({
       profile_id: profileId,
-      link_id: null,
+      link_id: icon.id,
       event_type: "link_click",
       referrer: typeof document !== "undefined" ? document.referrer || undefined : undefined,
     });

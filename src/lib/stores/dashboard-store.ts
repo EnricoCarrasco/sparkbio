@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type DashboardTab = "content" | "design" | "analytics" | "settings";
+export type DashboardTab = "content" | "design" | "analytics" | "settings" | "card";
 export type DesignSubTab = "header" | "theme" | "wallpaper" | "text" | "buttons" | "colors" | "footer";
 
 interface DashboardState {

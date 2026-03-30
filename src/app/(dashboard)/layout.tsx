@@ -24,6 +24,8 @@ import { useDashboardStore } from "@/lib/stores/dashboard-store";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { Skeleton } from "@/components/ui/skeleton";
 
+const BusinessCardTab = lazy(() => import("@/components/dashboard/business-card/business-card-tab").then((m) => ({ default: m.BusinessCardTab })));
+
 // Lazy-load heavier tab content
 const AnalyticsPage = lazy(
   () => import("@/app/(dashboard)/dashboard/analytics/page")
@@ -236,10 +238,15 @@ export default function DashboardLayout({
                 <SettingsPage />
               </Suspense>
             )}
+            {activeTab === "card" && (
+              <Suspense fallback={<TabFallback />}>
+                <BusinessCardTab />
+              </Suspense>
+            )}
           </main>
 
-          {/* Live preview panel - desktop only */}
-          <aside className="hidden lg:flex lg:flex-col lg:w-80 lg:shrink-0 border-l border-border bg-white overflow-y-auto">
+          {/* Live preview panel - desktop only (hidden on card tab which has its own preview) */}
+          <aside className={`hidden lg:flex lg:flex-col lg:w-80 lg:shrink-0 border-l border-border bg-white overflow-y-auto ${activeTab === "card" ? "lg:hidden" : ""}`}>
             <PreviewPanel />
           </aside>
         </div>
