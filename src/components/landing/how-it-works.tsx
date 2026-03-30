@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { motion, useInView, type Variants } from "framer-motion";
 import {
@@ -140,24 +139,7 @@ function BlockCustomize() {
             </motion.ul>
           </motion.div>
 
-          {/* Visual — RIGHT */}
-          <motion.div
-            variants={slideRight}
-            initial="hidden"
-            animate={inView ? "visible" : "hidden"}
-            className="order-first lg:order-last"
-          >
-            <div className="rounded-3xl bg-[#F6F3F5] p-4 md:p-6 overflow-hidden">
-              <Image
-                src="/images/landing/theme-preview.png"
-                alt="Viopage theme customization preview"
-                width={640}
-                height={480}
-                className="w-full h-auto rounded-2xl object-cover"
-                priority={false}
-              />
-            </div>
-          </motion.div>
+          {/* Visual placeholder removed — theme previews now in ThemeGallery */}
         </div>
       </div>
     </div>
