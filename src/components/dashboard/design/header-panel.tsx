@@ -14,7 +14,7 @@ import { AVATAR_MAX_SIZE, AVATAR_ACCEPTED_TYPES } from "@/lib/constants";
 import { ToggleGroup } from "./toggle-group";
 import { ColorInput } from "./color-input";
 import { Switch } from "@/components/ui/switch";
-import type { ProfileLayout, TitleSize, TitleStyle } from "@/types";
+import type { ProfileLayout, TitleSize, TitleStyle, AvatarShape, AvatarBorder } from "@/types";
 
 export function HeaderPanel() {
   const t = useTranslations("dashboard.design");
@@ -114,6 +114,36 @@ export function HeaderPanel() {
         />
       </div>
 
+      {/* Avatar shape */}
+      <div className="space-y-2">
+        <Label>{t("avatarShape")}</Label>
+        <ToggleGroup
+          options={[
+            { value: "circle" as AvatarShape, label: t("circle") },
+            { value: "rounded" as AvatarShape, label: t("rounded") },
+            { value: "square" as AvatarShape, label: t("square") },
+          ]}
+          value={theme.avatar_shape}
+          onChange={(v) => updateTheme({ avatar_shape: v })}
+        />
+      </div>
+
+      {/* Avatar border */}
+      <div className="space-y-2">
+        <Label>{t("avatarBorder")}</Label>
+        <ToggleGroup
+          options={[
+            { value: "none" as AvatarBorder, label: t("noneBorder") },
+            { value: "subtle" as AvatarBorder, label: t("subtle") },
+            { value: "solid" as AvatarBorder, label: t("solidBorder") },
+            { value: "thick" as AvatarBorder, label: t("thick") },
+            { value: "glow" as AvatarBorder, label: t("glow") },
+          ]}
+          value={theme.avatar_border}
+          onChange={(v) => updateTheme({ avatar_border: v })}
+        />
+      </div>
+
       {/* Title (display name) */}
       <div className="space-y-1.5">
         <Label htmlFor="header-title">{t("title")}</Label>
@@ -152,15 +182,6 @@ export function HeaderPanel() {
         />
       </div>
 
-      {/* Alt title font */}
-      <div className="flex items-center justify-between">
-        <Label>{t("altTitleFont")}</Label>
-        <Switch
-          checked={theme.title_font_alt}
-          onCheckedChange={(v) => updateTheme({ title_font_alt: v })}
-        />
-      </div>
-
       {/* Title color */}
       <ColorInput
         id="title-color"
@@ -168,6 +189,18 @@ export function HeaderPanel() {
         value={theme.title_color ?? theme.text_color}
         onChange={(v) => updateTheme({ title_color: v })}
       />
+
+      {/* Hide bio */}
+      <div className="space-y-1">
+        <div className="flex items-center justify-between">
+          <Label>{t("hideBio")}</Label>
+          <Switch
+            checked={theme.hide_bio}
+            onCheckedChange={(v) => updateTheme({ hide_bio: v })}
+          />
+        </div>
+        <p className="text-xs text-muted-foreground">{t("hideBioDesc")}</p>
+      </div>
     </div>
   );
 }

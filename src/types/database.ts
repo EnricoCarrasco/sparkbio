@@ -7,6 +7,10 @@ export type ProfileLayout = "classic" | "hero";
 export type TitleStyle = "text" | "logo";
 export type TitleSize = "small" | "large";
 export type WallpaperStyle = "fill" | "gradient" | "blur" | "pattern";
+export type AvatarShape = "circle" | "rounded" | "square";
+export type AvatarBorder = "none" | "subtle" | "solid" | "thick" | "glow";
+export type LinkGap = "compact" | "normal" | "relaxed";
+export type ButtonFontSize = "small" | "medium" | "large";
 
 export type SocialPlatform =
   | "instagram"
@@ -80,6 +84,13 @@ export interface Theme {
   button_corner: ButtonCorner;
   button_shadow: ButtonShadow;
   hide_footer: boolean;
+  // Design customization (Tier 1)
+  avatar_shape: AvatarShape;
+  avatar_border: AvatarBorder;
+  link_gap: LinkGap;
+  title_font: string | null;
+  hide_bio: boolean;
+  button_font_size: ButtonFontSize;
 }
 
 export interface SocialIcon {

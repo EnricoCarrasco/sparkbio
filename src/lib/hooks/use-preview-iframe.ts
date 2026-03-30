@@ -51,6 +51,12 @@ export function usePreviewIframe() {
     theme?.wallpaper_animate,
     theme?.wallpaper_noise,
     theme?.hide_footer,
+    theme?.avatar_shape,
+    theme?.avatar_border,
+    theme?.link_gap,
+    theme?.title_font,
+    theme?.hide_bio,
+    theme?.button_font_size,
     socialIcons,
   ]);
 

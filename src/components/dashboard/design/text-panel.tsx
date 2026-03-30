@@ -3,7 +3,6 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -62,13 +61,27 @@ export function TextPanel() {
         onChange={(v) => updateTheme({ text_color: v })}
       />
 
-      {/* Alt title font */}
-      <div className="flex items-center justify-between">
-        <Label>{t("altTitleFont")}</Label>
-        <Switch
-          checked={theme.title_font_alt}
-          onCheckedChange={(v) => updateTheme({ title_font_alt: v })}
-        />
+      {/* Title font */}
+      <div className="space-y-1.5">
+        <Label htmlFor="title-font">{t("titleFont")}</Label>
+        <Select
+          value={theme.title_font ?? "__inherit__"}
+          onValueChange={(v) => {
+            if (v) updateTheme({ title_font: v === "__inherit__" ? null : v });
+          }}
+        >
+          <SelectTrigger id="title-font" className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__inherit__">{t("inheritFont")}</SelectItem>
+            {THEME_FONTS.map((font) => (
+              <SelectItem key={font.value} value={font.value}>
+                <span style={{ fontFamily: font.value }}>{font.label}</span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Title color */}

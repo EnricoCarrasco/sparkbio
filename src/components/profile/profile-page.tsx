@@ -157,7 +157,11 @@ export function ProfilePage({ data }: ProfilePageProps) {
 
         {/* Link buttons + button-mode social icons */}
         {(activeLinks.length > 0 || buttonIcons.length > 0) && (
-          <div className="w-full flex flex-col gap-3">
+          <div className={`w-full flex flex-col ${
+            theme.link_gap === "compact" ? "gap-2" :
+            theme.link_gap === "relaxed" ? "gap-5" :
+            "gap-3"
+          }`}>
             {/* Button-mode social icons first */}
             {buttonIcons
               .sort((a, b) => a.position - b.position)

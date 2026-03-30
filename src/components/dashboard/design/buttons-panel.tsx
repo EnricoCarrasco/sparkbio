@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { useThemeStore } from "@/lib/stores/theme-store";
 import { ColorInput } from "./color-input";
 import { VisualOptionPicker } from "./visual-option-picker";
-import type { ButtonStyleV2, ButtonCorner, ButtonShadow } from "@/types";
+import { ToggleGroup } from "./toggle-group";
+import type { ButtonStyleV2, ButtonCorner, ButtonShadow, LinkGap, ButtonFontSize } from "@/types";
 
 export function ButtonsPanel() {
   const t = useTranslations("dashboard.design");
@@ -139,6 +140,34 @@ export function ButtonsPanel() {
           options={shadowOptions}
           value={theme.button_shadow}
           onChange={(v) => updateTheme({ button_shadow: v })}
+        />
+      </div>
+
+      {/* Link spacing */}
+      <div className="space-y-2">
+        <Label>{t("linkSpacing")}</Label>
+        <ToggleGroup
+          options={[
+            { value: "compact" as LinkGap, label: t("compact") },
+            { value: "normal" as LinkGap, label: t("normal") },
+            { value: "relaxed" as LinkGap, label: t("relaxed") },
+          ]}
+          value={theme.link_gap}
+          onChange={(v) => updateTheme({ link_gap: v })}
+        />
+      </div>
+
+      {/* Button text size */}
+      <div className="space-y-2">
+        <Label>{t("buttonTextSize")}</Label>
+        <ToggleGroup
+          options={[
+            { value: "small" as ButtonFontSize, label: t("small") },
+            { value: "medium" as ButtonFontSize, label: t("medium") },
+            { value: "large" as ButtonFontSize, label: t("large") },
+          ]}
+          value={theme.button_font_size}
+          onChange={(v) => updateTheme({ button_font_size: v })}
         />
       </div>
 

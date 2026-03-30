@@ -49,7 +49,7 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
     width: "100%",
     minHeight: "56px",
     padding: "10px 20px",
-    fontSize: "15px",
+    fontSize: ({ small: "13px", medium: "15px", large: "17px" })[theme.button_font_size] ?? "15px",
     fontWeight: 600,
     letterSpacing: "0.01em",
     cursor: "pointer",

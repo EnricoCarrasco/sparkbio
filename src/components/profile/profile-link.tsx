@@ -30,7 +30,9 @@ function getShadow(shadow: string): string {
 }
 
 function getLinkStyles(theme: Theme): React.CSSProperties {
-  const { button_color, button_text_color, button_style_v2, button_corner, button_shadow } = theme;
+  const { button_color, button_text_color, button_style_v2, button_corner, button_shadow, button_font_size } = theme;
+
+  const fontSizeMap = { small: "13px", medium: "15px", large: "17px" };
 
   const base: React.CSSProperties = {
     display: "flex",
@@ -39,7 +41,7 @@ function getLinkStyles(theme: Theme): React.CSSProperties {
     width: "100%",
     minHeight: "56px",
     padding: "12px 24px",
-    fontSize: "15px",
+    fontSize: fontSizeMap[button_font_size] ?? "15px",
     fontWeight: 600,
     letterSpacing: "0.01em",
     cursor: "pointer",

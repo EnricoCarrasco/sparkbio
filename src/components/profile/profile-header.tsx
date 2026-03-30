@@ -26,6 +26,31 @@ export function ProfileHeader({ profile, textColor, theme }: ProfileHeaderProps)
   const titleSize = theme?.title_size === "large" ? "text-3xl md:text-4xl" : "text-2xl";
   const titleColor = theme?.title_color ?? textColor;
 
+  // Avatar shape
+  const avatarRadius =
+    theme?.avatar_shape === "square" ? "rounded-none" :
+    theme?.avatar_shape === "rounded" ? "rounded-2xl" :
+    "rounded-full";
+
+  // Avatar border
+  const avatarBorderStyle = (() => {
+    const border = theme?.avatar_border ?? "subtle";
+    const accentColor = theme?.button_color ?? "#FFFFFF";
+    switch (border) {
+      case "none": return {};
+      case "subtle": return { boxShadow: `0 0 0 2px rgba(255,255,255,0.2)` };
+      case "solid": return { boxShadow: `0 0 0 2px ${accentColor}` };
+      case "thick": return { boxShadow: `0 0 0 4px ${accentColor}` };
+      case "glow": return { boxShadow: `0 0 16px 4px ${accentColor}66` };
+      default: return {};
+    }
+  })();
+
+  // Title font
+  const titleFontFamily = theme?.title_font
+    ? `'${theme.title_font}', sans-serif`
+    : undefined;
+
   return (
     <motion.div
       className={`flex flex-col items-center gap-4 text-center ${isHero ? "pt-4 pb-2" : ""}`}
@@ -35,9 +60,10 @@ export function ProfileHeader({ profile, textColor, theme }: ProfileHeaderProps)
     >
       {/* Avatar */}
       <motion.div
-        className={`relative shrink-0 rounded-full overflow-hidden ring-2 ring-white/20 ${
+        className={`relative shrink-0 ${avatarRadius} overflow-hidden ${
           isHero ? "size-32 md:size-[160px]" : "size-24 md:size-[120px]"
         }`}
+        style={avatarBorderStyle}
         initial={{ scale: 0.85, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.4, ease: "easeOut", delay: 0.05 }}
@@ -67,7 +93,7 @@ export function ProfileHeader({ profile, textColor, theme }: ProfileHeaderProps)
       {/* Display name */}
       <motion.h1
         className={`${titleSize} font-bold leading-tight tracking-tight`}
-        style={{ color: titleColor }}
+        style={{ color: titleColor, fontFamily: titleFontFamily }}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
@@ -76,7 +102,7 @@ export function ProfileHeader({ profile, textColor, theme }: ProfileHeaderProps)
       </motion.h1>
 
       {/* Bio */}
-      {profile.bio && (
+      {profile.bio && !theme?.hide_bio && (
         <motion.p
           className="text-sm leading-relaxed max-w-xs line-clamp-3"
           style={{ color: textColor, opacity: 0.8 }}
