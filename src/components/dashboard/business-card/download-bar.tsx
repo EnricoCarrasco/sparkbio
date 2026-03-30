@@ -24,21 +24,22 @@ export function DownloadBar({ cardRef }: DownloadBarProps) {
 
     setDownloading(true);
     try {
-      // Temporarily remove the CSS scale transform so we capture at full 600px size
       const el = cardRef.current;
-      const origTransform = el.style.transform;
-      const origTransformOrigin = el.style.transformOrigin;
-      el.style.transform = "none";
-      el.style.transformOrigin = "";
 
+      // Use html-to-image's style option to override transforms on its internal
+      // clone instead of mutating the live DOM. This avoids the 700ms CSS
+      // transition causing a mid-animation capture.
       const dataUrl = await toPng(el, {
         pixelRatio: 3, // 3x for crisp print-quality export (1800×1125)
         cacheBust: true,
+        width: 600,
+        height: 375,
+        style: {
+          transform: "none",
+          transformOrigin: "top left",
+          transition: "none",
+        },
       });
-
-      // Restore original transform
-      el.style.transform = origTransform;
-      el.style.transformOrigin = origTransformOrigin;
 
       // Create download link
       const link = document.createElement("a");

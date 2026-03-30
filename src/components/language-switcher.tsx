@@ -24,6 +24,10 @@ const LANGUAGES: Language[] = [
   { locale: "pt-BR", label: "Português (BR)", shortLabel: "PT" },
 ];
 
+function persistLocaleCookie(locale: Locale) {
+  document.cookie = `locale=${locale};path=/;max-age=31536000;SameSite=Lax`;
+}
+
 interface LanguageSwitcherProps {
   variant?: "dark" | "light";
 }
@@ -39,7 +43,7 @@ export function LanguageSwitcher({ variant = "dark" }: LanguageSwitcherProps) {
     if (newLocale === currentLocale) return;
 
     // Persist locale preference in a long-lived cookie (1 year)
-    document.cookie = `locale=${newLocale};path=/;max-age=31536000;SameSite=Lax`;
+    persistLocaleCookie(newLocale);
 
     // Re-render server components with the new locale
     router.refresh();

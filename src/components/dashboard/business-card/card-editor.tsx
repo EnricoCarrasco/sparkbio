@@ -2,7 +2,8 @@
 
 import React from "react";
 import { useBusinessCardStore } from "@/lib/stores/business-card-store";
-import { Palette, User, QrCode, Paintbrush } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Palette, User, QrCode, Paintbrush, Image, Sliders } from "lucide-react";
 
 function ColorField({
   label,
@@ -29,6 +30,42 @@ function ColorField({
           {value}
         </span>
       </div>
+    </div>
+  );
+}
+
+function SliderField({
+  label,
+  value,
+  min,
+  max,
+  step = 1,
+  unit = "px",
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step?: number;
+  unit?: string;
+  onChange: (val: number) => void;
+}) {
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1">
+        <label className="text-xs font-medium text-muted-foreground">{label}</label>
+        <span className="text-xs text-muted-foreground font-mono">{value}{unit}</span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full h-2 rounded-full appearance-none cursor-pointer bg-muted/50 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#FF6B35] [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#FF6B35] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-md"
+      />
     </div>
   );
 }
@@ -184,6 +221,70 @@ export function CardEditor() {
             />
             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:bg-[#FF6B35] transition-colors after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full" />
           </label>
+        </div>
+        {store.showQrCode && (
+          <div className="mt-3">
+            <SliderField
+              label="QR Code Size"
+              value={store.qrCodeSize}
+              min={80}
+              max={180}
+              onChange={(v) => store.setField("qrCodeSize", v)}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Logo Style */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Image className="w-4 h-4 text-[#FF6B35]" />
+          <h3 className="text-sm font-semibold">Logo Style</h3>
+        </div>
+        <div className="space-y-4">
+          <SliderField
+            label="Logo Size"
+            value={store.logoSize}
+            min={48}
+            max={120}
+            onChange={(v) => store.setField("logoSize", v)}
+          />
+          <div>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">
+              Logo Shape
+            </label>
+            <div className="inline-flex rounded-lg border border-border bg-muted/50 p-0.5">
+              {(["rounded", "circle", "square"] as const).map((shape) => (
+                <button
+                  key={shape}
+                  type="button"
+                  onClick={() => store.setField("logoShape", shape)}
+                  className={cn(
+                    "px-3 py-1.5 text-xs font-medium rounded-md transition-all capitalize",
+                    store.logoShape === shape
+                      ? "bg-white text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {shape}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Text Sizes */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Sliders className="w-4 h-4 text-[#FF6B35]" />
+          <h3 className="text-sm font-semibold">Text Sizes</h3>
+        </div>
+        <div className="space-y-4">
+          <SliderField label="Name" value={store.nameFontSize} min={18} max={42} onChange={(v) => store.setField("nameFontSize", v)} />
+          <SliderField label="Job Title" value={store.titleFontSize} min={10} max={22} onChange={(v) => store.setField("titleFontSize", v)} />
+          <SliderField label="Contact Info" value={store.contactFontSize} min={9} max={16} onChange={(v) => store.setField("contactFontSize", v)} />
+          <SliderField label="Brand Name" value={store.brandNameFontSize} min={12} max={28} onChange={(v) => store.setField("brandNameFontSize", v)} />
         </div>
       </div>
     </div>

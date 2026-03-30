@@ -17,6 +17,15 @@ interface BusinessCardState {
   accentColor: string;
   bgColor: string;
 
+  // Customization (sizes & shapes)
+  logoSize: number;
+  logoShape: "rounded" | "circle" | "square";
+  nameFontSize: number;
+  titleFontSize: number;
+  contactFontSize: number;
+  brandNameFontSize: number;
+  qrCodeSize: number;
+
   // Template & AI
   selectedTemplateId: string;
   aiBackgroundUrl: string | null;
@@ -28,7 +37,7 @@ interface BusinessCardState {
   downloading: boolean;
 
   // Actions
-  setField: (key: string, value: string | boolean | null) => void;
+  setField: (key: string, value: string | boolean | number | null) => void;
   setSelectedTemplate: (id: string) => void;
   setAiBackgroundUrl: (url: string | null) => void;
   setAiBackgroundLoading: (loading: boolean) => void;
@@ -65,6 +74,13 @@ const initialState = {
   textColor: "#FFFFFF",
   accentColor: "#D4AF37",
   bgColor: "#0a0a0a",
+  logoSize: 80,
+  logoShape: "rounded" as const,
+  nameFontSize: 30,
+  titleFontSize: 14,
+  contactFontSize: 12,
+  brandNameFontSize: 18,
+  qrCodeSize: 140,
   selectedTemplateId: "midnight-gold",
   aiBackgroundUrl: null as string | null,
   aiBackgroundLoading: false,

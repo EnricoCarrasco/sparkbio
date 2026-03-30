@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { subDays } from "date-fns";
 import {
@@ -135,10 +135,13 @@ export function LinkInsightsModal({
     fetchEvents();
   }, [open, link]);
 
-  // Reset range when modal opens
-  useEffect(() => {
-    if (open) setRange("7d");
-  }, [open]);
+  const handleOpenChange = useCallback(
+    (nextOpen: boolean) => {
+      if (nextOpen) setRange("7d");
+      onOpenChange(nextOpen);
+    },
+    [onOpenChange]
+  );
 
   // Process data based on selected date range
   const analytics: ProcessedLinkAnalytics | null = useMemo(() => {
@@ -165,7 +168,7 @@ export function LinkInsightsModal({
         : t("allTime");
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent
         side="bottom"
         showCloseButton

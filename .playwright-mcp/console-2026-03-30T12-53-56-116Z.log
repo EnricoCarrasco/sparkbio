@@ -1,0 +1,5 @@
+[    1207ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ http://localhost:3000/testdev?preview=1&t=0:0
+[    2033ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ http://localhost:3000/testdev?preview=1&t=1:0
+[   29870ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=Jd0up3ywlzO2xnCLdg1VQ' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13299
+[   38915ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ http://localhost:3000/testdev?preview=1&t=0:0
+[   39715ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ http://localhost:3000/testdev?preview=1&t=1:0

@@ -597,7 +597,7 @@ function DeleteAccountSection() {
       toast.error("An unexpected error occurred. Please try again.");
       setIsDeleting(false);
     }
-  }, [profile?.id, router]);
+  }, [profile, router]);
 
   return (
     <Card className="border-destructive/30">

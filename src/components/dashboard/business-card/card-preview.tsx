@@ -133,7 +133,11 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
                 <img
                   src={logoSrc}
                   alt="Logo"
-                  style={{ width: 80, height: 80, borderRadius: 16 }}
+                  style={{
+                    width: store.logoSize,
+                    height: store.logoSize,
+                    borderRadius: store.logoShape === "circle" ? "50%" : store.logoShape === "square" ? 0 : 16,
+                  }}
                   className="object-cover"
                   crossOrigin="anonymous"
                 />
@@ -141,10 +145,10 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
                 <div
                   className="flex items-center justify-center text-white font-black"
                   style={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: 16,
-                    fontSize: 28,
+                    width: store.logoSize,
+                    height: store.logoSize,
+                    borderRadius: store.logoShape === "circle" ? "50%" : store.logoShape === "square" ? 0 : 16,
+                    fontSize: store.logoSize * 0.35,
                     background: `linear-gradient(135deg, ${store.primaryColor}, ${store.primaryColor}cc)`,
                     boxShadow: `0 4px 24px ${store.primaryColor}40`,
                   }}
@@ -158,13 +162,26 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
             <div>
               <h2
                 className="font-black leading-tight tracking-tight"
-                style={{ color: store.textColor, fontSize: 30 }}
+                style={{
+                  color: store.textColor,
+                  fontSize: store.nameFontSize,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
               >
                 {store.fullName || "Your Name"}
               </h2>
               <p
                 className="font-semibold"
-                style={{ color: store.accentColor, fontSize: 14, marginTop: 4 }}
+                style={{
+                  color: store.accentColor,
+                  fontSize: store.titleFontSize,
+                  marginTop: 4,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
               >
                 {store.jobTitle || "Your Title"}
               </p>
@@ -173,24 +190,24 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
               <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 16 }}>
                 {store.phone && (
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <Phone style={{ width: 14, height: 14, color: store.accentColor }} />
-                    <span style={{ fontSize: 12, fontWeight: 500, color: mutedText }}>
+                    <Phone style={{ width: store.contactFontSize + 2, height: store.contactFontSize + 2, flexShrink: 0, color: store.accentColor }} />
+                    <span style={{ fontSize: store.contactFontSize, fontWeight: 500, color: mutedText, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {store.phone}
                     </span>
                   </div>
                 )}
                 {store.email && (
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <Mail style={{ width: 14, height: 14, color: store.accentColor }} />
-                    <span style={{ fontSize: 12, fontWeight: 500, color: mutedText }}>
+                    <Mail style={{ width: store.contactFontSize + 2, height: store.contactFontSize + 2, flexShrink: 0, color: store.accentColor }} />
+                    <span style={{ fontSize: store.contactFontSize, fontWeight: 500, color: mutedText, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {store.email}
                     </span>
                   </div>
                 )}
                 {store.website && (
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <Globe style={{ width: 14, height: 14, color: store.accentColor }} />
-                    <span style={{ fontSize: 12, fontWeight: 500, color: mutedText }}>
+                    <Globe style={{ width: store.contactFontSize + 2, height: store.contactFontSize + 2, flexShrink: 0, color: store.accentColor }} />
+                    <span style={{ fontSize: store.contactFontSize, fontWeight: 500, color: mutedText, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {store.website}
                     </span>
                   </div>
@@ -236,7 +253,15 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
             {/* Brand name */}
             <p
               className="font-bold text-center leading-snug"
-              style={{ color: store.accentColor, fontSize: 18 }}
+              style={{
+                color: store.accentColor,
+                fontSize: store.brandNameFontSize,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical" as const,
+              }}
             >
               {store.brandName || "Your Brand"}
             </p>
@@ -264,7 +289,7 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
                     <div style={{ backgroundColor: "#fff", borderRadius: 8, padding: 8 }}>
                       <QRCodeCanvas
                         value={qrValue}
-                        size={140}
+                        size={store.qrCodeSize}
                         bgColor="#FFFFFF"
                         fgColor="#000000"
                         level="H"

@@ -1,0 +1,2 @@
+[    2382ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ http://localhost:3000/testdev?preview=1&t=0:0
+[    3175ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ http://localhost:3000/testdev?preview=1&t=1:0

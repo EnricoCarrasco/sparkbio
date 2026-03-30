@@ -148,7 +148,6 @@ export default function DashboardLayout({
   const fetchSubscription = useSubscriptionStore((s) => s.fetchSubscription);
   const isPro = useSubscriptionStore((s) => s.isPro);
   const subLoading = useSubscriptionStore((s) => s.loading);
-  const subscription = useSubscriptionStore((s) => s.subscription);
   const activeTab = useDashboardStore((s) => s.activeTab);
 
   useEffect(() => {
@@ -170,9 +169,6 @@ export default function DashboardLayout({
   }, [searchParams, fetchSubscription]);
 
   // Gate: show trial signup if no active subscription
-  // Wait for subscription store to finish loading before deciding
-  const needsTrial = !subLoading && !isPro && !subscription;
-
   if (subLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
@@ -181,16 +177,8 @@ export default function DashboardLayout({
     );
   }
 
-  if (needsTrial) {
-    // Redirect to the in-app trial page — no dashboard access without a subscription
-    if (typeof window !== "undefined") {
-      window.location.href = "/trial";
-    }
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
-        <Loader2 className="size-6 animate-spin text-[#FF6B35]" />
-      </div>
-    );
+  if (!isPro) {
+    return <TrialGate />;
   }
 
   return (

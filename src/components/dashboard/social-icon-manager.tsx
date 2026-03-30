@@ -2,7 +2,7 @@
 
 import React, { useCallback, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Globe } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,12 +10,24 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SOCIAL_PLATFORMS } from "@/lib/constants";
 import {
-  getIconForPlatform,
+  LUCIDE_ICON_MAP,
   getPlatformUrlPrefix,
 } from "@/lib/social-icon-map";
 import { useSocialStore } from "@/lib/stores/social-store";
 import type { SocialIcon, SocialPlatform } from "@/types";
 import { cn } from "@/lib/utils";
+
+function renderPlatformIcon(
+  iconName: string | undefined,
+  props: {
+    size: number;
+    strokeWidth?: number;
+    className?: string;
+  }
+) {
+  const Icon = (iconName ? LUCIDE_ICON_MAP[iconName] : undefined) ?? Globe;
+  return React.createElement(Icon, props);
+}
 
 // ---------------------------------------------------------------------------
 // Active platform row – shown at the top for each platform already saved
@@ -34,7 +46,6 @@ function ActiveIconRow({
   onToggle,
   onDelete,
 }: ActiveIconRowProps) {
-  const IconComponent = getIconForPlatform(icon.platform);
   const platformEntry = SOCIAL_PLATFORMS.find(
     (p) => p.platform === icon.platform
   );
@@ -90,7 +101,10 @@ function ActiveIconRow({
               : "bg-muted text-muted-foreground"
           )}
         >
-          <IconComponent size={16} strokeWidth={1.75} />
+          {renderPlatformIcon(platformEntry?.icon, {
+            size: 16,
+            strokeWidth: 1.75,
+          })}
         </div>
         <span className="text-sm font-medium text-foreground truncate flex-1">
           {label}
@@ -161,10 +175,9 @@ interface InactivePlatformButtonProps {
 function InactivePlatformButton({
   platform,
   label,
+  iconName,
   onAdd,
 }: InactivePlatformButtonProps) {
-  const IconComponent = getIconForPlatform(platform);
-
   return (
     <motion.button
       type="button"
@@ -179,7 +192,7 @@ function InactivePlatformButton({
       transition={{ duration: 0.15, ease: "easeOut" }}
       aria-label={`Add ${label}`}
     >
-      <IconComponent size={20} strokeWidth={1.75} />
+      {renderPlatformIcon(iconName, { size: 20, strokeWidth: 1.75 })}
       <span className="text-[11px] font-medium leading-tight text-center">
         {label}
       </span>
