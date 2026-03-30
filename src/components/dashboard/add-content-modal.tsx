@@ -5,17 +5,10 @@ import { useTranslations } from "next-intl";
 import {
   Search,
   Lightbulb,
-  ShoppingCart,
   Heart,
   PlayCircle,
   Contact,
-  CalendarDays,
-  FileText,
-  MoreHorizontal,
-  Grid2X2,
   Link2,
-  Tag,
-  ClipboardList,
   ChevronRight,
 } from "lucide-react";
 import {
@@ -30,22 +23,13 @@ import { getPlatformLabel } from "@/lib/social-icon-map";
 import { BrandIcon } from "@/components/ui/brand-icon";
 import type { SocialPlatform } from "@/types";
 
-type Category =
-  | "suggested"
-  | "commerce"
-  | "social"
-  | "media"
-  | "contact"
-  | "events"
-  | "text";
+type Category = "suggested" | "social" | "media" | "contact";
 
 const CATEGORIES: { key: Category; icon: React.ElementType }[] = [
   { key: "suggested", icon: Lightbulb },
   { key: "social", icon: Heart },
   { key: "media", icon: PlayCircle },
   { key: "contact", icon: Contact },
-  { key: "events", icon: CalendarDays },
-  { key: "text", icon: FileText },
 ];
 
 const PLATFORM_CATEGORIES: Record<Category, SocialPlatform[]> = {
@@ -57,7 +41,6 @@ const PLATFORM_CATEGORIES: Record<Category, SocialPlatform[]> = {
     "whatsapp",
     "x",
   ],
-  commerce: [],
   social: [
     "instagram",
     "tiktok",
@@ -70,8 +53,6 @@ const PLATFORM_CATEGORIES: Record<Category, SocialPlatform[]> = {
   ],
   media: ["youtube", "spotify", "soundcloud", "twitch"],
   contact: ["whatsapp", "telegram", "email", "website"],
-  events: [],
-  text: [],
 };
 
 const PLATFORM_DESCRIPTIONS: Partial<Record<SocialPlatform, string>> = {
@@ -174,13 +155,6 @@ export function AddContentModal({
                 {t(key)}
               </button>
             ))}
-            <button
-              type="button"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-muted/50 text-muted-foreground shrink-0"
-            >
-              <MoreHorizontal className="size-3.5" />
-              {t("viewAll")}
-            </button>
             {/* Spacer so last chip isn't flush with edge */}
             <div className="shrink-0 w-1" aria-hidden="true" />
           </div>
@@ -213,72 +187,22 @@ export function AddContentModal({
                 {t(key)}
               </button>
             ))}
-            <button
-              type="button"
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors text-left"
-            >
-              <MoreHorizontal className="size-4 shrink-0" />
-              {t("viewAll")}
-            </button>
           </div>
 
           {/* Right content */}
           <div className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto py-3 px-4 md:py-4 md:px-5">
-            {/* Type cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4 md:mb-5">
-              {[
-                {
-                  key: "collection" as const,
-                  icon: Grid2X2,
-                  onClick: () => {},
-                  disabled: true,
-                },
-                {
-                  key: "link" as const,
-                  icon: Link2,
-                  onClick: handleLinkClick,
-                  disabled: false,
-                },
-                {
-                  key: "product" as const,
-                  icon: Tag,
-                  onClick: () => {},
-                  disabled: true,
-                },
-                {
-                  key: "form" as const,
-                  icon: ClipboardList,
-                  onClick: () => {},
-                  disabled: true,
-                },
-              ].map(({ key, icon: Icon, onClick, disabled }) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={onClick}
-                  disabled={disabled}
-                  className={cn(
-                    "flex flex-col items-start justify-between px-4 py-3 h-[68px] rounded-full border transition-all text-left",
-                    key === "link"
-                      ? "bg-[#8B5CF6]/10 border-[#8B5CF6]/30 hover:bg-[#8B5CF6]/15 cursor-pointer"
-                      : disabled
-                        ? "bg-muted/30 opacity-50 cursor-not-allowed"
-                        : "bg-muted/30 hover:bg-muted/60 hover:border-foreground/20 cursor-pointer"
-                  )}
-                >
-                  <span className={cn(
-                    "text-xs font-semibold",
-                    key === "link" ? "text-[#8B5CF6]" : "text-foreground"
-                  )}>
-                    {t(key)}
-                  </span>
-                  <Icon className={cn(
-                    "size-4",
-                    key === "link" ? "text-[#8B5CF6]/60" : "text-muted-foreground"
-                  )} />
-                </button>
-              ))}
-            </div>
+            {/* Add custom link button */}
+            <button
+              type="button"
+              onClick={handleLinkClick}
+              className="w-full flex items-center gap-3 px-4 py-3 mb-4 md:mb-5 rounded-full bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 hover:bg-[#8B5CF6]/15 transition-colors"
+            >
+              <Link2 className="size-4 text-[#8B5CF6]" />
+              <span className="text-sm font-semibold text-[#8B5CF6]">
+                {t("link")}
+              </span>
+              <ChevronRight className="size-4 text-[#8B5CF6]/40 ml-auto" />
+            </button>
 
             {/* Section label */}
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
@@ -289,9 +213,7 @@ export function AddContentModal({
             <div className="space-y-0.5 md:space-y-1">
               {filteredPlatforms.length === 0 && (
                 <p className="text-sm text-muted-foreground py-6 text-center">
-                  {activeCategory === "commerce" || activeCategory === "events" || activeCategory === "text"
-                    ? t("collection") + " — " + "Coming soon"
-                    : "No results found"}
+                  No results found
                 </p>
               )}
               {filteredPlatforms.map((platform) => {
