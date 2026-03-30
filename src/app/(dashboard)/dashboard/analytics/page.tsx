@@ -168,16 +168,26 @@ export default function AnalyticsPage() {
       const [
         { data: events, error: eventsError },
         { data: links, error: linksError },
+        { data: socials, error: socialsError },
       ] = await Promise.all([
         eventsQuery,
         supabase.from("links").select("id, title").eq("user_id", user.id),
+        supabase.from("social_icons").select("id, platform").eq("user_id", user.id),
       ]);
 
       if (eventsError) throw eventsError;
       if (linksError) throw linksError;
+      if (socialsError) throw socialsError;
 
       const rawEvents = (events ?? []) as AnalyticsEvent[];
-      const rawLinks = (links ?? []) as Pick<Link, "id" | "title">[];
+      // Merge links + social icons into a unified title lookup array
+      const rawLinks: Pick<Link, "id" | "title">[] = [
+        ...((links ?? []) as Pick<Link, "id" | "title">[]),
+        ...((socials ?? []) as { id: string; platform: string }[]).map((s) => ({
+          id: s.id,
+          title: s.platform.charAt(0).toUpperCase() + s.platform.slice(1),
+        })),
+      ];
 
       setHasEvents(rawEvents.length > 0);
       setRawEvents(rawEvents);
