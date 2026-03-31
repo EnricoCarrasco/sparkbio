@@ -52,12 +52,17 @@ export function AiLogoGenerator() {
 
       // Convert to base64 data URL
       const imgRes = await fetch(imageUrl);
+      if (!imgRes.ok) throw new Error("Failed to fetch generated image");
       const blob = await imgRes.blob();
       const reader = new FileReader();
       reader.onloadend = () => {
         store.setAiLogoUrl(reader.result as string);
         store.setAiLogoLoading(false);
         toast.success("Logo generated!");
+      };
+      reader.onerror = () => {
+        store.setAiLogoLoading(false);
+        toast.error("Failed to process logo image.");
       };
       reader.readAsDataURL(blob);
     } catch (error) {

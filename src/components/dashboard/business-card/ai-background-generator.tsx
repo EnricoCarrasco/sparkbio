@@ -46,12 +46,17 @@ export function AiBackgroundGenerator() {
 
       // Convert to base64 data URL to avoid CORS issues with html-to-image
       const imgRes = await fetch(imageUrl);
+      if (!imgRes.ok) throw new Error("Failed to fetch generated image");
       const blob = await imgRes.blob();
       const reader = new FileReader();
       reader.onloadend = () => {
         store.setAiBackgroundUrl(reader.result as string);
         store.setAiBackgroundLoading(false);
         toast.success("Background generated!");
+      };
+      reader.onerror = () => {
+        store.setAiBackgroundLoading(false);
+        toast.error("Failed to process background image.");
       };
       reader.readAsDataURL(blob);
     } catch (error) {

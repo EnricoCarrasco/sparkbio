@@ -67,30 +67,10 @@ export function BusinessCardTab() {
         </p>
       </div>
 
-      {/* Mobile: Preview first, then editor. Desktop: side-by-side */}
+      {/* Mobile: Preview first (order-1), then editor. Desktop: side-by-side */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Mobile-only Preview (shown first on small screens, hidden on lg) */}
-        <div className="lg:hidden space-y-4">
-          <PreviewHeader />
-          <CardPreview cardRef={cardRef} />
-          {username && (
-            <p className="text-xs text-muted-foreground text-center">
-              {siteUrl}/{username}
-            </p>
-          )}
-        </div>
-
-        {/* Left Column — Editor */}
-        <div className="lg:col-span-7 space-y-6">
-          <TemplateSelector />
-          <CardEditor />
-          <AiLogoGenerator />
-          <AiBackgroundGenerator />
-          <DownloadBar cardRef={cardRef} />
-        </div>
-
-        {/* Right Column — Preview (sticky, desktop only) */}
-        <div className="hidden lg:block lg:col-span-5">
+        {/* Preview — shows first on mobile (order), sticky sidebar on desktop */}
+        <div className="order-first lg:order-last lg:col-span-5">
           <div className="lg:sticky lg:top-24 space-y-5">
             <PreviewHeader />
             <CardPreview cardRef={cardRef} />
@@ -101,8 +81,8 @@ export function BusinessCardTab() {
               </p>
             )}
 
-            {/* Pro Tip */}
-            <div className="rounded-2xl p-5 bg-[#FF6B35]/5 border border-[#FF6B35]/10">
+            {/* Pro Tip (desktop only) */}
+            <div className="hidden lg:block rounded-2xl p-5 bg-[#FF6B35]/5 border border-[#FF6B35]/10">
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-lg bg-[#FF6B35]/10 flex items-center justify-center shrink-0">
                   <Sparkles className="w-4 h-4 text-[#FF6B35]" />
@@ -117,6 +97,15 @@ export function BusinessCardTab() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Left Column — Editor */}
+        <div className="lg:col-span-7 space-y-6">
+          <TemplateSelector />
+          <CardEditor />
+          <AiLogoGenerator />
+          <AiBackgroundGenerator />
+          <DownloadBar cardRef={cardRef} />
         </div>
       </div>
     </div>

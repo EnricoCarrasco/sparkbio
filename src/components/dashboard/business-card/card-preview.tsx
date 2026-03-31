@@ -90,6 +90,8 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
             src={store.aiBackgroundUrl}
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
+            crossOrigin="anonymous"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
           />
         )}
 
@@ -140,6 +142,7 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
                   }}
                   className="object-cover"
                   crossOrigin="anonymous"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               ) : (
                 <div
@@ -240,6 +243,7 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
                           filter: isDark ? "brightness(0) invert(1)" : "none",
                           opacity: isDark ? 0.8 : 0.7,
                         }}
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                       />
                     </div>
                   ))}

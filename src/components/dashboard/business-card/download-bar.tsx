@@ -26,6 +26,21 @@ export function DownloadBar({ cardRef }: DownloadBarProps) {
     try {
       const el = cardRef.current;
 
+      // Wait for all images inside the card to finish loading before capture.
+      // This prevents html-to-image from encountering broken/mid-loading images
+      // which would reject with a DOM Event and crash React reconciliation.
+      const images = el.querySelectorAll("img");
+      await Promise.all(
+        Array.from(images).map((img) =>
+          img.complete
+            ? Promise.resolve()
+            : new Promise<void>((resolve) => {
+                img.onload = () => resolve();
+                img.onerror = () => resolve();
+              })
+        )
+      );
+
       // Use html-to-image's style option to override transforms on its internal
       // clone instead of mutating the live DOM. This avoids the 700ms CSS
       // transition causing a mid-animation capture.
