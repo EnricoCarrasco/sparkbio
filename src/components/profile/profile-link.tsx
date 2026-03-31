@@ -87,8 +87,15 @@ function getLinkStyles(theme: Theme): React.CSSProperties {
 
 export function ProfileLink({ link, profileId, theme, index }: ProfileLinkProps) {
   const styles = getLinkStyles(theme);
+  const isPreview = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("preview");
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    // In preview mode (dashboard iframe), don't navigate — just show the click animation
+    if (isPreview) {
+      e.preventDefault();
+      return;
+    }
+
     const payload = JSON.stringify({
       profile_id: profileId,
       link_id: link.id,
@@ -102,8 +109,6 @@ export function ProfileLink({ link, profileId, theme, index }: ProfileLinkProps)
         new Blob([payload], { type: "application/json" })
       );
     }
-
-    void e;
   }
 
   return (

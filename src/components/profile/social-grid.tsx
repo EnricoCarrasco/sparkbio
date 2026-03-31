@@ -61,6 +61,7 @@ function GridIcon({
   const brand = PLATFORM_BRAND_COLORS[icon.platform];
   const iconPath = getBrandIconPath(icon.platform);
   const label = getPlatformLabel(icon.platform);
+  const isPreview = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("preview");
 
   // Icon size scales: fewer icons = bigger icons
   // With 1: icon is ~100px. With 2: ~90px. With 3+: auto-fill the column
@@ -68,9 +69,10 @@ function GridIcon({
 
   return (
     <motion.a
-      href={icon.url}
+      href={isPreview ? undefined : icon.url}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={isPreview ? (e: React.MouseEvent) => e.preventDefault() : undefined}
       aria-label={label}
       title={label}
       className="aspect-square rounded-full flex items-center justify-center w-full transition-transform"
