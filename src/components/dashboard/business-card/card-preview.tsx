@@ -6,6 +6,7 @@ import { useBusinessCardStore } from "@/lib/stores/business-card-store";
 import { useProfileStore } from "@/lib/stores/profile-store";
 import { useSocialStore } from "@/lib/stores/social-store";
 import { Phone, Mail, Globe } from "lucide-react";
+import { getBrandIconPath } from "@/lib/brand-icons";
 
 // The card renders at a fixed internal width so fonts/elements stay crisp.
 // CSS scale() shrinks it to fit the container on any screen.
@@ -235,7 +236,7 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
                       }}
                     >
                       <img
-                        src={`/icons/social/${social.platform}.svg`}
+                        src={getBrandIconPath(social.platform as Parameters<typeof getBrandIconPath>[0])}
                         alt={social.platform}
                         style={{
                           width: 16,
