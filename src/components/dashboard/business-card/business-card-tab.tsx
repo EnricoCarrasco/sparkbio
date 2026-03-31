@@ -41,16 +41,25 @@ export function BusinessCardTab() {
   const profile = useProfileStore((s) => s.profile);
   const socialIcons = useSocialStore((s) => s.socialIcons);
   const initFromProfile = useBusinessCardStore((s) => s.initFromProfile);
+  const loadFromSupabase = useBusinessCardStore((s) => s.loadFromSupabase);
+  const loaded = useBusinessCardStore((s) => s.loaded);
   const username = useProfileStore((s) => s.profile?.username);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://viopage.com";
 
-  // Auto-populate from profile on mount
+  // Load saved card settings from Supabase on mount
   useEffect(() => {
-    if (profile && socialIcons) {
+    if (profile && !loaded) {
+      loadFromSupabase(profile.id);
+    }
+  }, [profile, loaded, loadFromSupabase]);
+
+  // Auto-populate empty fields from profile data
+  useEffect(() => {
+    if (profile && socialIcons && loaded) {
       initFromProfile(profile, socialIcons);
     }
-  }, [profile, socialIcons, initFromProfile]);
+  }, [profile, socialIcons, loaded, initFromProfile]);
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto">

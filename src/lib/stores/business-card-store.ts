@@ -1,8 +1,7 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createClient } from "@/lib/supabase/client";
 
-interface BusinessCardState {
-  // Card content (populated from profile)
+interface BusinessCardSettings {
   brandName: string;
   fullName: string;
   jobTitle: string;
@@ -11,14 +10,10 @@ interface BusinessCardState {
   phone: string;
   logoUrl: string | null;
   showQrCode: boolean;
-
-  // User-editable colors (override template defaults)
   primaryColor: string;
   textColor: string;
   accentColor: string;
   bgColor: string;
-
-  // Customization (sizes & shapes)
   logoSize: number;
   logoShape: "rounded" | "circle" | "square";
   nameFontSize: number;
@@ -26,16 +21,17 @@ interface BusinessCardState {
   contactFontSize: number;
   brandNameFontSize: number;
   qrCodeSize: number;
-
-  // Template & AI
   selectedTemplateId: string;
   aiBackgroundUrl: string | null;
-  aiBackgroundLoading: boolean;
   aiLogoUrl: string | null;
-  aiLogoLoading: boolean;
+}
 
-  // Export
+interface BusinessCardState extends BusinessCardSettings {
+  // Transient UI states (not persisted)
+  aiBackgroundLoading: boolean;
+  aiLogoLoading: boolean;
   downloading: boolean;
+  loaded: boolean;
 
   // Actions
   setField: (key: string, value: string | boolean | number | null) => void;
@@ -50,100 +46,208 @@ interface BusinessCardState {
     textColor: string;
     accentColor: string;
   }) => void;
+  loadFromSupabase: (profileId: string) => Promise<void>;
   initFromProfile: (
     profile: {
+      id: string;
       display_name?: string | null;
       bio?: string | null;
       avatar_url?: string | null;
       username?: string | null;
+      business_card_settings?: Record<string, unknown> | null;
     },
     socialIcons: { platform: string; url: string }[]
   ) => void;
   reset: () => void;
 }
 
-const initialState = {
+const defaultSettings: BusinessCardSettings = {
   brandName: "",
   fullName: "",
   jobTitle: "",
   email: "",
   website: "",
   phone: "",
-  logoUrl: null as string | null,
+  logoUrl: null,
   showQrCode: true,
   primaryColor: "#FF6B35",
   textColor: "#FFFFFF",
   accentColor: "#D4AF37",
   bgColor: "#0a0a0a",
   logoSize: 80,
-  logoShape: "rounded" as const,
+  logoShape: "rounded",
   nameFontSize: 30,
   titleFontSize: 14,
   contactFontSize: 12,
   brandNameFontSize: 18,
   qrCodeSize: 140,
   selectedTemplateId: "midnight-gold",
-  aiBackgroundUrl: null as string | null,
-  aiBackgroundLoading: false,
-  aiLogoUrl: null as string | null,
-  aiLogoLoading: false,
-  downloading: false,
+  aiBackgroundUrl: null,
+  aiLogoUrl: null,
 };
 
-export const useBusinessCardStore = create<BusinessCardState>()(
-  persist(
-    (set, get) => ({
-      ...initialState,
+// Debounced save to Supabase
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
-      setField: (key, value) => set({ [key]: value }),
-      setSelectedTemplate: (id) => set({ selectedTemplateId: id }),
-      setAiBackgroundUrl: (url) => set({ aiBackgroundUrl: url }),
-      setAiBackgroundLoading: (loading) => set({ aiBackgroundLoading: loading }),
-      setAiLogoUrl: (url) => set({ aiLogoUrl: url }),
-      setAiLogoLoading: (loading) => set({ aiLogoLoading: loading }),
-      setDownloading: (downloading) => set({ downloading: downloading }),
-
-      applyTemplateColors: (template) =>
-        set({
-          bgColor: template.bgColor,
-          textColor: template.textColor,
-          accentColor: template.accentColor,
-        }),
-
-      initFromProfile: (profile, socialIcons) => {
-        // Only populate empty fields — don't overwrite user customizations
-        const state = get();
-        const updates: Partial<BusinessCardState> = {};
-
-        if (!state.brandName && profile.display_name) updates.brandName = profile.display_name;
-        if (!state.fullName && profile.display_name) updates.fullName = profile.display_name;
-        if (!state.jobTitle && profile.bio) updates.jobTitle = profile.bio;
-        if (!state.logoUrl && profile.avatar_url) updates.logoUrl = profile.avatar_url;
-
-        const emailIcon = socialIcons.find((s) => s.platform === "email");
-        if (!state.email && emailIcon) updates.email = emailIcon.url.replace("mailto:", "");
-
-        const whatsappIcon = socialIcons.find((s) => s.platform === "whatsapp");
-        if (!state.phone && whatsappIcon) {
-          const phoneMatch = whatsappIcon.url.match(/[\d+]+/);
-          if (phoneMatch) updates.phone = phoneMatch[0];
-        }
-
-        const websiteIcon = socialIcons.find((s) => s.platform === "website");
-        if (!state.website && websiteIcon) updates.website = websiteIcon.url;
-
-        if (Object.keys(updates).length > 0) set(updates);
-      },
-
-      reset: () => set(initialState),
-    }),
-    {
-      name: "viopage-business-card",
-      partialize: (state) => {
-        // Persist everything except transient UI states
-        const { downloading, aiBackgroundLoading, aiLogoLoading, ...rest } = state;
-        return rest;
-      },
+function debouncedSave(getState: () => BusinessCardState, profileId: string) {
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    const state = getState();
+    const settings: BusinessCardSettings = {
+      brandName: state.brandName,
+      fullName: state.fullName,
+      jobTitle: state.jobTitle,
+      email: state.email,
+      website: state.website,
+      phone: state.phone,
+      logoUrl: state.logoUrl,
+      showQrCode: state.showQrCode,
+      primaryColor: state.primaryColor,
+      textColor: state.textColor,
+      accentColor: state.accentColor,
+      bgColor: state.bgColor,
+      logoSize: state.logoSize,
+      logoShape: state.logoShape,
+      nameFontSize: state.nameFontSize,
+      titleFontSize: state.titleFontSize,
+      contactFontSize: state.contactFontSize,
+      brandNameFontSize: state.brandNameFontSize,
+      qrCodeSize: state.qrCodeSize,
+      selectedTemplateId: state.selectedTemplateId,
+      aiBackgroundUrl: state.aiBackgroundUrl,
+      aiLogoUrl: state.aiLogoUrl,
+    };
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("profiles")
+      .update({ business_card_settings: settings })
+      .eq("id", profileId);
+    if (error) {
+      console.error("[business-card-store] save failed:", error.message);
     }
-  )
-);
+  }, 500);
+}
+
+// Store the profile ID for debounced saves
+let currentProfileId: string | null = null;
+
+export const useBusinessCardStore = create<BusinessCardState>((set, get) => ({
+  ...defaultSettings,
+  aiBackgroundLoading: false,
+  aiLogoLoading: false,
+  downloading: false,
+  loaded: false,
+
+  setField: (key, value) => {
+    set({ [key]: value });
+    if (currentProfileId) debouncedSave(get, currentProfileId);
+  },
+
+  setSelectedTemplate: (id) => {
+    set({ selectedTemplateId: id });
+    if (currentProfileId) debouncedSave(get, currentProfileId);
+  },
+
+  setAiBackgroundUrl: (url) => {
+    set({ aiBackgroundUrl: url });
+    if (currentProfileId) debouncedSave(get, currentProfileId);
+  },
+
+  setAiBackgroundLoading: (loading) => set({ aiBackgroundLoading: loading }),
+
+  setAiLogoUrl: (url) => {
+    set({ aiLogoUrl: url });
+    if (currentProfileId) debouncedSave(get, currentProfileId);
+  },
+
+  setAiLogoLoading: (loading) => set({ aiLogoLoading: loading }),
+
+  setDownloading: (downloading) => set({ downloading }),
+
+  applyTemplateColors: (template) => {
+    set({
+      bgColor: template.bgColor,
+      textColor: template.textColor,
+      accentColor: template.accentColor,
+    });
+    if (currentProfileId) debouncedSave(get, currentProfileId);
+  },
+
+  loadFromSupabase: async (profileId: string) => {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from("profiles")
+      .select("business_card_settings")
+      .eq("id", profileId)
+      .single();
+
+    if (data?.business_card_settings) {
+      const saved = data.business_card_settings as Record<string, unknown>;
+      const restored: Partial<BusinessCardSettings> = {};
+      for (const key of Object.keys(defaultSettings) as (keyof BusinessCardSettings)[]) {
+        if (key in saved && saved[key] !== undefined) {
+          (restored as Record<string, unknown>)[key] = saved[key];
+        }
+      }
+      set({ ...restored, loaded: true });
+    } else {
+      set({ loaded: true });
+    }
+    currentProfileId = profileId;
+  },
+
+  initFromProfile: (profile, socialIcons) => {
+    const state = get();
+    currentProfileId = profile.id;
+
+    // If we already loaded saved settings, only fill empty fields from profile
+    if (state.loaded) {
+      const updates: Partial<BusinessCardState> = {};
+      if (!state.brandName && profile.display_name) updates.brandName = profile.display_name;
+      if (!state.fullName && profile.display_name) updates.fullName = profile.display_name;
+      if (!state.jobTitle && profile.bio) updates.jobTitle = profile.bio;
+      if (!state.logoUrl && profile.avatar_url) updates.logoUrl = profile.avatar_url;
+
+      const emailIcon = socialIcons.find((s) => s.platform === "email");
+      if (!state.email && emailIcon) updates.email = emailIcon.url.replace("mailto:", "");
+
+      const whatsappIcon = socialIcons.find((s) => s.platform === "whatsapp");
+      if (!state.phone && whatsappIcon) {
+        const phoneMatch = whatsappIcon.url.match(/[\d+]+/);
+        if (phoneMatch) updates.phone = phoneMatch[0];
+      }
+
+      const websiteIcon = socialIcons.find((s) => s.platform === "website");
+      if (!state.website && websiteIcon) updates.website = websiteIcon.url;
+
+      if (Object.keys(updates).length > 0) set(updates);
+      return;
+    }
+
+    // First load without saved settings — populate from profile
+    const updates: Partial<BusinessCardState> = {};
+    if (profile.display_name) updates.brandName = profile.display_name;
+    if (profile.display_name) updates.fullName = profile.display_name;
+    if (profile.bio) updates.jobTitle = profile.bio;
+    if (profile.avatar_url) updates.logoUrl = profile.avatar_url;
+
+    const emailIcon = socialIcons.find((s) => s.platform === "email");
+    if (emailIcon) updates.email = emailIcon.url.replace("mailto:", "");
+
+    const whatsappIcon = socialIcons.find((s) => s.platform === "whatsapp");
+    if (whatsappIcon) {
+      const phoneMatch = whatsappIcon.url.match(/[\d+]+/);
+      if (phoneMatch) updates.phone = phoneMatch[0];
+    }
+
+    const websiteIcon = socialIcons.find((s) => s.platform === "website");
+    if (websiteIcon) updates.website = websiteIcon.url;
+
+    set(updates);
+  },
+
+  reset: () => {
+    set({ ...defaultSettings, loaded: false });
+    if (currentProfileId) debouncedSave(get, currentProfileId);
+  },
+}));
