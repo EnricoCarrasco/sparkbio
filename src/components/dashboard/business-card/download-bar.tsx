@@ -46,7 +46,6 @@ export function DownloadBar({ cardRef }: DownloadBarProps) {
       // transition causing a mid-animation capture.
       const dataUrl = await toPng(el, {
         pixelRatio: 3, // 3x for crisp print-quality export (1800×1125)
-        cacheBust: true,
         width: 600,
         height: 375,
         style: {
