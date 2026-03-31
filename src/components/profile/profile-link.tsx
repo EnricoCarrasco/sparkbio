@@ -87,12 +87,13 @@ function getLinkStyles(theme: Theme): React.CSSProperties {
 
 export function ProfileLink({ link, profileId, theme, index }: ProfileLinkProps) {
   const styles = getLinkStyles(theme);
-  const isPreview = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("preview");
+  const isInIframe = typeof window !== "undefined" && window.self !== window.top;
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
-    // In preview mode (dashboard iframe), don't navigate — just show the click animation
-    if (isPreview) {
+    // In dashboard preview iframe, open in parent window instead of inside the iframe
+    if (isInIframe) {
       e.preventDefault();
+      window.open(link.url, "_blank", "noopener,noreferrer");
       return;
     }
 

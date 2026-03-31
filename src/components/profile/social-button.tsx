@@ -36,7 +36,7 @@ interface SocialButtonProps {
 export function SocialButton({ icon, profileId, theme, index }: SocialButtonProps) {
   const [copied, setCopied] = useState(false);
   const isPix = icon.platform === "pix";
-  const isPreview = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("preview");
+  const isInIframe = typeof window !== "undefined" && window.self !== window.top;
   const { button_color, button_text_color, button_style_v2, button_corner, button_shadow } = theme;
   const brand = PLATFORM_BRAND_COLORS[icon.platform];
   const iconPath = getBrandIconPath(icon.platform);
@@ -161,7 +161,7 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
           type="button"
           aria-label={title}
           style={outerStyle}
-          onClick={isPreview ? undefined : handlePixCopy}
+          onClick={handlePixCopy}
           whileHover={{ scale: 1.02, opacity: 0.92 }}
           whileTap={{ scale: 0.97, opacity: 0.85 }}
           transition={{ duration: 0.15, ease: "easeOut" }}
@@ -170,12 +170,12 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
         </motion.button>
       ) : (
         <motion.a
-          href={isPreview ? undefined : icon.url}
+          href={icon.url}
           target="_blank"
           rel="noopener noreferrer"
           aria-label={title}
           style={outerStyle}
-          onClick={isPreview ? (e: React.MouseEvent) => e.preventDefault() : fireAnalytics}
+          onClick={isInIframe ? (e: React.MouseEvent) => { e.preventDefault(); window.open(icon.url, "_blank", "noopener,noreferrer"); } : fireAnalytics}
           whileHover={{ scale: 1.02, opacity: 0.92 }}
           whileTap={{ scale: 0.97, opacity: 0.85 }}
           transition={{ duration: 0.15, ease: "easeOut" }}
