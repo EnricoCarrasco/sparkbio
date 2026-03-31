@@ -78,7 +78,7 @@ export function PreviewPanel() {
                     width: "154%",
                     height: "154%",
                   }}
-                  sandbox="allow-scripts allow-same-origin allow-popups"
+                  sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
                 />
               ) : (
                 <div className="flex items-center justify-center h-full text-xs text-muted-foreground">

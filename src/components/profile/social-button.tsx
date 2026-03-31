@@ -107,7 +107,17 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback: select text approach
+      // Fallback for sandboxed iframes or unsupported clipboard API
+      const textarea = document.createElement("textarea");
+      textarea.value = icon.url;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   }
 
