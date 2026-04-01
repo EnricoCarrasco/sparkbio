@@ -278,7 +278,7 @@ function SocialIconCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "rounded-2xl bg-white border border-border/60 shadow-sm",
+        "rounded-2xl bg-orange-50 border border-border/60 shadow-sm",
         isDragging && "shadow-lg opacity-80 z-50"
       )}
     >

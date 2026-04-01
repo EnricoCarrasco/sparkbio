@@ -92,7 +92,7 @@ export function LinkCard({ link, clickCount, onOpenInsights }: LinkCardProps) {
         ref={setNodeRef}
         style={style}
         className={cn(
-          "rounded-2xl bg-white border border-border/60 shadow-sm transition-shadow",
+          "rounded-2xl bg-orange-50 border border-border/60 shadow-sm transition-shadow",
           isDragging && "shadow-lg opacity-80 z-50"
         )}
       >

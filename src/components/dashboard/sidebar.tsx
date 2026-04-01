@@ -56,14 +56,13 @@ export function Sidebar({ onNavigate }: SidebarProps) {
 
   return (
     <div className="flex flex-col h-full py-3">
-      {/* Compact logo */}
+      {/* Logo */}
       <div className="flex items-center justify-center mb-4 px-2">
-        <span
-          className="font-bold text-base tracking-tight select-none"
-          style={{ color: "#FF6B35" }}
-        >
-          Spark
-        </span>
+        <img
+          src="/images/landing/logo-viopage.png"
+          alt="Viopage"
+          className="h-8 w-auto select-none"
+        />
       </div>
 
       {/* Nav icons */}

@@ -92,7 +92,7 @@ export function ProfileEditor() {
   const bioRemaining = BIO_MAX_LENGTH - bio.length;
 
   return (
-    <div className="p-6 border border-border rounded-xl bg-white space-y-5">
+    <div className="p-6 border border-border rounded-xl bg-orange-50 space-y-5">
       <h2 className="text-base font-semibold text-foreground">{t("title")}</h2>
 
       {/* Avatar */}

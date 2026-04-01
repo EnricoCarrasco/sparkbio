@@ -21,7 +21,7 @@ export function FooterPanel() {
     <div className="space-y-6">
       <h3 className="text-sm font-semibold text-foreground">{t("footerSection")}</h3>
 
-      <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-white">
+      <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-orange-50">
         <div className="space-y-0.5">
           <Label className="text-sm font-medium flex items-center gap-1.5">
             {t("hideFooter")}

@@ -196,10 +196,17 @@ export function ProfilePage({ data }: ProfilePageProps) {
             href="https://viopage.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 text-xs font-medium tracking-wide opacity-40 hover:opacity-70 transition-opacity"
+            className="mt-4 flex items-center gap-1.5 opacity-40 hover:opacity-70 transition-opacity"
             style={{ color: theme.text_color }}
           >
-            Made with Viopage
+            <img
+              src="/images/landing/logo-viopage.png"
+              alt="Viopage"
+              className="h-3.5 w-auto"
+            />
+            <span className="text-xs font-medium tracking-wide">
+              Made with Viopage
+            </span>
           </a>
         )}
       </main>
