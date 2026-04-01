@@ -128,7 +128,13 @@ export default function DashboardLayout({
         {/* Content + preview row */}
         <div className="flex flex-1 overflow-hidden">
           {/* Main content — tab-based switching */}
-          <main className="flex-1 overflow-y-auto pb-20 lg:pb-0">
+          <main className="relative flex-1 overflow-y-auto pb-20 lg:pb-0">
+            {/* Viopage logo — top right */}
+            <img
+              src="/images/landing/viopage-icon.png"
+              alt="Viopage"
+              className="absolute top-4 right-4 h-10 w-auto select-none pointer-events-none opacity-80 z-10"
+            />
             {activeTab === "content" && <ContentTab />}
             {activeTab === "design" && <DesignTab />}
             {activeTab === "analytics" && (

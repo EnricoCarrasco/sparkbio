@@ -56,13 +56,11 @@ export function Sidebar({ onNavigate }: SidebarProps) {
 
   return (
     <div className="flex flex-col h-full py-3">
-      {/* Logo */}
+      {/* Logo text */}
       <div className="flex items-center justify-center mb-4 px-2">
-        <img
-          src="/images/landing/logo-viopage.png"
-          alt="Viopage"
-          className="h-8 w-auto select-none"
-        />
+        <span className="font-bold text-base tracking-tight select-none" style={{ color: "#FF6B35" }}>
+          Viopage
+        </span>
       </div>
 
       {/* Nav icons */}
