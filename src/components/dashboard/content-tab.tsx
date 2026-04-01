@@ -610,7 +610,7 @@ export function ContentTab() {
         onClick={() => setAddModalOpen(true)}
         className="w-full flex items-center justify-center gap-2 py-3.5 rounded-full text-white font-semibold text-sm transition-all hover:opacity-90 active:scale-[0.98]"
         style={{
-          background: "linear-gradient(135deg, #8B5CF6, #7C3AED)",
+          background: "linear-gradient(135deg, #FF6B35, #E8501A)",
         }}
       >
         <Plus className="size-4" strokeWidth={2.5} />
