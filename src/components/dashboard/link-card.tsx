@@ -6,10 +6,7 @@ import {
   GripVertical,
   Pencil,
   Trash2,
-  Share2,
-  QrCode,
-  Image,
-  Star,
+  ExternalLink,
   BarChart3,
   Copy,
 } from "lucide-react";
@@ -140,15 +137,17 @@ export function LinkCard({ link, clickCount, onOpenInsights }: LinkCardProps) {
             </div>
           </div>
 
-          {/* Right side: share + toggle */}
+          {/* Right side: open link + toggle */}
           <div className="flex items-center gap-2 shrink-0">
             <Button
               type="button"
               variant="ghost"
               size="icon"
               className="size-8 text-muted-foreground/60 hover:text-muted-foreground"
+              title="Open link"
+              onClick={() => window.open(link.url, "_blank", "noopener,noreferrer")}
             >
-              <Share2 className="size-3.5" />
+              <ExternalLink className="size-3.5" />
             </Button>
             <Switch
               checked={link.is_active}
@@ -159,35 +158,8 @@ export function LinkCard({ link, clickCount, onOpenInsights }: LinkCardProps) {
         </div>
 
         {/* Bottom action bar */}
-        <div className="flex items-center justify-between px-4 pb-3 pt-0">
-          <div className="flex items-center gap-0.5">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="size-7 text-muted-foreground/40 hover:text-muted-foreground"
-              title="QR Code"
-            >
-              <QrCode className="size-3.5" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="size-7 text-muted-foreground/40 hover:text-muted-foreground"
-              title="Thumbnail"
-            >
-              <Image className="size-3.5" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="size-7 text-muted-foreground/40 hover:text-muted-foreground"
-              title="Highlight"
-            >
-              <Star className="size-3.5" />
-            </Button>
+        <div className="flex items-center justify-between px-4 py-2.5 border-t border-border/40">
+          <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={() => onOpenInsights(link.id)}

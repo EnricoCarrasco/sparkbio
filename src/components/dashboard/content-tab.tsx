@@ -417,7 +417,7 @@ function SocialIconCard({
       </div>
 
       {/* Bottom action bar */}
-      <div className="flex items-center justify-between px-3.5 pb-2.5 pt-0">
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-t border-border/40">
         <div className="flex items-center gap-1">
           <a
             href={icon.url}
