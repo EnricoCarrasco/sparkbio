@@ -186,7 +186,7 @@ export function Hero() {
             >
               <Image
                 src="/images/landing/phone-mockups.png"
-                alt="Three viopage creator profiles displayed on phone screens"
+                alt="Professional link-in-bio pages displayed on mobile phones — Viopage bio link builder for creators"
                 width={1200}
                 height={1080}
                 className="w-[500px] sm:w-[600px] lg:w-[700px] xl:w-[800px] h-auto object-contain"

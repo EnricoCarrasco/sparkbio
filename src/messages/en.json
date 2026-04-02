@@ -1,12 +1,12 @@
 {
   "landing": {
     "hero": {
-      "title": "The Digital Stage for Creators.",
-      "titleLine1": "The Digital Stage",
-      "titleLine1Connector": "for",
+      "title": "The Professional Link in Bio for Creators.",
+      "titleLine1": "The Professional",
+      "titleLine1Connector": "Link in Bio for",
       "titleLine2": "Creators.",
-      "subtitle": "Build a professional link-in-bio that looks like a high-end editorial gallery. Showcase your work, social links, and products in style.",
-      "eyebrow": "The link in bio for creators",
+      "subtitle": "Build a stunning bio link page that looks like a high-end editorial gallery. Share your work, social links, and products — all from one link.",
+      "eyebrow": "The #1 Linktree alternative for creators",
       "ctaPrimary": "Claim your link →",
       "ctaSecondary": "View Themes",
       "trustLine": "Joined by 2k+ creators this week",
@@ -58,7 +58,7 @@
       "statUptimeLabel": "Uptime Guaranteed"
     },
     "features": {
-      "title": "The easiest way to connect your audience to everything you are.",
+      "title": "The easiest link in bio tool to connect your audience to everything you are.",
       "getStarted": "Get started for free",
       "customization": {
         "eyebrow": "Customization",
@@ -98,27 +98,27 @@
       },
       "customize": {
         "eyebrow": "CUSTOMIZE",
-        "heading": "Create and customize in minutes",
+        "heading": "Create and customize your bio link page in minutes",
         "headingHighlight": "customize",
-        "description": "Our drag-and-drop editor makes it easy to add links, social icons, and embeds. No coding required, just pure creativity.",
+        "description": "Our drag-and-drop bio link builder makes it easy to add links, social icons, and embeds. No coding required, just pure creativity.",
         "check1": "Live preview while you build",
         "check2": "Premium typography included"
       },
       "share": {
         "eyebrow": "SHARE",
-        "heading": "Share your Viopage everywhere",
+        "heading": "Share your link in bio everywhere",
         "headingHighlight": "everywhere",
-        "description": "One link to rule them all. Use it on Instagram, TikTok, Twitter, and even your email signature.",
+        "description": "One link to rule them all. Use it as your Instagram bio link, TikTok bio link, Twitter link, and even your email signature.",
         "qrTitle": "QR Codes",
-        "qrDesc": "Download high-res QR codes for print.",
+        "qrDesc": "Download high-res QR codes for print and offline sharing.",
         "emailTagsTitle": "Email Tags",
         "emailTagsDesc": "Beautiful snippets for your email footer."
       },
       "analyticsBlock": {
         "eyebrow": "ANALYTICS",
-        "heading": "Track what's working",
-        "headingHighlight": "working",
-        "description": "Detailed analytics without the headache. See where your audience is coming from and which links they love most.",
+        "heading": "Link in bio analytics that work",
+        "headingHighlight": "work",
+        "description": "Detailed link in bio analytics without the headache. See where your audience is coming from and which links they love most.",
         "viewReport": "View Sample Report",
         "weeklyGrowth": "Weekly Growth +14.2%",
         "totalViews": "Total Views",
@@ -147,9 +147,9 @@
     },
     "themeGallery": {
       "eyebrow": "Customization",
-      "heading": "Make it unmistakably yours.",
+      "heading": "Make your link in bio unmistakably yours.",
       "headingHighlight": "unmistakably",
-      "subheading": "12 stunning themes to match your vibe. Customize colors, fonts, and more."
+      "subheading": "12 stunning link-in-bio themes to match your vibe. Customize colors, fonts, and more."
     },
     "themes": {
       "eyebrow": "THEMES",
@@ -160,13 +160,13 @@
     },
     "howItWorks": {
       "eyebrow": "How it works",
-      "heading": "Live in three steps.",
+      "heading": "Create your link in bio in three steps.",
       "headingHighlight": "three",
       "step1Title": "Claim your link",
       "step1Desc": "Pick your username and sign up in seconds.",
       "step2Title": "Add your content",
       "step2Desc": "Links, social icons, choose your theme.",
-      "step3Title": "Share everywhere",
+      "step3Title": "Share on Instagram, TikTok & more",
       "step3Desc": "Put your link in every bio and profile."
     },
     "featuresBento": {
@@ -177,7 +177,7 @@
         "eyebrow": "Customization",
         "heading": "Make it yours.",
         "headingHighlight": "yours.",
-        "description": "12 stunning themes, unlimited colors, 10 fonts, gradient backgrounds, button styles. Your page is your canvas.",
+        "description": "12 stunning themes, unlimited colors, 10 fonts, gradient backgrounds, button styles. Your creator profile page is your canvas.",
         "themes": "12 Themes",
         "colors": "Custom Colors",
         "fonts": "10 Fonts",
@@ -203,7 +203,7 @@
       "uptime": "Uptime"
     },
     "testimonials": {
-      "heading": "Loved by",
+      "heading": "Loved by 60K+",
       "headingHighlight": "creators",
       "headingAfter": "worldwide",
       "quote1": "Viopage turned my chaotic list of links into a high-end digital portfolio. The conversion rate on my shop increased by 30% in the first week.",
@@ -217,9 +217,9 @@
     },
     "pricingPreview": {
       "eyebrow": "PRICING",
-      "heading": "Simple,",
-      "headingHighlight": "transparent",
-      "headingAfter": "pricing.",
+      "heading": "Link in bio pricing.",
+      "headingHighlight": "pricing.",
+      "headingAfter": "Start your free trial.",
       "monthly": "Monthly",
       "yearly": "Yearly",
       "savePercent": "Save 22%",
@@ -274,6 +274,21 @@
       "features": "Features",
       "themes": "Themes",
       "pricing": "Pricing"
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "heading": "Frequently asked questions",
+      "headingHighlight": "questions",
+      "q1": "What is a link-in-bio tool?",
+      "a1": "A link-in-bio tool lets you create a single landing page with multiple links, replacing your bare bio link on Instagram, TikTok, and other platforms. It acts as a micro landing page for creators to share everything they create.",
+      "q2": "How is Viopage different from Linktree?",
+      "a2": "Viopage offers 12 premium themes, advanced link-in-bio analytics, custom domain support, and a drag-and-drop builder — all included in one plan. Unlike Linktree, every feature is available from day one with your 7-day free trial.",
+      "q3": "Can I use a custom domain with my link-in-bio?",
+      "a3": "Yes! Pro members can connect their own custom domain to their Viopage. Instead of viopage.com/yourname, your audience sees yourname.com — a more professional creator profile page.",
+      "q4": "Do you provide link-in-bio analytics?",
+      "a4": "Absolutely. Viopage includes advanced analytics that track views, clicks, geographic data, and device breakdown. You can identify your top-performing links and optimize your content strategy.",
+      "q5": "Is there a free trial?",
+      "a5": "Yes, Viopage offers a 7-day free trial with full access to all Pro features. No limitations — try every theme, use the analytics dashboard, and customize your bio link page completely before you decide."
     }
   },
   "auth": {
@@ -904,5 +919,8 @@
       "step2": "Tap \"Add to Home screen\".",
       "step3": "Tap \"Add\" to confirm. Done!"
     }
+  },
+  "publicProfile": {
+    "joinCta": "Join {username} on Viopage"
   }
 }

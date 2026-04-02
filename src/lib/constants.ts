@@ -109,7 +109,7 @@ export const THEME_FONTS = [
 
 export const THEME_PRESETS = [
   {
-    name: "Sparkbio Default",
+    name: "Viopage Default",
     bg_color: "#FAFAFA",
     text_color: "#1E1E2E",
     button_color: "#FF6B35",

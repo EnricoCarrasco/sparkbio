@@ -1,12 +1,12 @@
 /**
- * Generates a Schema.org Person JSON-LD object for a Sparkbio public profile.
+ * Generates a Schema.org Person JSON-LD object for a Viopage public profile.
  * Embed the result as a <script type="application/ld+json"> in the <head>
  * to improve search-engine rich results for profile pages.
  */
 export interface PersonJsonLdParams {
   /** The user's display name shown on their profile. */
   name: string;
-  /** The canonical URL of the profile page, e.g. https://sparkbio.co/johndoe */
+  /** The canonical URL of the profile page, e.g. https://viopage.com/johndoe */
   url: string;
   /** Optional short bio / description text. */
   description?: string | null;
@@ -29,7 +29,7 @@ export interface PersonJsonLd {
  * `JSON.stringify`. Falsy optional fields are omitted from the output.
  *
  * @example
- * const jsonLd = generatePersonJsonLd({ name: "Jane", url: "https://sparkbio.co/jane" });
+ * const jsonLd = generatePersonJsonLd({ name: "Jane", url: "https://viopage.com/jane" });
  * // <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
  */
 export function generatePersonJsonLd({

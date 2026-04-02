@@ -95,7 +95,7 @@ export function ThemeGallery() {
               <div className="h-full w-full p-8 flex flex-col items-center pt-12">
                 <div className="w-20 h-20 rounded-full bg-stone-800 mb-6 border-2 border-stone-700 overflow-hidden">
                   <img
-                    alt="Profile"
+                    alt="Executive theme — dark premium link-in-bio design for professional creators"
                     className="w-full h-full object-cover grayscale"
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcv1xkKkw7FGTchaaeFTlIa-elp5sA-UjXSbCJkrMXTL-r5licYJCS2RDz2zz_b39zLTDqEsE5XVdFlPguHYQBJSSLJ6q7BK9VgD7g79yv0IsRi2rYwIoIfzjLd9Hw6_QjtYF6Alml8ZMs30o8NdikZVejr7Uy-2tPg-AE0NFIOk3O5wt57N05ZQ-mvJiag9LtuMYdOmv0cXxzCsZlNAHPKWwnmF5iDFICbCPLw-f-Weknuh2k1hKgbu_9JXTp1LltlGRfnzaLeGti"
                   />
@@ -134,7 +134,7 @@ export function ThemeGallery() {
               <div className="h-full w-full p-8 flex flex-col items-center pt-8">
                 <div className="w-16 h-16 rounded-full bg-[#ab3500] mb-4 overflow-hidden border-2 border-[#ffdbd0]">
                   <img
-                    alt="Profile"
+                    alt="Atelier theme — warm artistic link-in-bio template for artists"
                     className="w-full h-full object-cover"
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6WOUTdvHaZnjEPOeNTDv28Z4liXzu9uiPy_sR8ldR4PmUgV45TW7tEpUo7pNuA9RP2mNR_bL5jnNdgO_7SThDjrJ_Xe3wSEhjZ2ZKiXbtUGiFLgRn1ZGVZqy3cXrhsiRkaRZrU0BJL_CNIsGWVPUVbCOYjMXCzPP_Cc83XUx2qKSXHQDtzz-HR3T3Fm5TMXZKZnA0gAACrizZ5BVWEJIjDyi7h1Rd6NmHxhcOuRCex3ABxLi3UnAAMAUBQuN9JYHhEL5Ek5mqFRq2"
                   />
@@ -172,7 +172,7 @@ export function ThemeGallery() {
             >
               <div className="h-full w-full p-6 flex flex-col items-center pt-10">
                 <div className="w-16 h-16 rounded-2xl bg-stone-100 rotate-3 mb-6 overflow-hidden border border-stone-200">
-                  <img alt="Profile" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvZpCD5MQHgQNuG9ZodkMNoZPBH36VrTXtOJArQzXtgQExIL08OSXpGjkSNQtLi3HFiykud_ZsAnp-Jb-vHlXGXBd7cAUSW-ujke43i16S95ia4SSRe16Hsext5EIsPnqCbmZNILQ4VNeso_iDPiPtRKcE7rjBUl6fIXHwdXjs8CF5heBx3vxjYMyE2O-_t08iq_SGDFkGrfTUERveWH5y_L30U3ttZCbAX6GFuXHWzr9F0GQNGti97c74RPdzsQUIPVkCn4lnmV1l" />
+                  <img alt="Modernist theme — clean minimal link-in-bio design for agencies" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvZpCD5MQHgQNuG9ZodkMNoZPBH36VrTXtOJArQzXtgQExIL08OSXpGjkSNQtLi3HFiykud_ZsAnp-Jb-vHlXGXBd7cAUSW-ujke43i16S95ia4SSRe16Hsext5EIsPnqCbmZNILQ4VNeso_iDPiPtRKcE7rjBUl6fIXHwdXjs8CF5heBx3vxjYMyE2O-_t08iq_SGDFkGrfTUERveWH5y_L30U3ttZCbAX6GFuXHWzr9F0GQNGti97c74RPdzsQUIPVkCn4lnmV1l" />
                 </div>
                 <h3 className="text-stone-900 font-bold text-lg mb-1">Studio K.</h3>
                 <p className="text-stone-500 text-[10px] mb-8 text-center px-4">Creating digital experiences for the next generation.</p>
@@ -222,7 +222,7 @@ export function ThemeGallery() {
             >
               <div className="h-full w-full p-6 flex flex-col items-center pt-10">
                 <div className="w-20 h-20 rounded-full border-2 border-cyan-400 p-1 mb-6">
-                  <img alt="Profile" className="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfW7zwcLvoCPfDAAv-VnbGudx4JcyUkMZ2SIiTbAmBNHrDwmHYFVnZ2i4EbICCbu4t0DL5IrozK1dxL6WzLFSC7TMrD0aaezM-M36ptwlXscafOZqScZXQfz-Pw2DyCL-kuW6QZ7sBwnSeZ1ZNbkmUR8zEikKOVelRviF_zuKlYTVbZgM2Aq_8MvRMtA4SUnspudzQpNkqxhnsEQE4ya3cZmMMK8lYSUD671jlIYm0hDTQ39SInUFmLCIw_e0SJ7_THgVEPGsKF-Wr" />
+                  <img alt="Electric theme — bold neon link-in-bio template for musicians" className="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfW7zwcLvoCPfDAAv-VnbGudx4JcyUkMZ2SIiTbAmBNHrDwmHYFVnZ2i4EbICCbu4t0DL5IrozK1dxL6WzLFSC7TMrD0aaezM-M36ptwlXscafOZqScZXQfz-Pw2DyCL-kuW6QZ7sBwnSeZ1ZNbkmUR8zEikKOVelRviF_zuKlYTVbZgM2Aq_8MvRMtA4SUnspudzQpNkqxhnsEQE4ya3cZmMMK8lYSUD671jlIYm0hDTQ39SInUFmLCIw_e0SJ7_THgVEPGsKF-Wr" />
                 </div>
                 <h3 className="text-white font-black italic text-2xl mb-8 tracking-tighter">BEATZ BOX</h3>
                 <div className="w-full space-y-3">
@@ -243,7 +243,7 @@ export function ThemeGallery() {
             >
               <div className="h-full w-full p-6 flex flex-col items-center pt-10">
                 <div className="w-16 h-16 rounded-full bg-white shadow-sm mb-6 flex items-center justify-center">
-                  <img alt="Profile" className="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKIAYoHB-KqbX2GZO0VYnqGbHW3Wx3UzVki9eXQTgzALyhoaidV_53T6Ge9sMKqH-J3Mlx8CEy47ltMiwFO8rZJu_AWMf59wxDYw3scabRlYUMLU4MeKeVyz6KjoEK74BSJRUtj03VtZxsWCY3YhAralRvGZTPcktOC9i7Ppwxh6Dy94IARiSTNYwWs7URaYaFSI4J1MIzGxolSReXrvwsny71jU2PMY2-Gcy041YILyRAc4d4ICC7fLesS4biTbYoGl0soMV9ca_c" />
+                  <img alt="Silk theme — elegant pink link-in-bio template for musicians and creators" className="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKIAYoHB-KqbX2GZO0VYnqGbHW3Wx3UzVki9eXQTgzALyhoaidV_53T6Ge9sMKqH-J3Mlx8CEy47ltMiwFO8rZJu_AWMf59wxDYw3scabRlYUMLU4MeKeVyz6KjoEK74BSJRUtj03VtZxsWCY3YhAralRvGZTPcktOC9i7Ppwxh6Dy94IARiSTNYwWs7URaYaFSI4J1MIzGxolSReXrvwsny71jU2PMY2-Gcy041YILyRAc4d4ICC7fLesS4biTbYoGl0soMV9ca_c" />
                 </div>
                 <h3 className="text-pink-900 italic text-xl mb-1" style={{ fontFamily: "var(--font-display), 'Instrument Serif', Georgia, serif" }}>Mia Song</h3>
                 <p className="text-pink-400 text-[10px] font-medium tracking-widest uppercase mb-8">Musician</p>

@@ -1,22 +1,30 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sparkbio.co";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://viopage.com";
 
 /**
  * Generates the XML sitemap served at /sitemap.xml.
- * Static routes are always included; user profile routes are fetched
- * from the profiles table so every public page is indexed.
+ * Includes bilingual marketing pages (EN + PT-BR) with alternates,
+ * plus dynamic user profile routes.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Static routes
-  const staticRoutes: MetadataRoute.Sitemap = [
-    {
-      url: siteUrl,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 1,
+  // Marketing pages with hrefLang alternates (EN at root, PT-BR at /pt-BR/)
+  const marketingPages = ["", "/privacy", "/terms"].map((path) => ({
+    url: `${siteUrl}${path}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: path === "" ? 1 : 0.4,
+    alternates: {
+      languages: {
+        en: `${siteUrl}${path}`,
+        "pt-BR": `${siteUrl}/pt-BR${path}`,
+      },
     },
+  }));
+
+  // Auth pages (no alternates needed — cookie-based locale)
+  const authRoutes: MetadataRoute.Sitemap = [
     {
       url: `${siteUrl}/login`,
       lastModified: new Date(),
@@ -46,9 +54,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }));
 
-    return [...staticRoutes, ...profileRoutes];
+    return [...marketingPages, ...authRoutes, ...profileRoutes];
   } catch {
     // If the DB is unreachable during build, return only static routes.
-    return staticRoutes;
+    return [...marketingPages, ...authRoutes];
   }
 }

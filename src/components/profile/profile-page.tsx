@@ -9,6 +9,7 @@ import { SocialButton } from "./social-button";
 import { SocialGrid } from "./social-grid";
 import { AnalyticsTracker } from "./analytics-tracker";
 import { AddToHomeButton } from "./add-to-home-button";
+import { useTranslations } from "next-intl";
 
 interface ProfilePageProps {
   data: PublicProfile;
@@ -43,6 +44,7 @@ function buildBackgroundStyle(theme: PublicProfile["theme"]): React.CSSPropertie
 
 export function ProfilePage({ data }: ProfilePageProps) {
   const { profile, links, theme, social_icons, subscription } = data;
+  const t = useTranslations("publicProfile");
 
   const backgroundStyle = useMemo(() => buildBackgroundStyle(theme), [theme]);
 
@@ -193,22 +195,21 @@ export function ProfilePage({ data }: ProfilePageProps) {
         {/* Spacer — pushes footer to bottom when content is sparse */}
         <div className="flex-1" />
 
-        {/* Viopage branding footer */}
+        {/* Viopage branding CTA */}
         {showFooter && (
           <a
             href="https://viopage.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 flex items-center gap-1.5 opacity-40 hover:opacity-70 transition-opacity"
-            style={{ color: theme.text_color }}
+            className="mt-6 mb-2 inline-flex items-center justify-center gap-2 rounded-full bg-[#FF6B35] px-4 py-2.5 text-white shadow-md hover:shadow-lg hover:brightness-110 active:scale-[0.98] transition-all max-w-full"
           >
             <img
               src="/images/landing/logo-viopage.png"
               alt="Viopage"
-              className="h-3.5 w-auto"
+              className="h-4 w-auto shrink-0 brightness-0 invert"
             />
-            <span className="text-xs font-medium tracking-wide">
-              Made with Viopage
+            <span className="text-sm font-semibold truncate">
+              {t("joinCta", { username: profile.username })}
             </span>
           </a>
         )}

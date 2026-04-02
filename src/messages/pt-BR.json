@@ -1,12 +1,12 @@
 {
   "landing": {
     "hero": {
-      "title": "O Palco Digital para Criadores.",
-      "titleLine1": "O Palco Digital",
-      "titleLine1Connector": "para",
+      "title": "A Melhor Ferramenta de Link na Bio para Criadores.",
+      "titleLine1": "A Melhor Ferramenta",
+      "titleLine1Connector": "de Link na Bio para",
       "titleLine2": "Criadores.",
-      "subtitle": "Crie um link-in-bio profissional com aparência de galeria editorial de alto nível. Mostre seu trabalho, redes sociais e produtos com estilo.",
-      "eyebrow": "O link na bio para criadores",
+      "subtitle": "Crie sua página de links profissional em minutos. Compartilhe seu trabalho, redes sociais e produtos — tudo em um único link na bio.",
+      "eyebrow": "A melhor alternativa ao Linktree para criadores",
       "ctaPrimary": "Reivindique seu link →",
       "ctaSecondary": "Ver Temas",
       "trustLine": "Mais de 2 mil criadores esta semana",
@@ -59,7 +59,7 @@
       "statUptimeLabel": "Disponibilidade Garantida"
     },
     "features": {
-      "title": "A maneira mais fácil de conectar seu público a tudo o que você é.",
+      "title": "A ferramenta de link na bio mais fácil para conectar seu público a tudo o que você é.",
       "getStarted": "Comece gratuitamente",
       "customization": {
         "eyebrow": "Personalização",
@@ -99,17 +99,17 @@
       },
       "customize": {
         "eyebrow": "PERSONALIZAR",
-        "heading": "Crie e personalize em minutos",
+        "heading": "Crie e personalize sua página de links em minutos",
         "headingHighlight": "personalize",
-        "description": "Nosso editor arrasta-e-solta facilita adicionar links, ícones sociais e embeds. Sem código, apenas criatividade pura.",
+        "description": "Nosso agregador de links arrasta-e-solta facilita adicionar links, ícones sociais e embeds. Sem código, apenas criatividade pura.",
         "check1": "Pré-visualização ao vivo enquanto constrói",
         "check2": "Tipografia premium incluída"
       },
       "share": {
         "eyebrow": "COMPARTILHAR",
-        "heading": "Compartilhe seu Viopage em todo lugar",
+        "heading": "Compartilhe seu link na bio em todo lugar",
         "headingHighlight": "em todo lugar",
-        "description": "Um link para dominar todos. Use no Instagram, TikTok, Twitter e até na sua assinatura de email.",
+        "description": "Um link para dominar todos. Use como link na bio do Instagram, TikTok, Twitter e até na sua assinatura de email.",
         "qrTitle": "QR Codes",
         "qrDesc": "Baixe QR codes em alta resolução para impressão.",
         "emailTagsTitle": "Email Tags",
@@ -117,9 +117,9 @@
       },
       "analyticsBlock": {
         "eyebrow": "ANÁLISES",
-        "heading": "Acompanhe o que está funcionando",
-        "headingHighlight": "funcionando",
-        "description": "Análises detalhadas sem complicação. Veja de onde seu público vem e quais links eles mais gostam.",
+        "heading": "Análises do link na bio que funcionam",
+        "headingHighlight": "funcionam",
+        "description": "Análises detalhadas do link na bio sem complicação. Veja de onde seu público vem e quais links para vender mais funcionam.",
         "viewReport": "Ver Relatório Exemplo",
         "weeklyGrowth": "Crescimento Semanal +14,2%",
         "totalViews": "Total de Visualizações",
@@ -148,9 +148,9 @@
     },
     "themeGallery": {
       "eyebrow": "Personalização",
-      "heading": "Deixe com a sua cara.",
+      "heading": "Deixe seu link na bio com a sua cara.",
       "headingHighlight": "sua cara.",
-      "subheading": "12 temas incríveis para combinar com seu estilo. Personalize cores, fontes e mais."
+      "subheading": "12 temas incríveis para sua página de links. Personalize cores, fontes e mais."
     },
     "themes": {
       "eyebrow": "TEMAS",
@@ -161,13 +161,13 @@
     },
     "howItWorks": {
       "eyebrow": "Como funciona",
-      "heading": "Pronto em três passos.",
+      "heading": "Crie seu link na bio em três passos.",
       "headingHighlight": "três",
       "step1Title": "Crie seu link",
       "step1Desc": "Escolha seu nome de usuário e cadastre-se em segundos.",
       "step2Title": "Adicione seu conteúdo",
       "step2Desc": "Links, ícones sociais, escolha seu tema.",
-      "step3Title": "Compartilhe em todo lugar",
+      "step3Title": "Compartilhe no Instagram, TikTok e mais",
       "step3Desc": "Coloque seu link em toda bio e perfil."
     },
     "featuresBento": {
@@ -178,7 +178,7 @@
         "eyebrow": "Personalização",
         "heading": "Deixe com a sua cara.",
         "headingHighlight": "sua cara.",
-        "description": "12 temas incríveis, cores ilimitadas, 10 fontes, fundos gradientes, estilos de botão. Sua página é sua tela.",
+        "description": "12 temas incríveis, cores ilimitadas, 10 fontes, fundos gradientes, estilos de botão. Sua página de links é sua tela.",
         "themes": "12 Temas",
         "colors": "Cores personalizadas",
         "fonts": "10 Fontes",
@@ -204,7 +204,7 @@
       "uptime": "Disponibilidade"
     },
     "testimonials": {
-      "heading": "Amado por",
+      "heading": "Amado por 60K+",
       "headingHighlight": "criadores",
       "headingAfter": "do mundo todo",
       "quote1": "O Viopage transformou minha lista caótica de links em um portfólio digital de alto nível. A taxa de conversão da minha loja aumentou 30% na primeira semana.",
@@ -218,9 +218,9 @@
     },
     "pricingPreview": {
       "eyebrow": "PREÇOS",
-      "heading": "Preços simples e",
-      "headingHighlight": "transparentes",
-      "headingAfter": ".",
+      "heading": "Preços do link na bio.",
+      "headingHighlight": "link na bio.",
+      "headingAfter": "Comece seu teste grátis.",
       "monthly": "Mensal",
       "yearly": "Anual",
       "savePercent": "Economize 22%",
@@ -275,6 +275,21 @@
       "features": "Recursos",
       "themes": "Temas",
       "pricing": "Preços"
+    },
+    "faq": {
+      "eyebrow": "Perguntas Frequentes",
+      "heading": "Perguntas frequentes",
+      "headingHighlight": "frequentes",
+      "q1": "O que é uma ferramenta de link na bio?",
+      "a1": "Uma ferramenta de link na bio permite criar uma página de links centralizada, substituindo o link único na bio do Instagram, TikTok e outras plataformas. Funciona como um agregador de links para criadores compartilharem tudo em um lugar.",
+      "q2": "Como o Viopage é diferente do Linktree?",
+      "a2": "O Viopage oferece 12 temas premium, análises avançadas, suporte a domínio personalizado e um editor arrasta-e-solta — tudo incluído em um plano. Diferente do Linktree, todos os recursos estão disponíveis desde o primeiro dia no teste grátis de 7 dias.",
+      "q3": "Posso usar um domínio personalizado no meu link na bio?",
+      "a3": "Sim! Membros Pro podem conectar seu próprio domínio ao Viopage. Em vez de viopage.com/seunome, seu público vê seunome.com — uma página de links muito mais profissional.",
+      "q4": "Vocês oferecem análises do link na bio?",
+      "a4": "Com certeza. O Viopage inclui análises avançadas que rastreiam visualizações, cliques, dados geográficos e dispositivos. Descubra quais links para vender mais funcionam e otimize sua estratégia de monetização.",
+      "q5": "Tem teste grátis?",
+      "a5": "Sim, o Viopage oferece um teste grátis de 7 dias com acesso completo a todos os recursos Pro. Sem limitações — teste todos os temas, use o painel de análises e personalize sua página de links completamente."
     }
   },
   "auth": {
@@ -902,5 +917,8 @@
       "step2": "Toque em \"Adicionar à tela inicial\".",
       "step3": "Toque em \"Adicionar\" para confirmar. Pronto!"
     }
+  },
+  "publicProfile": {
+    "joinCta": "Junte-se a {username} no Viopage"
   }
 }

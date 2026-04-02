@@ -70,6 +70,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       images: profile.avatar_url ? [profile.avatar_url] : undefined,
     },
+    manifest: `/api/manifest/${username}`,
     alternates: {
       canonical: profileUrl,
     },

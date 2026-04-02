@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Globe, Check, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
@@ -24,6 +24,9 @@ const LANGUAGES: Language[] = [
   { locale: "pt-BR", label: "Português (BR)", shortLabel: "PT" },
 ];
 
+/** Marketing paths where we use URL-based locale for SEO */
+const MARKETING_PATHS = ["/", "/privacy", "/terms"];
+
 function persistLocaleCookie(locale: Locale) {
   document.cookie = `locale=${locale};path=/;max-age=31536000;SameSite=Lax`;
 }
@@ -35,18 +38,34 @@ interface LanguageSwitcherProps {
 export function LanguageSwitcher({ variant = "dark" }: LanguageSwitcherProps) {
   const currentLocale = useLocale() as Locale;
   const router = useRouter();
+  const pathname = usePathname();
 
   const currentLanguage =
     LANGUAGES.find((lang) => lang.locale === currentLocale) ?? LANGUAGES[0];
 
+  // Strip /pt-BR prefix to get the base path
+  const basePath = pathname.startsWith("/pt-BR")
+    ? pathname.slice(6) || "/"
+    : pathname;
+
+  const isMarketingPage = MARKETING_PATHS.includes(basePath);
+
   function switchLocale(newLocale: Locale) {
     if (newLocale === currentLocale) return;
 
-    // Persist locale preference in a long-lived cookie (1 year)
     persistLocaleCookie(newLocale);
 
-    // Re-render server components with the new locale
-    router.refresh();
+    if (isMarketingPage) {
+      // Marketing pages: navigate to /pt-BR or root for English
+      if (newLocale === "pt-BR") {
+        window.location.href = `/pt-BR${basePath === "/" ? "" : basePath}`;
+      } else {
+        window.location.href = basePath;
+      }
+    } else {
+      // Dashboard/Auth: cookie-based, just refresh
+      router.refresh();
+    }
   }
 
   return (

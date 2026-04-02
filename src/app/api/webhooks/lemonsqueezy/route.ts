@@ -180,7 +180,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   // --- On cancellation / expiry: remove premium perks ---
-  // Reset hide_footer so the Sparkbio footer is shown again on the public profile.
+  // Reset hide_footer so the Viopage footer is shown again on the public profile.
   if (status === "cancelled" || status === "expired") {
     const { error: themeError } = await supabase
       .from("themes")

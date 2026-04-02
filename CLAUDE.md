@@ -24,7 +24,7 @@ No test framework is set up yet.
 - **Supabase** (PostgreSQL, Auth, Storage) — project ID: `lbouculyhpqcnmvyrofo`
 - **Zustand** for client state (6 stores)
 - **LemonSqueezy** for payments (Merchant of Record — handles chargebacks, tax)
-- **next-intl** for i18n (EN + PT-BR, cookie-based locale, no URL prefixes)
+- **next-intl** for i18n translations only (EN + PT-BR). Locale routing via custom `proxy.ts` rewrite — NOT next-intl middleware
 - **Framer Motion** for animations
 - **Recharts** for analytics charts
 - **@dnd-kit** for drag-and-drop link reordering
@@ -43,9 +43,9 @@ src/app/
 └── api/analytics/   # POST endpoint for page views and link clicks
 ```
 
-### Critical: `[username]` vs i18n Conflict
+### `[username]` Route vs Locale Prefixes
 
-The `[username]` dynamic segment sits at the root. We intentionally do NOT use `next-intl` middleware URL rewriting — it would rewrite `/` to `/en`, which the `[username]` route catches. Instead, locale is detected from a `locale` cookie or `Accept-Language` header in `src/i18n/request.ts`. The middleware (`src/middleware.ts`) only handles Supabase session refresh.
+The `[username]` dynamic segment sits at the root. To prevent collisions, `"pt-br"` and `"en"` are in `RESERVED_USERNAMES` (`src/lib/constants.ts`). `src/proxy.ts` handles locale routing: requests to `/pt-BR` or `/pt-BR/*` are rewritten to the root path with an `x-locale-override: pt-BR` header, which `src/i18n/request.ts` reads to load Portuguese translations. For all other routes, the proxy runs Supabase `updateSession()` to refresh auth cookies and handle dashboard/auth redirects. We do NOT use next-intl's `createMiddleware` — it rewrites `/` to `/en` which conflicts with the `[username]` catch-all.
 
 ### Dashboard Architecture
 
@@ -75,12 +75,15 @@ All in `src/lib/stores/`:
 
 Theme store saves the entire theme object on debounce (not just the last changed field) to prevent lost updates during rapid changes.
 
-### i18n
+### i18n (Hybrid: Custom Proxy + next-intl for translations only)
 
-- Cookie-based, not URL-based. No locale in URLs.
+- **next-intl is used ONLY for translations** (`useTranslations`, `getMessages`, message files). We do NOT use next-intl's routing/middleware — it conflicts with the `[username]` catch-all.
+- **Locale routing is handled by `src/proxy.ts`**: rewrites `/pt-BR/*` to `/*` with an `x-locale-override` header. Supabase session refresh runs on all other routes.
+- **`src/i18n/request.ts`** detects locale in this order: `x-locale-override` header → `locale` cookie → `Accept-Language` header → default `en`.
+- **Marketing pages**: English at root (`/`), Portuguese at `/pt-BR/`. hrefLang tags on marketing pages link both versions for Google.
+- **Dashboard/Auth**: Cookie-based locale. Language switcher sets `locale` cookie + `router.refresh()`.
+- **Language switcher on marketing**: Uses `window.location.href` to navigate to `/pt-BR` or `/` (NOT next-intl's router — that would navigate to `/en` which 404s).
 - Messages in `src/messages/en.json` and `src/messages/pt-BR.json`
-- `Accept-Language` parsed with quality scores for auto-detection
-- `LanguageSwitcher` component sets a `locale` cookie and calls `router.refresh()`
 
 ### Fonts
 
