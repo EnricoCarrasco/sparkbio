@@ -20,12 +20,16 @@ const instrumentSerif = Instrument_Serif({
 
 export const metadata: Metadata = {
   title: {
-    default: "Viopage — Everything you are. One simple link.",
+    default: "Link in Bio Tool for Creators | Professional Bio Pages | Viopage",
     template: "%s | Viopage",
   },
   description:
-    "Join millions of creators using Viopage to share everything they create, curate and sell — all from one link in bio.",
+    "Create a professional link-in-bio page in minutes. 12 premium themes, analytics, custom domains. The Linktree alternative with a 7-day free trial. Join 60K+ creators.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  icons: {
+    icon: "/icons/icon-192x192.png",
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
 
 export default async function RootLayout({
