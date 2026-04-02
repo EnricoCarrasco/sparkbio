@@ -119,7 +119,7 @@ export function DesignTab() {
 
       {/* Active sub-tab content */}
       <div className="flex-1 overflow-y-auto bg-[#FAFAFA]">
-        <div className="px-6 pt-4 pb-6">
+        <div className="px-6 pt-10 pb-6">
           {activeSubTab === "header" && <HeaderPanel />}
           {activeSubTab === "theme" && <ThemePanel />}
           {activeSubTab === "wallpaper" && <WallpaperPanel />}
