@@ -62,7 +62,7 @@ export function AddToHomeButton() {
         <img
           src="/images/landing/viopage-icon.png"
           alt="Viopage"
-          className="h-8 w-auto"
+          className="h-16 w-auto"
         />
       </button>
 
