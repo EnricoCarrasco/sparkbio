@@ -886,5 +886,21 @@
       "heading": "13. Contato",
       "content": "Se você tiver dúvidas sobre esta Política de Privacidade ou deseja exercer seus direitos sobre dados, entre em contato conosco em privacy@viopage.com."
     }
+  },
+  "addToHome": {
+    "button": "Adicionar à Tela Inicial",
+    "title": "Adicionar à Tela Inicial",
+    "close": "Fechar",
+    "gotIt": "Entendi",
+    "ios": {
+      "step1": "Toque no botão Compartilhar na parte inferior do Safari (o quadrado com uma seta para cima).",
+      "step2": "Role para baixo e toque em \"Tela de Início\".",
+      "step3": "Toque em \"Adicionar\" no canto superior direito. Pronto!"
+    },
+    "android": {
+      "step1": "Toque no menu de três pontos (⋮) no canto superior direito do Chrome.",
+      "step2": "Toque em \"Adicionar à tela inicial\".",
+      "step3": "Toque em \"Adicionar\" para confirmar. Pronto!"
+    }
   }
 }

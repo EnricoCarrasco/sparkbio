@@ -888,5 +888,21 @@
       "heading": "13. Contact",
       "content": "If you have questions about this Privacy Policy or wish to exercise your data rights, please contact us at privacy@viopage.com."
     }
+  },
+  "addToHome": {
+    "button": "Add to Home Screen",
+    "title": "Add to Home Screen",
+    "close": "Close",
+    "gotIt": "Got it",
+    "ios": {
+      "step1": "Tap the Share button at the bottom of Safari (the square with an arrow pointing up).",
+      "step2": "Scroll down and tap \"Add to Home Screen\".",
+      "step3": "Tap \"Add\" in the top right corner. Done!"
+    },
+    "android": {
+      "step1": "Tap the three-dot menu (⋮) in the top right corner of Chrome.",
+      "step2": "Tap \"Add to Home screen\".",
+      "step3": "Tap \"Add\" to confirm. Done!"
+    }
   }
 }

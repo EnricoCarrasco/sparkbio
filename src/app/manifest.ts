@@ -7,10 +7,10 @@ import type { MetadataRoute } from "next";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Sparkbio",
-    short_name: "Sparkbio",
+    name: "Viopage",
+    short_name: "Viopage",
     description:
-      "Everything you are. One simple link. Share your links, socials, and more — all from one Sparkbio page.",
+      "Everything you are. One simple link. Share your links, socials, and more — all from one Viopage page.",
     start_url: "/",
     display: "standalone",
     background_color: "#FAFAFA",

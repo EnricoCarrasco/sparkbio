@@ -8,6 +8,7 @@ import { SocialIconsBar } from "./social-icons-bar";
 import { SocialButton } from "./social-button";
 import { SocialGrid } from "./social-grid";
 import { AnalyticsTracker } from "./analytics-tracker";
+import { AddToHomeButton } from "./add-to-home-button";
 
 interface ProfilePageProps {
   data: PublicProfile;
@@ -142,6 +143,8 @@ export function ProfilePage({ data }: ProfilePageProps) {
 
       {/* Content column — footer pushed to bottom via flex-grow spacer */}
       <main className="w-full max-w-[680px] mx-auto flex flex-col items-center gap-6 px-4 py-12 md:py-16 relative z-10 min-h-screen">
+        {/* Add to Home Screen button (mobile only) */}
+        <AddToHomeButton />
         {/* Profile header */}
         <ProfileHeader profile={profile} textColor={theme.text_color} theme={theme} />
 
