@@ -6,6 +6,7 @@ import { Pencil, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/lib/stores/theme-store";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
+import { UpgradeDialog } from "@/components/billing/upgrade-dialog";
 import { THEME_PRESETS_BASIC, THEME_PRESETS_PREMIUM, THEME_PRESETS } from "@/lib/constants";
 import type { Theme } from "@/types";
 
@@ -156,6 +157,7 @@ export function ThemePanel() {
   const updateTheme = useThemeStore((s) => s.updateTheme);
   const isPro = useSubscriptionStore((s) => s.isPro);
   const [catalogTab, setCatalogTab] = useState<ThemeCatalogTab>("basic");
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   if (!theme) return null;
 
@@ -280,8 +282,9 @@ export function ThemePanel() {
                 onClick={() => {
                   if (isPro) {
                     handlePresetApply(preset);
+                  } else {
+                    setUpgradeOpen(true);
                   }
-                  // Non-pro users: click is no-op, card shows Pro badge
                 }}
               />
             ))}
@@ -299,6 +302,8 @@ export function ThemePanel() {
           {t("premiumThemesDesc")}
         </p>
       )}
+
+      <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
     </div>
   );
 }
