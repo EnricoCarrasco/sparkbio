@@ -87,7 +87,7 @@ export function Hero() {
       aria-label="Hero section"
     >
       {/* ── Two-column layout ── */}
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 py-20 md:py-28 min-h-screen pt-24 flex items-center">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 py-20 md:py-28 lg:min-h-screen pt-24 lg:flex lg:items-center">
         <div className="flex flex-col lg:flex-row lg:items-center lg:gap-16 xl:gap-24">
 
           {/* ── LEFT: Text column (60%) ── */}
@@ -216,7 +216,7 @@ export function Hero() {
             variants={imageEntryVariants}
             initial="hidden"
             animate="visible"
-            className="mt-14 lg:mt-0 lg:w-[55%] xl:w-[58%] flex items-center justify-center lg:justify-end overflow-visible"
+            className="mt-14 lg:mt-0 lg:w-[55%] xl:w-[58%] flex items-center justify-center lg:justify-end"
           >
             <motion.div
               variants={floatVariants}
@@ -232,7 +232,7 @@ export function Hero() {
                 alt="Professional link-in-bio pages displayed on mobile phones — Viopage bio link builder for creators"
                 width={1200}
                 height={1080}
-                className="w-[500px] sm:w-[600px] lg:w-[700px] xl:w-[800px] h-auto object-contain"
+                className="w-full max-w-[340px] sm:max-w-[500px] md:max-w-[600px] lg:max-w-[700px] xl:max-w-[800px] h-auto object-contain"
                 priority
               />
             </motion.div>
