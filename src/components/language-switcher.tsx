@@ -24,8 +24,8 @@ const LANGUAGES: Language[] = [
   { locale: "pt-BR", label: "Português (BR)", shortLabel: "PT" },
 ];
 
-/** Marketing paths where we use URL-based locale for SEO */
-const MARKETING_PATHS = ["/", "/privacy", "/terms"];
+/** Marketing path prefixes where we use URL-based locale for SEO */
+const MARKETING_PREFIXES = ["/", "/privacy", "/terms", "/blog"];
 
 function persistLocaleCookie(locale: Locale) {
   document.cookie = `locale=${locale};path=/;max-age=31536000;SameSite=Lax`;
@@ -48,7 +48,9 @@ export function LanguageSwitcher({ variant = "dark" }: LanguageSwitcherProps) {
     ? pathname.slice(6) || "/"
     : pathname;
 
-  const isMarketingPage = MARKETING_PATHS.includes(basePath);
+  const isMarketingPage = MARKETING_PREFIXES.some(
+    (p) => basePath === p || basePath.startsWith(p + "/")
+  );
 
   function switchLocale(newLocale: Locale) {
     if (newLocale === currentLocale) return;
