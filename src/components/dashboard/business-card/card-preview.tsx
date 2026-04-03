@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { QRCodeCanvas } from "qrcode.react";
 import { useBusinessCardStore } from "@/lib/stores/business-card-store";
 import { useProfileStore } from "@/lib/stores/profile-store";
@@ -13,8 +14,41 @@ import { getBrandIconPath } from "@/lib/brand-icons";
 const CARD_WIDTH = 600;
 const CARD_HEIGHT = CARD_WIDTH / 1.6; // 375px — standard business card ratio
 
+// Demo data shown to free users so the card looks stunning
+const DEMO_DATA = {
+  brandName: "Sofia Martinez",
+  fullName: "Sofia Martinez",
+  jobTitle: "Digital Creator & Designer",
+  email: "hello@sofiamartinez.com",
+  website: "sofiamartinez.com",
+  phone: "+1 (555) 234-8901",
+  logoUrl: "/images/demo-card-avatar.jpeg",
+  showQrCode: true,
+  primaryColor: "#FF6B35",
+  textColor: "#FFFFFF",
+  accentColor: "#D4AF37",
+  bgColor: "#0a0a0a",
+  logoSize: 80,
+  logoShape: "rounded" as const,
+  nameFontSize: 30,
+  titleFontSize: 14,
+  contactFontSize: 12,
+  brandNameFontSize: 18,
+  qrCodeSize: 140,
+  aiBackgroundUrl: null as string | null,
+  aiLogoUrl: null as string | null,
+};
+
+const DEMO_SOCIALS = [
+  { id: "demo-ig", platform: "instagram", is_active: true },
+  { id: "demo-tt", platform: "tiktok", is_active: true },
+  { id: "demo-yt", platform: "youtube", is_active: true },
+  { id: "demo-tw", platform: "twitter", is_active: true },
+];
+
 interface CardPreviewProps {
   cardRef: React.RefObject<HTMLDivElement | null>;
+  demoMode?: boolean;
 }
 
 function isLightColor(hex: string) {
@@ -25,16 +59,24 @@ function isLightColor(hex: string) {
   return (r * 299 + g * 587 + b * 114) / 1000 > 140;
 }
 
-export function CardPreview({ cardRef }: CardPreviewProps) {
+export function CardPreview({ cardRef, demoMode = false }: CardPreviewProps) {
+  const t = useTranslations("dashboard.businessCard");
   const [isHovered, setIsHovered] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
-  const store = useBusinessCardStore();
+  const realStore = useBusinessCardStore();
   const username = useProfileStore((s) => s.profile?.username);
-  const socialIcons = useSocialStore((s) => s.socialIcons);
+  const realSocialIcons = useSocialStore((s) => s.socialIcons);
+
+  // Use demo data for free users so the card looks amazing
+  const displayName = useProfileStore((s) => s.profile?.display_name);
+  const store = demoMode
+    ? { ...DEMO_DATA, fullName: displayName || DEMO_DATA.fullName, brandName: displayName || DEMO_DATA.brandName }
+    : realStore;
+  const socialIcons = demoMode ? DEMO_SOCIALS : realSocialIcons;
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://viopage.com";
-  const qrValue = username ? `${siteUrl}/${username}` : siteUrl;
+  const qrValue = demoMode ? `${siteUrl}/sofia` : (username ? `${siteUrl}/${username}` : siteUrl);
 
   const logoSrc = store.aiLogoUrl || store.logoUrl;
   const isDark = !isLightColor(store.bgColor);
@@ -174,7 +216,7 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
                   whiteSpace: "nowrap",
                 }}
               >
-                {store.fullName || "Your Name"}
+                {store.fullName || t("yourName")}
               </h2>
               <p
                 className="font-semibold"
@@ -187,7 +229,7 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
                   whiteSpace: "nowrap",
                 }}
               >
-                {store.jobTitle || "Your Title"}
+                {store.jobTitle || t("yourTitle")}
               </p>
 
               {/* Contact info */}
@@ -268,7 +310,7 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
                 WebkitBoxOrient: "vertical" as const,
               }}
             >
-              {store.brandName || "Your Brand"}
+              {store.brandName || t("yourBrand")}
             </p>
 
             {/* QR Code */}
@@ -307,7 +349,7 @@ export function CardPreview({ cardRef }: CardPreviewProps) {
                   className="font-medium text-center"
                   style={{ color: mutedText, fontSize: 10, marginTop: 8 }}
                 >
-                  Scan to visit my page
+                  {t("scanToVisit")}
                 </p>
               </div>
             )}

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { toPng } from "html-to-image";
 import { Download, Save, Loader2 } from "lucide-react";
 import { useBusinessCardStore } from "@/lib/stores/business-card-store";
@@ -12,13 +13,14 @@ interface DownloadBarProps {
 }
 
 export function DownloadBar({ cardRef }: DownloadBarProps) {
+  const t = useTranslations("dashboard.businessCard");
   const downloading = useBusinessCardStore((s) => s.downloading);
   const setDownloading = useBusinessCardStore((s) => s.setDownloading);
   const username = useProfileStore((s) => s.profile?.username);
 
   async function handleDownload() {
     if (!cardRef.current) {
-      toast.error("Card preview not ready");
+      toast.error(t("toastCardNotReady"));
       return;
     }
 
@@ -61,10 +63,10 @@ export function DownloadBar({ cardRef }: DownloadBarProps) {
       link.href = dataUrl;
       link.click();
 
-      toast.success("Card downloaded!");
+      toast.success(t("toastCardDownloaded"));
     } catch (error) {
       console.error("Download error:", error);
-      toast.error("Failed to download card. Please try again.");
+      toast.error(t("toastDownloadError"));
     } finally {
       setDownloading(false);
     }
@@ -79,7 +81,7 @@ export function DownloadBar({ cardRef }: DownloadBarProps) {
         className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
       >
         <Download className="w-4 h-4" />
-        Download Card (PNG)
+        {t("downloadCardPng")}
       </button>
       <div className="flex-1" />
       <button
@@ -91,12 +93,12 @@ export function DownloadBar({ cardRef }: DownloadBarProps) {
         {downloading ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin" />
-            Exporting...
+            {t("exporting")}
           </>
         ) : (
           <>
             <Save className="w-4 h-4" />
-            Save and Export
+            {t("saveAndExport")}
           </>
         )}
       </button>

@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { motion } from "framer-motion";
 import {
   Search,
   Lightbulb,
@@ -23,6 +24,7 @@ import { SOCIAL_PLATFORMS } from "@/lib/constants";
 import { getPlatformLabel } from "@/lib/social-icon-map";
 import { BrandIcon } from "@/components/ui/brand-icon";
 import type { SocialPlatform } from "@/types";
+import type { OnboardingStep } from "@/components/dashboard/onboarding/onboarding-context";
 
 type Category = "suggested" | "social" | "media" | "contact" | "payment";
 
@@ -91,6 +93,7 @@ interface AddContentModalProps {
   onOpenChange: (open: boolean) => void;
   onOpenLinkForm: () => void;
   onOpenSmartInput: (platform: SocialPlatform) => void;
+  onboardingStep?: OnboardingStep;
 }
 
 export function AddContentModal({
@@ -98,8 +101,10 @@ export function AddContentModal({
   onOpenChange,
   onOpenLinkForm,
   onOpenSmartInput,
+  onboardingStep,
 }: AddContentModalProps) {
   const t = useTranslations("dashboard.addModal");
+  const tOnboarding = useTranslations("onboarding");
   const locale = useLocale();
   const [activeCategory, setActiveCategory] = useState<Category>("suggested");
   const [search, setSearch] = useState("");
@@ -240,12 +245,17 @@ export function AddContentModal({
                 const label = getPlatformLabel(platform);
                 const desc = (locale === "pt-BR" ? PLATFORM_DESCRIPTIONS_PTBR[platform] : undefined)
                   ?? PLATFORM_DESCRIPTIONS[platform] ?? "";
+                const isWhatsappHint =
+                  onboardingStep === "whatsapp-hint" && platform === "whatsapp";
                 return (
                   <button
                     key={platform}
                     type="button"
                     onClick={() => handlePlatformClick(platform)}
-                    className="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-muted/50 active:bg-muted/60 transition-colors group"
+                    className={cn(
+                      "w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-muted/50 active:bg-muted/60 transition-colors group relative",
+                      isWhatsappHint && "bg-[#25D366]/8 ring-2 ring-[#25D366]/40"
+                    )}
                   >
                     <BrandIcon platform={platform} size={40} iconSize={20} rounded="rounded-xl" />
                     <div className="flex-1 text-left min-w-0">
@@ -259,6 +269,17 @@ export function AddContentModal({
                       )}
                     </div>
                     <ChevronRight className="size-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
+
+                    {/* Onboarding hint badge */}
+                    {isWhatsappHint && (
+                      <motion.span
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-[#25D366] text-white text-[10px] font-bold shadow-sm"
+                      >
+                        {tOnboarding("whatsappHint")}
+                      </motion.span>
+                    )}
                   </button>
                 );
               })}

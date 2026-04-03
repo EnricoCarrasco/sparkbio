@@ -86,8 +86,8 @@ export default function RegisterPage() {
         .eq("id", user.id);
     }
 
-    // Redirect to in-app trial page where user picks plan + starts checkout overlay
-    router.push("/trial");
+    // Send new users straight to the dashboard (free tier)
+    router.push("/dashboard");
     router.refresh();
   };
 

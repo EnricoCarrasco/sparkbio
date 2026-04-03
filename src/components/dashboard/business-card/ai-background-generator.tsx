@@ -1,28 +1,33 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Sparkles, Loader2 } from "lucide-react";
 import { useBusinessCardStore } from "@/lib/stores/business-card-store";
 import { toast } from "sonner";
 
+// Keys for i18n display; English prompts sent to the AI API
 const STYLE_PRESETS = [
-  "Dark elegance with gold sparkles",
-  "Holographic gradient",
-  "Marble texture with neon glow",
-  "Abstract gradient dream",
-  "Minimal geometric patterns",
-  "Cosmic nebula",
-];
+  { key: "presetDarkElegance", prompt: "Dark elegance with gold sparkles" },
+  { key: "presetHolographic", prompt: "Holographic gradient" },
+  { key: "presetMarbleNeon", prompt: "Marble texture with neon glow" },
+  { key: "presetAbstractGradient", prompt: "Abstract gradient dream" },
+  { key: "presetMinimalGeometric", prompt: "Minimal geometric patterns" },
+  { key: "presetCosmicNebula", prompt: "Cosmic nebula" },
+] as const;
 
 export function AiBackgroundGenerator() {
+  const t = useTranslations("dashboard.businessCard");
   const [customPrompt, setCustomPrompt] = useState("");
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const store = useBusinessCardStore();
 
   async function handleGenerate() {
-    const style = customPrompt || selectedPreset;
+    // For API: use custom prompt or the English prompt for presets
+    const selectedPresetObj = STYLE_PRESETS.find((p) => p.key === selectedPreset);
+    const style = customPrompt || selectedPresetObj?.prompt;
     if (!style) {
-      toast.error("Please select a style or describe your own");
+      toast.error(t("toastSelectStyle"));
       return;
     }
 
@@ -52,17 +57,17 @@ export function AiBackgroundGenerator() {
       reader.onloadend = () => {
         store.setAiBackgroundUrl(reader.result as string);
         store.setAiBackgroundLoading(false);
-        toast.success("Background generated!");
+        toast.success(t("toastBackgroundGenerated"));
       };
       reader.onerror = () => {
         store.setAiBackgroundLoading(false);
-        toast.error("Failed to process background image.");
+        toast.error(t("toastBgProcessError"));
       };
       reader.readAsDataURL(blob);
     } catch (error) {
       console.error("Background generation error:", error);
       store.setAiBackgroundLoading(false);
-      toast.error("Failed to generate background. Please try again.");
+      toast.error(t("toastBgGenerateError"));
     }
   }
 
@@ -70,26 +75,26 @@ export function AiBackgroundGenerator() {
     <div className="bg-white rounded-2xl p-6 border border-border shadow-sm">
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-4 h-4 text-[#8B5CF6]" />
-        <h3 className="text-sm font-semibold">AI Background</h3>
+        <h3 className="text-sm font-semibold">{t("aiBackground")}</h3>
       </div>
 
       {/* Preset style chips */}
       <div className="flex flex-wrap gap-2 mb-4">
         {STYLE_PRESETS.map((preset) => (
           <button
-            key={preset}
+            key={preset.key}
             type="button"
             onClick={() => {
-              setSelectedPreset(preset);
+              setSelectedPreset(preset.key);
               setCustomPrompt("");
             }}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-              selectedPreset === preset
+              selectedPreset === preset.key
                 ? "bg-[#8B5CF6] text-white"
                 : "bg-muted/50 text-muted-foreground hover:bg-muted"
             }`}
           >
-            {preset}
+            {t(preset.key)}
           </button>
         ))}
       </div>
@@ -102,7 +107,7 @@ export function AiBackgroundGenerator() {
             setCustomPrompt(e.target.value);
             setSelectedPreset(null);
           }}
-          placeholder="Or describe the vibe you want..."
+          placeholder={t("placeholderDescribeVibe")}
           rows={2}
           className="w-full px-4 py-3 pr-24 rounded-xl border border-border bg-muted/30 text-sm resize-none focus:outline-none focus:border-[#8B5CF6] transition-colors"
         />
@@ -118,12 +123,12 @@ export function AiBackgroundGenerator() {
         {store.aiBackgroundLoading ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin" />
-            Generating...
+            {t("generating")}
           </>
         ) : (
           <>
             <Sparkles className="w-4 h-4" />
-            Generate Background
+            {t("generateBackground")}
           </>
         )}
       </button>
@@ -135,12 +140,12 @@ export function AiBackgroundGenerator() {
           onClick={() => store.setAiBackgroundUrl(null)}
           className="w-full mt-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
-          Reset to template background
+          {t("resetToTemplateBackground")}
         </button>
       )}
 
       <p className="text-[10px] text-muted-foreground mt-3 text-center">
-        Powered by Replicate AI
+        {t("poweredByReplicateAi")}
       </p>
     </div>
   );

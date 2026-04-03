@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import {
   Plus,
@@ -14,7 +14,9 @@ import {
   LayoutGrid,
   BarChart3,
   GripVertical,
+  X,
 } from "lucide-react";
+import { motion } from "framer-motion";
 import {
   DndContext,
   closestCenter,
@@ -50,6 +52,13 @@ import { BrandIcon } from "@/components/ui/brand-icon";
 import { cn } from "@/lib/utils";
 import { useLinkClickCounts } from "@/lib/hooks/use-link-click-counts";
 import { LinkInsightsModal } from "@/components/dashboard/link-insights-modal";
+import {
+  OnboardingProvider,
+  useOnboarding,
+  type OnboardingStep,
+} from "@/components/dashboard/onboarding/onboarding-context";
+import { SpotlightOverlay } from "@/components/dashboard/onboarding/spotlight-overlay";
+import { OnboardingTooltip } from "@/components/dashboard/onboarding/onboarding-tooltip";
 import type { SocialIcon, SocialPlatform, SocialDisplayMode, Link } from "@/types";
 
 // ---------------------------------------------------------------------------
@@ -88,6 +97,7 @@ function ContentSkeleton() {
 // ---------------------------------------------------------------------------
 
 function CompactProfileHeader({ onEditProfile }: { onEditProfile: () => void }) {
+  const t = useTranslations("dashboard.design");
   const profile = useProfileStore((s) => s.profile);
   const uploadAvatar = useProfileStore((s) => s.uploadAvatar);
   const socialIcons = useSocialStore((s) => s.socialIcons);
@@ -106,20 +116,20 @@ function CompactProfileHeader({ onEditProfile }: { onEditProfile: () => void }) 
     const file = e.target.files?.[0];
     if (!file) return;
     if (!AVATAR_ACCEPTED_TYPES.includes(file.type)) {
-      toast.error("Please upload a JPEG, PNG, WebP, or GIF image");
+      toast.error(t("toastInvalidFormat"));
       return;
     }
     if (file.size > AVATAR_MAX_SIZE) {
-      toast.error("Image must be smaller than 2MB");
+      toast.error(t("toastFileTooLarge"));
       return;
     }
     setAvatarUploading(true);
     try {
       const url = await uploadAvatar(file);
-      if (url) toast.success("Photo updated");
-      else toast.error("Failed to upload photo");
+      if (url) toast.success(t("toastPhotoUpdated"));
+      else toast.error(t("toastUploadFailed"));
     } catch {
-      toast.error("Failed to upload photo");
+      toast.error(t("toastUploadFailed"));
     } finally {
       setAvatarUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -220,6 +230,7 @@ function SocialIconCard({
 }) {
   const tSmart = useTranslations("dashboard.smartInput");
   const tLinks = useTranslations("dashboard.links");
+  const tDesign = useTranslations("dashboard.design");
   const toggleSocialIcon = useSocialStore((s) => s.toggleSocialIcon);
   const deleteSocialIcon = useSocialStore((s) => s.deleteSocialIcon);
   const updateSocialIcon = useSocialStore((s) => s.updateSocialIcon);
@@ -243,7 +254,7 @@ function SocialIconCard({
   async function handleSaveUrl() {
     if (urlValue.trim() && urlValue !== icon.url) {
       await updateSocialIcon(icon.id, { url: urlValue.trim() });
-      toast.success("URL updated");
+      toast.success(tDesign("toastUrlUpdated"));
     }
     setEditing(false);
   }
@@ -452,7 +463,7 @@ function SocialIconCard({
           size="icon"
           onClick={async () => {
             await deleteSocialIcon(icon.id);
-            toast.success("Social link removed");
+            toast.success(tDesign("toastSocialRemoved"));
           }}
           className="size-7 text-muted-foreground/40 hover:text-destructive"
         >
@@ -567,11 +578,30 @@ function SocialIconsList() {
 // ---------------------------------------------------------------------------
 
 export function ContentTab() {
-  const t = useTranslations("dashboard.design");
-  const tLinks = useTranslations("dashboard.links");
+  const links = useLinkStore((s) => s.links);
+  const socialIcons = useSocialStore((s) => s.socialIcons);
   const profileLoading = useProfileStore((s) => s.loading);
   const linksLoading = useLinkStore((s) => s.loading);
   const socialLoading = useSocialStore((s) => s.loading);
+
+  const isLoading = profileLoading || linksLoading || socialLoading;
+  const isEmpty = links.length === 0 && socialIcons.length === 0;
+
+  if (isLoading) {
+    return <ContentSkeleton />;
+  }
+
+  return (
+    <OnboardingProvider initialStep={isEmpty ? "add-button" : null}>
+      <ContentTabInner />
+    </OnboardingProvider>
+  );
+}
+
+function ContentTabInner() {
+  const t = useTranslations("dashboard.design");
+  const tOnboarding = useTranslations("onboarding");
+  const { step, setStep, dismiss } = useOnboarding();
 
   // Modal states
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -580,12 +610,32 @@ export function ContentTab() {
   const [smartInputPlatform, setSmartInputPlatform] =
     useState<SocialPlatform | null>(null);
   const [profileEditOpen, setProfileEditOpen] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
-  const isLoading = profileLoading || linksLoading || socialLoading;
+  // Ref for spotlight target
+  const addButtonRef = useRef<HTMLButtonElement>(null);
 
-  if (isLoading) {
-    return <ContentSkeleton />;
-  }
+  // Detect when first item is added → trigger celebration + share nudge
+  const socialIcons = useSocialStore((s) => s.socialIcons);
+  const links = useLinkStore((s) => s.links);
+  const prevCountRef = useRef(socialIcons.length + links.length);
+
+  useEffect(() => {
+    const currentCount = socialIcons.length + links.length;
+    if (
+      prevCountRef.current === 0 &&
+      currentCount > 0 &&
+      step === "smart-input-hint"
+    ) {
+      setShowCelebration(true);
+      const timer = setTimeout(() => {
+        setShowCelebration(false);
+        setStep("share-nudge");
+      }, 1800);
+      return () => clearTimeout(timer);
+    }
+    prevCountRef.current = currentCount;
+  }, [socialIcons.length, links.length, step, setStep]);
 
   return (
     <div className="max-w-[680px] mx-auto px-4 py-6 space-y-5">
@@ -606,8 +656,12 @@ export function ContentTab() {
 
       {/* ── Big purple "+ Add" button ── */}
       <button
+        ref={addButtonRef}
         type="button"
-        onClick={() => setAddModalOpen(true)}
+        onClick={() => {
+          setAddModalOpen(true);
+          if (step === "add-button") setStep("whatsapp-hint");
+        }}
         className="w-full flex items-center justify-center gap-2 py-3.5 rounded-full text-white font-semibold text-sm transition-all hover:opacity-90 active:scale-[0.98]"
         style={{
           background: "linear-gradient(135deg, #FF6B35, #E8501A)",
@@ -623,6 +677,9 @@ export function ContentTab() {
       {/* ── Link list (drag-and-drop cards) ── */}
       <LinkList />
 
+      {/* ── Share nudge banner ── */}
+      {step === "share-nudge" && <ShareNudgeBanner onDismiss={dismiss} />}
+
       {/* ── Modals ── */}
 
       {/* Add content modal (the popup with categories + platforms) */}
@@ -633,7 +690,9 @@ export function ContentTab() {
         onOpenSmartInput={(platform) => {
           setSmartInputPlatform(platform);
           setSmartInputOpen(true);
+          if (step === "whatsapp-hint") setStep("smart-input-hint");
         }}
+        onboardingStep={step}
       />
 
       {/* Standard link form dialog */}
@@ -645,6 +704,7 @@ export function ContentTab() {
         onOpenChange={setSmartInputOpen}
         platform={smartInputPlatform}
         onBack={() => setAddModalOpen(true)}
+        onboardingStep={step}
       />
 
       {/* Profile title/bio edit dialog */}
@@ -652,6 +712,146 @@ export function ContentTab() {
         open={profileEditOpen}
         onOpenChange={setProfileEditOpen}
       />
+
+      {/* ── Onboarding spotlight on Add button ── */}
+      <SpotlightOverlay
+        targetRef={addButtonRef}
+        visible={step === "add-button"}
+      />
+      <OnboardingTooltip
+        targetRef={addButtonRef}
+        visible={step === "add-button"}
+        position="bottom"
+        title={tOnboarding("addLinkTitle")}
+        description={tOnboarding("addLinkDescription")}
+        currentStep={1}
+        totalSteps={4}
+        onDismiss={dismiss}
+      />
+
+      {/* ── Celebration overlay ── */}
+      {showCelebration && <CelebrationOverlay title={tOnboarding("celebrationTitle")} />}
     </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Celebration animation (shown after first link is added)
+// ---------------------------------------------------------------------------
+
+function CelebrationOverlay({ title }: { title: string }) {
+  const particles = Array.from({ length: 8 }).map((_, i) => ({
+    id: i,
+    x: (Math.random() - 0.5) * 200,
+    y: -(Math.random() * 120 + 40),
+    color: ["#FF6B35", "#E8501A", "#FBBF24", "#34D399", "#60A5FA", "#A78BFA", "#F472B6", "#FB923C"][i],
+  }));
+
+  return (
+    <div className="fixed inset-0 z-[47] flex items-center justify-center pointer-events-none">
+      <motion.div
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0, opacity: 0 }}
+        className="flex flex-col items-center gap-2"
+      >
+        <div className="size-16 rounded-full bg-[#FF6B35] flex items-center justify-center">
+          <motion.svg
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <motion.path d="M5 12l5 5L19 7" />
+          </motion.svg>
+        </div>
+        <motion.p
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="text-sm font-semibold text-foreground"
+        >
+          {title}
+        </motion.p>
+      </motion.div>
+
+      {/* Confetti particles */}
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          className="absolute size-2.5 rounded-full"
+          style={{ backgroundColor: p.color }}
+          initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+          animate={{ x: p.x, y: p.y, opacity: 0, scale: 0.5 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Mobile share nudge banner (shown on mobile after adding first link)
+// ---------------------------------------------------------------------------
+
+function ShareNudgeBanner({ onDismiss }: { onDismiss: () => void }) {
+  const tOnboarding = useTranslations("onboarding");
+  const [shareOpen, setShareOpen] = useState(false);
+  const profile = useProfileStore((s) => s.profile);
+
+  const ShareModal = React.lazy(
+    () => import("@/components/dashboard/share-modal").then((m) => ({ default: m.ShareModal }))
+  );
+
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative rounded-2xl border border-[#FF6B35]/20 bg-[#FF6B35]/5 p-4"
+      >
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="absolute top-3 right-3 p-1 rounded-full hover:bg-black/5 transition-colors"
+        >
+          <X className="size-3.5 text-muted-foreground" />
+        </button>
+        <p className="text-sm font-semibold text-foreground pr-6">
+          {tOnboarding("shareTitle")}
+        </p>
+        <p className="text-xs text-muted-foreground mt-1">
+          {tOnboarding("shareDescription")}
+        </p>
+        <button
+          type="button"
+          onClick={() => setShareOpen(true)}
+          className="mt-3 flex items-center gap-2 px-4 py-2 rounded-full bg-[#FF6B35] text-white text-xs font-semibold hover:opacity-90 transition-opacity active:scale-[0.98]"
+        >
+          <Share2 className="size-3.5" />
+          {tOnboarding("shareCta")}
+        </button>
+      </motion.div>
+
+      {profile?.username && (
+        <React.Suspense fallback={null}>
+          <ShareModal
+            open={shareOpen}
+            onOpenChange={(open) => {
+              setShareOpen(open);
+              if (!open) onDismiss();
+            }}
+            username={profile.username}
+          />
+        </React.Suspense>
+      )}
+    </>
   );
 }

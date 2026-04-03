@@ -5,10 +5,12 @@ import { useTranslations } from "next-intl";
 import { Pencil, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/lib/stores/theme-store";
-import { THEME_PRESETS } from "@/lib/constants";
+import { useSubscriptionStore } from "@/lib/stores/subscription-store";
+import { UpgradeDialog } from "@/components/billing/upgrade-dialog";
+import { THEME_PRESETS_BASIC, THEME_PRESETS_PREMIUM, THEME_PRESETS } from "@/lib/constants";
 import type { Theme } from "@/types";
 
-type ThemeCatalogTab = "customizable" | "curated";
+type ThemeCatalogTab = "basic" | "premium";
 
 function getActivePresetName(theme: Theme | null): string | null {
   if (!theme) return null;
@@ -153,7 +155,9 @@ export function ThemePanel() {
   const t = useTranslations("dashboard.design");
   const theme = useThemeStore((s) => s.theme);
   const updateTheme = useThemeStore((s) => s.updateTheme);
-  const [catalogTab, setCatalogTab] = useState<ThemeCatalogTab>("customizable");
+  const isPro = useSubscriptionStore((s) => s.isPro);
+  const [catalogTab, setCatalogTab] = useState<ThemeCatalogTab>("basic");
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   if (!theme) return null;
 
@@ -178,28 +182,31 @@ export function ThemePanel() {
 
   return (
     <div className="space-y-4">
-      {/* Customizable / Curated tab bar */}
+      {/* Basic / Premium tab bar */}
       <div className="flex gap-5 border-b border-border">
-        {(["customizable", "curated"] as ThemeCatalogTab[]).map((tab) => (
+        {(["basic", "premium"] as ThemeCatalogTab[]).map((tab) => (
           <button
             key={tab}
             type="button"
             onClick={() => setCatalogTab(tab)}
             className={cn(
-              "pb-2.5 text-sm font-medium transition-colors capitalize focus-visible:outline-none",
+              "pb-2.5 text-sm font-medium transition-colors capitalize focus-visible:outline-none flex items-center gap-1.5",
               catalogTab === tab
                 ? "text-foreground border-b-2 border-foreground"
                 : "text-muted-foreground hover:text-foreground border-b-2 border-transparent"
             )}
           >
-            {tab === "customizable" ? t("customizable") : t("curated")}
+            {tab === "basic" ? t("basicThemes") : t("premiumThemes")}
+            {tab === "premium" && !isPro && (
+              <Crown className="size-3.5 text-amber-500" strokeWidth={2} />
+            )}
           </button>
         ))}
       </div>
 
       {/* Theme preset grid */}
       <div>
-        {catalogTab === "customizable" ? (
+        {catalogTab === "basic" ? (
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
             {/* "Custom" card — first slot */}
             <button
@@ -253,8 +260,8 @@ export function ThemePanel() {
               </div>
             </button>
 
-            {/* Preset cards */}
-            {THEME_PRESETS.map((preset) => (
+            {/* Basic preset cards */}
+            {THEME_PRESETS_BASIC.map((preset) => (
               <PresetCard
                 key={preset.name}
                 preset={preset}
@@ -264,26 +271,39 @@ export function ThemePanel() {
             ))}
           </div>
         ) : (
-          /* Curated tab — show all presets as "pro" locked */
+          /* Premium tab — Pro users can apply, free users see locked cards */
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-            {THEME_PRESETS.map((preset) => (
+            {THEME_PRESETS_PREMIUM.map((preset) => (
               <PresetCard
                 key={preset.name}
                 preset={preset}
-                isActive={false}
-                isPro
-                onClick={() => {/* pro upsell */}}
+                isActive={activePresetName === preset.name}
+                isPro={!isPro}
+                onClick={() => {
+                  if (isPro) {
+                    handlePresetApply(preset);
+                  } else {
+                    setUpgradeOpen(true);
+                  }
+                }}
               />
             ))}
           </div>
         )}
       </div>
 
-      {catalogTab === "customizable" && (
+      {catalogTab === "basic" && (
         <p className="text-xs text-muted-foreground">
           {t("themesDesc")}
         </p>
       )}
+      {catalogTab === "premium" && !isPro && (
+        <p className="text-xs text-muted-foreground">
+          {t("premiumThemesDesc")}
+        </p>
+      )}
+
+      <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
     </div>
   );
 }

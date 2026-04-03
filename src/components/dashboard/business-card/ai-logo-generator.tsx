@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Upload, Sparkles, Loader2, X } from "lucide-react";
 import { useBusinessCardStore } from "@/lib/stores/business-card-store";
 import { toast } from "sonner";
 
 export function AiLogoGenerator() {
+  const t = useTranslations("dashboard.businessCard");
   const [description, setDescription] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const store = useBusinessCardStore();
@@ -17,7 +19,7 @@ export function AiLogoGenerator() {
     if (!file) return;
 
     if (file.size > 2 * 1024 * 1024) {
-      toast.error("File must be under 2MB");
+      toast.error(t("toastFileSize"));
       return;
     }
 
@@ -31,7 +33,7 @@ export function AiLogoGenerator() {
 
   async function handleGenerateLogo() {
     if (!description.trim()) {
-      toast.error("Please describe your brand");
+      toast.error(t("toastDescribeBrand"));
       return;
     }
 
@@ -58,17 +60,17 @@ export function AiLogoGenerator() {
       reader.onloadend = () => {
         store.setAiLogoUrl(reader.result as string);
         store.setAiLogoLoading(false);
-        toast.success("Logo generated!");
+        toast.success(t("toastLogoGenerated"));
       };
       reader.onerror = () => {
         store.setAiLogoLoading(false);
-        toast.error("Failed to process logo image.");
+        toast.error(t("toastLogoProcessError"));
       };
       reader.readAsDataURL(blob);
     } catch (error) {
       console.error("Logo generation error:", error);
       store.setAiLogoLoading(false);
-      toast.error("Failed to generate logo. Please try again.");
+      toast.error(t("toastLogoGenerateError"));
     }
   }
 
@@ -81,7 +83,7 @@ export function AiLogoGenerator() {
     <div className="bg-white rounded-2xl p-6 border border-border shadow-sm">
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-4 h-4 text-[#8B5CF6]" />
-        <h3 className="text-sm font-semibold">Logo</h3>
+        <h3 className="text-sm font-semibold">{t("logo")}</h3>
       </div>
 
       {/* Current logo preview */}
@@ -93,9 +95,9 @@ export function AiLogoGenerator() {
             className="w-12 h-12 rounded-lg object-cover"
           />
           <div className="flex-1">
-            <p className="text-xs font-medium">Current Logo</p>
+            <p className="text-xs font-medium">{t("currentLogo")}</p>
             <p className="text-[10px] text-muted-foreground">
-              {store.aiLogoUrl ? "AI Generated" : "Uploaded"}
+              {store.aiLogoUrl ? t("aiGenerated") : t("uploaded")}
             </p>
           </div>
           <button
@@ -116,7 +118,7 @@ export function AiLogoGenerator() {
           className="flex-1 h-10 rounded-xl border-2 border-dashed border-border text-sm font-medium text-muted-foreground hover:border-[#FF6B35] hover:text-[#FF6B35] transition-colors flex items-center justify-center gap-2"
         >
           <Upload className="w-4 h-4" />
-          Upload Logo
+          {t("uploadLogo")}
         </button>
         <input
           ref={fileInputRef}
@@ -129,12 +131,12 @@ export function AiLogoGenerator() {
 
       {/* AI Generation */}
       <div className="space-y-3">
-        <p className="text-xs text-muted-foreground">Or generate with AI:</p>
+        <p className="text-xs text-muted-foreground">{t("orGenerateWithAi")}</p>
         <input
           type="text"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Describe your brand (e.g., modern tech startup)"
+          placeholder={t("placeholderDescribeBrand")}
           className="w-full h-10 px-3 rounded-lg border border-border bg-muted/30 text-sm focus:outline-none focus:border-[#8B5CF6] transition-colors"
         />
         <button
@@ -146,12 +148,12 @@ export function AiLogoGenerator() {
           {store.aiLogoLoading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Generating...
+              {t("generating")}
             </>
           ) : (
             <>
               <Sparkles className="w-4 h-4" />
-              Generate Logo
+              {t("generateLogo")}
             </>
           )}
         </button>

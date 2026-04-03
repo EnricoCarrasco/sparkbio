@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { BarChart3, RefreshCw } from "lucide-react";
+import { BarChart3, Crown, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { createClient } from "@/lib/supabase/client";
@@ -14,6 +14,8 @@ import {
 } from "@/lib/analytics/process";
 import { AnalyticsCharts } from "@/components/dashboard/analytics-charts";
 import { useDashboardStore } from "@/lib/stores/dashboard-store";
+import { useSubscriptionStore } from "@/lib/stores/subscription-store";
+import { UpgradeDialog } from "@/components/billing/upgrade-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { AnalyticsEvent, Link } from "@/types/database";
@@ -126,6 +128,8 @@ export default function AnalyticsPage() {
   const [allLinksData, setAllLinksData] = useState<LinkClick[]>([]);
   const [rawEvents, setRawEvents] = useState<AnalyticsEvent[]>([]);
   const [hasEvents, setHasEvents] = useState(false);
+  const isPro = useSubscriptionStore((s) => s.isPro);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const selectedLinkId = useDashboardStore((s) => s.selectedLinkId);
   const setSelectedLinkId = useDashboardStore((s) => s.setSelectedLinkId);
 
@@ -211,6 +215,10 @@ export default function AnalyticsPage() {
   }, [setSelectedLinkId]);
 
   function handleRangeChange(value: string) {
+    if ((value === "30d" || value === "all") && !isPro) {
+      setUpgradeOpen(true);
+      return;
+    }
     setTimeRange(value as TimeRange);
   }
 
@@ -240,8 +248,14 @@ export default function AnalyticsPage() {
         >
           <TabsList>
             <TabsTrigger value="7d">{t("last7days")}</TabsTrigger>
-            <TabsTrigger value="30d">{t("last30days")}</TabsTrigger>
-            <TabsTrigger value="all">{t("allTime")}</TabsTrigger>
+            <TabsTrigger value="30d" className="gap-1">
+              {t("last30days")}
+              {!isPro && <Crown className="size-3 text-amber-500" />}
+            </TabsTrigger>
+            <TabsTrigger value="all" className="gap-1">
+              {t("allTime")}
+              {!isPro && <Crown className="size-3 text-amber-500" />}
+            </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -277,6 +291,8 @@ export default function AnalyticsPage() {
           />
         </motion.div>
       ) : null}
+
+      <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
     </div>
   );
 }
