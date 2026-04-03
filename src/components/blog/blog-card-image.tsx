@@ -12,14 +12,26 @@ interface BlogCardImageProps {
   title: string;
   category: string;
   image?: string;
-  variant?: "card" | "hero";
+  variant?: "card" | "hero" | "featured";
 }
 
 export function BlogCardImage({ title, category, image, variant = "card" }: BlogCardImageProps) {
+  const isFeatured = variant === "featured";
   const isHero = variant === "hero";
 
-  // Use real image if available
   if (image) {
+    if (isFeatured) {
+      // Fill the parent container completely (parent must be relative + have height)
+      return (
+        <Image
+          src={image}
+          alt={`${title} — Viopage blog`}
+          fill
+          className="object-cover"
+          sizes="50vw"
+        />
+      );
+    }
     return (
       <div className={`relative ${isHero ? "aspect-[21/9]" : "aspect-[16/9]"}`}>
         <Image
@@ -33,13 +45,13 @@ export function BlogCardImage({ title, category, image, variant = "card" }: Blog
     );
   }
 
-  // Fallback: branded gradient card
   const gradientIndex = title.length % GRADIENTS.length;
   const gradient = GRADIENTS[gradientIndex];
 
   return (
     <div
       className={`bg-gradient-to-br ${gradient} flex flex-col justify-between ${
+        isFeatured ? "absolute inset-0 p-8" :
         isHero ? "aspect-[21/9] rounded-2xl p-10" : "aspect-[16/9] p-5"
       }`}
     >
@@ -56,6 +68,7 @@ export function BlogCardImage({ title, category, image, variant = "card" }: Blog
       </div>
       <h3
         className={`text-white font-bold leading-tight ${
+          isFeatured ? "text-xl sm:text-2xl max-w-sm" :
           isHero ? "text-2xl sm:text-3xl max-w-2xl" : "text-sm sm:text-base max-w-[90%] line-clamp-2"
         }`}
       >

@@ -58,11 +58,15 @@ export function LanguageSwitcher({ variant = "dark" }: LanguageSwitcherProps) {
     persistLocaleCookie(newLocale);
 
     if (isMarketingPage) {
-      // Marketing pages: navigate to /pt-BR or root for English
+      // Blog posts are original content per language (not translations).
+      // When switching language on a specific post, go to the blog index.
+      const isBlogPost = basePath.startsWith("/blog/") && basePath !== "/blog";
+      const targetPath = isBlogPost ? "/blog" : basePath;
+
       if (newLocale === "pt-BR") {
-        window.location.href = `/pt-BR${basePath === "/" ? "" : basePath}`;
+        window.location.href = `/pt-BR${targetPath === "/" ? "" : targetPath}`;
       } else {
-        window.location.href = basePath;
+        window.location.href = targetPath;
       }
     } else {
       // Dashboard/Auth: cookie-based, just refresh

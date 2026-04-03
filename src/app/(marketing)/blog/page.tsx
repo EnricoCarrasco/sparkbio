@@ -66,10 +66,10 @@ function FeaturedPost({ post, locale }: { post: BlogPost; locale: "en" | "pt-BR"
   return (
     <Link
       href={`/blog/${post.slug}`}
-      className="group grid md:grid-cols-2 gap-8 rounded-2xl bg-white border border-stone-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+      className="group grid md:grid-cols-2 rounded-2xl bg-white border border-stone-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
     >
-      <div className="md:min-h-[280px]">
-        <BlogCardImage title={post.title} category={post.category} image={post.image} variant="hero" />
+      <div className="relative min-h-[250px] md:min-h-full">
+        <BlogCardImage title={post.title} category={post.category} image={post.image} variant="featured" />
       </div>
       <div className="p-8 flex flex-col justify-center">
         <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#FF6B35] mb-3">
