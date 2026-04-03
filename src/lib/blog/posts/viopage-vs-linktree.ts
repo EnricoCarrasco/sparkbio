@@ -11,6 +11,7 @@ export const viopageVsLinktree: BlogPost = {
   author: "Viopage Team",
   date: "2026-04-02",
   readTime: "9 min read",
+  image: "/images/blog/viopage-vs-linktree.jpeg",
   content: [
     {
       type: "paragraph",

@@ -42,7 +42,7 @@ function PostCard({ post }: { post: BlogPost }) {
       href={`/blog/${post.slug}`}
       className="group flex flex-col rounded-2xl bg-white border border-stone-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
     >
-      <BlogCardImage title={post.title} category={post.category} />
+      <BlogCardImage title={post.title} category={post.category} image={post.image} />
       <div className="p-6 flex flex-col flex-1">
         <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#FF6B35] mb-3">
           {post.category}
@@ -69,7 +69,7 @@ function FeaturedPost({ post, locale }: { post: BlogPost; locale: "en" | "pt-BR"
       className="group grid md:grid-cols-2 gap-8 rounded-2xl bg-white border border-stone-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
     >
       <div className="md:min-h-[280px]">
-        <BlogCardImage title={post.title} category={post.category} variant="hero" />
+        <BlogCardImage title={post.title} category={post.category} image={post.image} variant="hero" />
       </div>
       <div className="p-8 flex flex-col justify-center">
         <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#FF6B35] mb-3">

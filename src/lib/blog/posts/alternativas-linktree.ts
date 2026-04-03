@@ -12,6 +12,7 @@ export const alternativasLinktree: BlogPost = {
   author: "Viopage Team",
   date: "2026-04-02",
   readTime: "9 min de leitura",
+  image: "/images/blog/alternativas-linktree.jpeg",
   content: [
     {
       type: "paragraph",

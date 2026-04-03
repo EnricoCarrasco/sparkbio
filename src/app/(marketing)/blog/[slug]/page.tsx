@@ -253,7 +253,7 @@ export default async function BlogPostPage({ params }: Props) {
 
         {/* Hero image */}
         <div className="w-full rounded-2xl overflow-hidden mb-12">
-          <BlogCardImage title={post.title} category={post.category} variant="hero" />
+          <BlogCardImage title={post.title} category={post.category} image={post.image} variant="hero" />
         </div>
 
         {/* Content with ToC sidebar */}
