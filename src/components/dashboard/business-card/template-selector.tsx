@@ -1,12 +1,14 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { useBusinessCardStore } from "@/lib/stores/business-card-store";
 import { CARD_TEMPLATES } from "./card-templates";
 import { CheckCircle } from "lucide-react";
 
 export function TemplateSelector() {
+  const t = useTranslations("dashboard.businessCard");
   const selectedTemplateId = useBusinessCardStore((s) => s.selectedTemplateId);
   const setSelectedTemplate = useBusinessCardStore((s) => s.setSelectedTemplate);
   const applyTemplateColors = useBusinessCardStore((s) => s.applyTemplateColors);
@@ -15,7 +17,7 @@ export function TemplateSelector() {
     <div className="bg-white rounded-2xl p-6 border border-border shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Select Template
+          {t("selectTemplate")}
         </h3>
       </div>
       <div className="grid grid-cols-3 gap-3">

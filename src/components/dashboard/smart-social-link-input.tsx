@@ -2,7 +2,8 @@
 
 import React, { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowLeft, Check, Circle, RectangleHorizontal, LayoutGrid } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowLeft, Check, Circle, RectangleHorizontal, LayoutGrid, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -19,12 +20,14 @@ import {
 } from "@/lib/utils/platform-url";
 import { cn } from "@/lib/utils";
 import type { SocialPlatform, SocialDisplayMode } from "@/types";
+import type { OnboardingStep } from "@/components/dashboard/onboarding/onboarding-context";
 
 interface SmartSocialLinkInputProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   platform: SocialPlatform | null;
   onBack?: () => void;
+  onboardingStep?: OnboardingStep;
 }
 
 const INPUT_LABELS: Record<string, string> = {
@@ -42,8 +45,10 @@ export function SmartSocialLinkInput({
   onOpenChange,
   platform,
   onBack,
+  onboardingStep,
 }: SmartSocialLinkInputProps) {
   const t = useTranslations("dashboard.smartInput");
+  const tOnboarding = useTranslations("onboarding");
   const addSocialIcon = useSocialStore((s) => s.addSocialIcon);
   const socialIcons = useSocialStore((s) => s.socialIcons);
 
@@ -92,7 +97,7 @@ export function SmartSocialLinkInput({
       toast.success(t("added"));
       onOpenChange(false);
     } catch {
-      toast.error("Failed to add social link");
+      toast.error(t("addError"));
     } finally {
       setSaving(false);
     }
@@ -120,6 +125,20 @@ export function SmartSocialLinkInput({
           <BrandIcon platform={platform} size={36} iconSize={18} />
           <span className="text-base font-bold text-foreground">{label}</span>
         </div>
+
+        {/* Onboarding hint banner */}
+        {onboardingStep === "smart-input-hint" && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mx-5 mt-4 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-[#FF6B35]/8 border border-[#FF6B35]/20"
+          >
+            <Sparkles className="size-4 text-[#FF6B35] shrink-0" />
+            <p className="text-xs font-medium text-[#FF6B35]">
+              {tOnboarding("fillDetailsHint")}
+            </p>
+          </motion.div>
+        )}
 
         {/* Input section */}
         <div className="px-5 py-5 space-y-4">

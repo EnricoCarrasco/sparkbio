@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Share2 } from "lucide-react";
 import { usePreviewIframe } from "@/lib/hooks/use-preview-iframe";
 import { ShareModal } from "@/components/dashboard/share-modal";
@@ -9,6 +10,7 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://viopage.com";
 
 export function PreviewPanel() {
+  const t = useTranslations("dashboard.preview");
   const { iframeSrc, refreshKey, username } = usePreviewIframe();
   const [shareOpen, setShareOpen] = useState(false);
 
@@ -21,7 +23,7 @@ export function PreviewPanel() {
       {/* Panel header */}
       <div className="px-4 py-3 border-b border-border shrink-0 flex items-center justify-between">
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          Live Preview
+          {t("livePreview")}
         </p>
         {username && (
           <a
@@ -30,7 +32,7 @@ export function PreviewPanel() {
             rel="noopener noreferrer"
             className="text-[11px] text-[#FF6B35] hover:underline font-medium"
           >
-            Open full page
+            {t("openFullPage")}
           </a>
         )}
       </div>
@@ -82,7 +84,7 @@ export function PreviewPanel() {
                 />
               ) : (
                 <div className="flex items-center justify-center h-full text-xs text-muted-foreground">
-                  Loading preview...
+                  {t("loading")}
                 </div>
               )}
             </div>
