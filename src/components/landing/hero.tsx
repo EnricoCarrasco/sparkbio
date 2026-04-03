@@ -4,31 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { EASE, stagger, fadeUp } from "@/lib/motion-variants";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const EASE = [0.25, 0.1, 0.25, 1] as const;
+const containerVariants = stagger(0.12, 0.18);
 
-/** Stagger container: each child fades up 0.12s after the previous */
-const containerVariants: Variants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.18,
-    },
-  },
-};
-
-/** Individual text element: fade-up, 0.55s */
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, ease: EASE },
-  },
-};
+const itemVariants = fadeUp(24);
 
 /** Right column slides in from the right */
 const imageEntryVariants: Variants = {

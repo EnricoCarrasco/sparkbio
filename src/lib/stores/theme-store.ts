@@ -2,6 +2,7 @@ import { create } from "zustand";
 import type { Theme } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
+import { createDebouncedSave } from "@/lib/utils/debounced-save";
 
 interface ThemeState {
   theme: Theme | null;
@@ -11,7 +12,7 @@ interface ThemeState {
   updateTheme: (updates: Partial<Theme>) => Promise<void>;
 }
 
-let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+const debouncedSave = createDebouncedSave(500);
 
 export const useThemeStore = create<ThemeState>((set, get) => ({
   theme: null,
@@ -51,8 +52,7 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
     set({ theme: { ...theme, ...updates } });
 
     // Debounced save — reads latest state from store so all accumulated changes are saved
-    if (debounceTimer) clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(async () => {
+    debouncedSave(async () => {
       const current = get().theme;
       if (!current) return;
       const supabase = createClient();
@@ -61,6 +61,6 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
       if (error) {
         console.error("[theme-store] save failed:", error.message, error);
       }
-    }, 500);
+    });
   },
 }));

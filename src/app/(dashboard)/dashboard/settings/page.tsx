@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod/v4";
+import { passwordChangeSchema, type PasswordChangeInput } from "@/lib/validators/auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -50,23 +51,7 @@ import {
 import { UpgradeButton } from "@/components/billing/upgrade-button";
 import { UpgradeDialog } from "@/components/billing/upgrade-dialog";
 
-// ---------------------------------------------------------------------------
-// Password change schema — defined locally since it lives only in this page
-// ---------------------------------------------------------------------------
-const passwordChangeSchema = z
-  .object({
-    newPassword: z
-      .string()
-      .min(8, "Password must be at least 8 characters"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
-
 type UsernameChangeInput = z.infer<typeof usernameChangeSchema>;
-type PasswordChangeInput = z.infer<typeof passwordChangeSchema>;
 
 // ---------------------------------------------------------------------------
 // Profile URL section

@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import type { Subscription } from "@/types";
 import { createClient } from "@/lib/supabase/client";
+import { isSubscriptionActive } from "@/lib/constants";
 
 interface SubscriptionState {
   subscription: Subscription | null;
@@ -36,7 +37,7 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
 
     set({
       subscription: data,
-      isPro: data?.status === "on_trial" || data?.status === "active",
+      isPro: isSubscriptionActive(data?.status),
       loading: false,
     });
   },
@@ -45,7 +46,6 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
     set({
       subscription,
       isPro:
-        subscription?.status === "on_trial" ||
-        subscription?.status === "active",
+        isSubscriptionActive(subscription?.status),
     }),
 }));

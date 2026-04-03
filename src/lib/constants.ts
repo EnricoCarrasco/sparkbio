@@ -343,3 +343,13 @@ export const PLANS = {
     trialDays: 7,
   },
 } as const;
+
+// ── Subscription helpers ─────────────────────────────────────────────────────
+
+export const ACTIVE_SUBSCRIPTION_STATUSES = ["on_trial", "active"] as const;
+
+export function isSubscriptionActive(status?: string | null): boolean {
+  return ACTIVE_SUBSCRIPTION_STATUSES.includes(
+    status as (typeof ACTIVE_SUBSCRIPTION_STATUSES)[number],
+  );
+}

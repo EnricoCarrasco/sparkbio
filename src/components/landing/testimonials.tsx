@@ -4,26 +4,12 @@ import { useRef } from "react";
 import Image from "next/image";
 import { motion, useInView, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { EASE, stagger, fadeUp as _fadeUp } from "@/lib/motion-variants";
 
 // ── Animation constants ───────────────────────────────────────────────────────
 
-const EASE = [0.25, 0.1, 0.25, 1] as const;
-
-const staggerCards: Variants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.13, delayChildren: 0.05 },
-  },
-};
-
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 28 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, ease: EASE },
-  },
-};
+const staggerCards = stagger(0.13, 0.05);
+const fadeUp = _fadeUp();
 
 const staggerPress: Variants = {
   hidden: {},

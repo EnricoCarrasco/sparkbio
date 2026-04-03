@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { ACTIVE_SUBSCRIPTION_STATUSES } from "@/lib/constants";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -36,7 +37,7 @@ export async function GET(request: Request) {
           .from("subscriptions")
           .select("status")
           .eq("user_id", user.id)
-          .in("status", ["on_trial", "active"])
+          .in("status", [...ACTIVE_SUBSCRIPTION_STATUSES])
           .maybeSingle();
 
         // No active subscription → send to trial page

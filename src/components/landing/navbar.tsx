@@ -8,8 +8,7 @@ import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LanguageSwitcher } from "@/components/language-switcher";
-
-const EASE = [0.25, 0.1, 0.25, 1] as const;
+import { EASE } from "@/lib/motion-variants";
 
 const NAV_LINKS = [
   { key: "features" as const, href: "#features" },

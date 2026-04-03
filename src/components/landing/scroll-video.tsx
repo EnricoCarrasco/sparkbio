@@ -3,10 +3,7 @@
 import { useRef } from "react";
 import { motion, useInView, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
-
-// ── Constants ────────────────────────────────────────────────────────────────
-
-const EASE = [0.25, 0.1, 0.25, 1] as const;
+import { EASE } from "@/lib/motion-variants";
 
 /** Marquee item keys — used to look up translations */
 const MARQUEE_KEYS = [

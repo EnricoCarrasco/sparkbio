@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { createClient } from "@/lib/supabase/client";
+import { createDebouncedSave } from "@/lib/utils/debounced-save";
 
 interface BusinessCardSettings {
   brandName: string;
@@ -87,11 +88,10 @@ const defaultSettings: BusinessCardSettings = {
 };
 
 // Debounced save to Supabase
-let saveTimer: ReturnType<typeof setTimeout> | null = null;
+const debouncedSave = createDebouncedSave(500);
 
-function debouncedSave(getState: () => BusinessCardState, profileId: string) {
-  if (saveTimer) clearTimeout(saveTimer);
-  saveTimer = setTimeout(async () => {
+function triggerSave(getState: () => BusinessCardState, profileId: string) {
+  debouncedSave(async () => {
     const state = getState();
     const settings: BusinessCardSettings = {
       brandName: state.brandName,
@@ -125,7 +125,7 @@ function debouncedSave(getState: () => BusinessCardState, profileId: string) {
     if (error) {
       console.error("[business-card-store] save failed:", error.message);
     }
-  }, 500);
+  });
 }
 
 // Store the profile ID for debounced saves
@@ -140,24 +140,24 @@ export const useBusinessCardStore = create<BusinessCardState>((set, get) => ({
 
   setField: (key, value) => {
     set({ [key]: value });
-    if (currentProfileId) debouncedSave(get, currentProfileId);
+    if (currentProfileId) triggerSave(get, currentProfileId);
   },
 
   setSelectedTemplate: (id) => {
     set({ selectedTemplateId: id });
-    if (currentProfileId) debouncedSave(get, currentProfileId);
+    if (currentProfileId) triggerSave(get, currentProfileId);
   },
 
   setAiBackgroundUrl: (url) => {
     set({ aiBackgroundUrl: url });
-    if (currentProfileId) debouncedSave(get, currentProfileId);
+    if (currentProfileId) triggerSave(get, currentProfileId);
   },
 
   setAiBackgroundLoading: (loading) => set({ aiBackgroundLoading: loading }),
 
   setAiLogoUrl: (url) => {
     set({ aiLogoUrl: url });
-    if (currentProfileId) debouncedSave(get, currentProfileId);
+    if (currentProfileId) triggerSave(get, currentProfileId);
   },
 
   setAiLogoLoading: (loading) => set({ aiLogoLoading: loading }),
@@ -170,7 +170,7 @@ export const useBusinessCardStore = create<BusinessCardState>((set, get) => ({
       textColor: template.textColor,
       accentColor: template.accentColor,
     });
-    if (currentProfileId) debouncedSave(get, currentProfileId);
+    if (currentProfileId) triggerSave(get, currentProfileId);
   },
 
   loadFromSupabase: async (profileId: string) => {
@@ -248,6 +248,6 @@ export const useBusinessCardStore = create<BusinessCardState>((set, get) => ({
 
   reset: () => {
     set({ ...defaultSettings, loaded: false });
-    if (currentProfileId) debouncedSave(get, currentProfileId);
+    if (currentProfileId) triggerSave(get, currentProfileId);
   },
 }));

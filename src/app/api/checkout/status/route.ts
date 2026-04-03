@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { ACTIVE_SUBSCRIPTION_STATUSES } from "@/lib/constants";
 
 export async function GET(): Promise<NextResponse> {
   const supabase = await createClient();
@@ -15,7 +16,7 @@ export async function GET(): Promise<NextResponse> {
     .from("subscriptions")
     .select("status")
     .eq("user_id", user.id)
-    .in("status", ["on_trial", "active"])
+    .in("status", [...ACTIVE_SUBSCRIPTION_STATUSES])
     .maybeSingle();
 
   return NextResponse.json({ hasSubscription: !!sub });

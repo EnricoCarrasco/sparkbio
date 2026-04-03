@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import Replicate from "replicate";
 import { generateLogoSchema } from "@/lib/validators/business-card";
+import { extractReplicateUrl } from "@/lib/replicate";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   // Auth
@@ -34,9 +35,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const output = await replicate.run("google/nano-banana", { input: { prompt } });
 
-    const imageUrl = typeof output === "object" && output !== null && "url" in output
-      ? (output as { url: () => string }).url()
-      : String(output);
+    const imageUrl = extractReplicateUrl(output);
 
     return NextResponse.json({ imageUrl });
   } catch (error) {

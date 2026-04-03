@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import type { PublicProfile } from "@/types";
+import { isSubscriptionActive } from "@/lib/constants";
 import { ProfileHeader } from "./profile-header";
 import { ProfileLink } from "./profile-link";
 import { SocialIconsBar } from "./social-icons-bar";
@@ -86,7 +87,7 @@ export function ProfilePage({ data }: ProfilePageProps) {
   const gridIcons = activeSocialIcons.filter((s) => s.display_mode === "grid");
   const buttonIcons = activeSocialIcons.filter((s) => s.display_mode === "button");
 
-  const isProActive = subscription?.status === "on_trial" || subscription?.status === "active";
+  const isProActive = isSubscriptionActive(subscription?.status);
   const showFooter = !(theme.hide_footer && isProActive);
 
   return (

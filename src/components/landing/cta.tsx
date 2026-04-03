@@ -2,28 +2,14 @@
 
 import { useRef } from "react";
 import Link from "next/link";
-import { motion, useInView, type Variants } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { stagger as _stagger, fadeUp as _fadeUp } from "@/lib/motion-variants";
 
 // ── Animation constants ───────────────────────────────────────────────────────
 
-const EASE = [0.25, 0.1, 0.25, 1] as const;
-
-const stagger: Variants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.1, delayChildren: 0.05 },
-  },
-};
-
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, ease: EASE },
-  },
-};
+const stagger = _stagger(0.1, 0.05);
+const fadeUp = _fadeUp(24);
 
 // ── Main export ───────────────────────────────────────────────────────────────
 
