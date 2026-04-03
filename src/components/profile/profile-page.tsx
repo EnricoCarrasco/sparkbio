@@ -202,15 +202,10 @@ export function ProfilePage({ data }: ProfilePageProps) {
             href="https://viopage.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 mb-2 inline-flex items-center justify-center gap-2 rounded-full bg-[#FF6B35] px-4 py-2.5 text-white shadow-md hover:shadow-lg hover:brightness-110 active:scale-[0.98] transition-all max-w-full"
+            className="mt-6 mb-2 inline-flex items-center justify-center rounded-full bg-[#FF6B35] px-5 py-2.5 text-white shadow-md hover:shadow-lg hover:brightness-110 active:scale-[0.98] transition-all max-w-full whitespace-nowrap"
           >
-            <img
-              src="/images/landing/logo-viopage.png"
-              alt="Viopage"
-              className="h-4 w-auto shrink-0 brightness-0 invert"
-            />
-            <span className="text-sm font-semibold truncate">
-              {t("joinCta", { username: profile.username })}
+            <span className="text-[13px] sm:text-sm font-semibold truncate">
+              viopage · {t("joinCta", { username: profile.username })}
             </span>
           </a>
         )}

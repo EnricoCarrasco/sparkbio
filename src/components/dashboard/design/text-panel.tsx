@@ -38,109 +38,149 @@ export function TextPanel() {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-sm font-semibold text-foreground">{t("textSection")}</h3>
+      {/* ── Page Font ── */}
+      <section className="bg-white p-6 rounded-2xl border border-zinc-100">
+        <h2 className="text-lg font-bold text-zinc-900 mb-6">
+          {t("pageFont")}
+        </h2>
 
-      {/* Page font — free users get 3, Pro gets all 10 */}
-      <div className="space-y-1.5">
-        <Label htmlFor="page-font">{t("pageFont")}</Label>
-        <Select
-          value={theme.font_family}
-          onValueChange={(v) => {
-            if (!v) return;
-            if (!isPro && !FREE_FONTS.includes(v)) {
-              setUpgradeOpen(true);
-              return;
-            }
-            updateTheme({ font_family: v });
-          }}
-        >
-          <SelectTrigger id="page-font" className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {THEME_FONTS.map((font) => {
-              const locked = !isPro && !FREE_FONTS.includes(font.value);
-              return (
-                <SelectItem key={font.value} value={font.value}>
-                  <span className="flex items-center gap-2" style={{ fontFamily: font.value }}>
-                    {font.label}
-                    {locked && <Crown className="size-3 text-amber-500" />}
-                  </span>
-                </SelectItem>
-              );
-            })}
-          </SelectContent>
-        </Select>
-        <p
-          className="text-sm text-muted-foreground mt-2 truncate"
-          style={{ fontFamily: theme.font_family }}
-        >
-          The quick brown fox jumps over the lazy dog
-        </p>
-        {!isPro && (
-          <p className="text-[10px] text-amber-600 flex items-center gap-1">
-            <Crown className="size-3" />
-            {tBilling("proOnlyFonts")}
-          </p>
-        )}
-      </div>
-
-      {/* Page text color */}
-      <ColorInput
-        id="text-color"
-        label={t("pageTextColor")}
-        value={theme.text_color}
-        onChange={(v) => updateTheme({ text_color: v })}
-      />
-
-      {/* Title font — Pro only */}
-      <div className="space-y-1.5">
-        <Label htmlFor="title-font" className="flex items-center gap-1.5">
-          {t("titleFont")}
-          {!isPro && <Crown className="size-3.5 text-amber-500" />}
-        </Label>
-        {isPro ? (
+        <div className="space-y-4">
           <Select
-            value={theme.title_font ?? "__inherit__"}
+            value={theme.font_family}
             onValueChange={(v) => {
-              if (v) updateTheme({ title_font: v === "__inherit__" ? null : v });
+              if (!v) return;
+              if (!isPro && !FREE_FONTS.includes(v)) {
+                setUpgradeOpen(true);
+                return;
+              }
+              updateTheme({ font_family: v });
             }}
           >
-            <SelectTrigger id="title-font" className="w-full">
+            <SelectTrigger id="page-font" className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__inherit__">{t("inheritFont")}</SelectItem>
-              {THEME_FONTS.map((font) => (
-                <SelectItem key={font.value} value={font.value}>
-                  <span style={{ fontFamily: font.value }}>{font.label}</span>
-                </SelectItem>
-              ))}
+              {THEME_FONTS.map((font) => {
+                const locked = !isPro && !FREE_FONTS.includes(font.value);
+                return (
+                  <SelectItem key={font.value} value={font.value}>
+                    <span
+                      className="flex items-center gap-2"
+                      style={{ fontFamily: font.value }}
+                    >
+                      {font.label}
+                      {locked && <Crown className="size-3 text-amber-500" />}
+                    </span>
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
+
+          {/* Font preview */}
+          <div className="bg-zinc-50 rounded-xl p-5 border border-zinc-100">
+            <p
+              className="text-lg text-zinc-700 leading-relaxed"
+              style={{ fontFamily: theme.font_family }}
+            >
+              The quick brown fox jumps over the lazy dog
+            </p>
+          </div>
+
+          {!isPro && (
+            <p className="text-xs text-amber-600 flex items-center gap-1.5">
+              <Crown className="size-3.5" />
+              {tBilling("proOnlyFonts")}
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* ── Title Font ── */}
+      <section className="bg-white p-6 rounded-2xl border border-zinc-100">
+        <h2 className="text-lg font-bold text-zinc-900 mb-6 flex items-center gap-2">
+          {t("titleFont")}
+          {!isPro && <Crown className="size-4 text-amber-500" />}
+        </h2>
+
+        {isPro ? (
+          <div className="space-y-4">
+            <Select
+              value={theme.title_font ?? "__inherit__"}
+              onValueChange={(v) => {
+                if (v)
+                  updateTheme({ title_font: v === "__inherit__" ? null : v });
+              }}
+            >
+              <SelectTrigger id="title-font" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__inherit__">
+                  {t("inheritFont")}
+                </SelectItem>
+                {THEME_FONTS.map((font) => (
+                  <SelectItem key={font.value} value={font.value}>
+                    <span style={{ fontFamily: font.value }}>
+                      {font.label}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Title font preview */}
+            <div className="bg-zinc-50 rounded-xl p-5 border border-zinc-100">
+              <p
+                className="text-lg text-zinc-700 leading-relaxed"
+                style={{
+                  fontFamily: theme.title_font ?? theme.font_family,
+                }}
+              >
+                The quick brown fox jumps over the lazy dog
+              </p>
+            </div>
+          </div>
         ) : (
           <button
             type="button"
             onClick={() => setUpgradeOpen(true)}
-            className="w-full flex items-center justify-between rounded-md border border-border bg-muted/30 px-3 py-2 text-sm text-muted-foreground hover:bg-muted/50 transition-colors"
+            className="w-full flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-500 hover:bg-zinc-100 transition-colors"
           >
             <span>{t("inheritFont")}</span>
             <Crown className="size-3.5 text-amber-500" />
           </button>
         )}
-      </div>
+      </section>
 
-      {/* Title color */}
-      <ColorInput
-        id="title-text-color"
-        label={t("titleColor")}
-        value={theme.title_color ?? theme.text_color}
-        onChange={(v) => updateTheme({ title_color: v })}
-      />
+      {/* ── Colors ── */}
+      <section className="bg-white p-6 rounded-2xl border border-zinc-100">
+        <h2 className="text-lg font-bold text-zinc-900 mb-6">
+          {t("pageTextColor")}
+        </h2>
 
-      {/* Title size */}
-      <div className="space-y-2">
-        <Label>{t("titleSizeLabel")}</Label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <ColorInput
+            id="text-color"
+            label={t("pageTextColor")}
+            value={theme.text_color}
+            onChange={(v) => updateTheme({ text_color: v })}
+          />
+          <ColorInput
+            id="title-text-color"
+            label={t("titleColor")}
+            value={theme.title_color ?? theme.text_color}
+            onChange={(v) => updateTheme({ title_color: v })}
+          />
+        </div>
+      </section>
+
+      {/* ── Title Size ── */}
+      <section className="bg-white p-6 rounded-2xl border border-zinc-100">
+        <h2 className="text-lg font-bold text-zinc-900 mb-4">
+          {t("titleSizeLabel")}
+        </h2>
+
         <ToggleGroup
           options={[
             { value: "small" as TitleSize, label: t("small") },
@@ -149,7 +189,7 @@ export function TextPanel() {
           value={theme.title_size}
           onChange={(v) => updateTheme({ title_size: v })}
         />
-      </div>
+      </section>
 
       <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
     </div>

@@ -40,9 +40,9 @@ export async function GET(request: Request) {
           .in("status", [...ACTIVE_SUBSCRIPTION_STATUSES])
           .maybeSingle();
 
-        // No active subscription → send to trial page
+        // No active subscription → send to dashboard (free tier)
         if (!sub) {
-          return NextResponse.redirect(`${origin}/trial`);
+          return NextResponse.redirect(`${origin}/dashboard`);
         }
       }
 

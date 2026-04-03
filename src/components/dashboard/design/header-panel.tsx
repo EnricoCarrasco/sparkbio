@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Camera, Crown, User, LayoutTemplate, Type, EyeOff } from "lucide-react";
+import { Camera, Crown } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -17,36 +17,6 @@ import { ColorInput } from "./color-input";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import type { ProfileLayout, TitleSize, TitleStyle, AvatarShape, AvatarBorder } from "@/types";
-
-// ---------------------------------------------------------------------------
-// Section card wrapper — matches the ContentTab visual language
-// ---------------------------------------------------------------------------
-
-function SectionCard({
-  icon,
-  title,
-  children,
-  className,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={cn("rounded-2xl border border-border/60 shadow-sm overflow-hidden", className)}>
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-border/40">
-        <span className="text-muted-foreground">{icon}</span>
-        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          {title}
-        </h4>
-      </div>
-      <div className="p-4 space-y-4">
-        {children}
-      </div>
-    </div>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Visual shape picker — shows actual shape previews instead of text buttons
@@ -150,7 +120,7 @@ function BorderPicker({
 }
 
 // ---------------------------------------------------------------------------
-// HeaderPanel — redesigned with visual cards and previews
+// HeaderPanel — Stitch design language
 // ---------------------------------------------------------------------------
 
 export function HeaderPanel() {
@@ -197,15 +167,13 @@ export function HeaderPanel() {
     .toUpperCase();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
 
-      {/* ── Profile Image Card ── */}
-      <SectionCard
-        icon={<Camera className="size-4" />}
-        title={t("profileImage")}
-        className="bg-orange-50/50"
-      >
-        <div className="flex items-center gap-4">
+      {/* ── Profile Image ── */}
+      <section className="bg-white p-6 rounded-2xl border border-zinc-100">
+        <h2 className="text-lg font-bold text-zinc-900 mb-6">{t("profileImage")}</h2>
+
+        <div className="flex items-center gap-5">
           <div className="relative shrink-0">
             <Avatar className="size-20 ring-2 ring-white shadow-md">
               <AvatarImage
@@ -226,8 +194,8 @@ export function HeaderPanel() {
             </button>
           </div>
           <div className="flex-1 space-y-2">
-            <p className="text-sm font-medium text-foreground">{t("editImage")}</p>
-            <p className="text-xs text-muted-foreground">{t("profileImageDesc") || "JPEG, PNG, WebP or GIF. Max 2MB."}</p>
+            <p className="text-sm font-medium text-zinc-900">{t("editImage")}</p>
+            <p className="text-xs text-zinc-500">{t("profileImageDesc") || "JPEG, PNG, WebP or GIF. Max 2MB."}</p>
             <Button
               type="button"
               size="sm"
@@ -249,9 +217,9 @@ export function HeaderPanel() {
           />
         </div>
 
-        {/* Avatar shape — visual shape previews */}
-        <div className="space-y-2.5 pt-2 border-t border-border/40">
-          <p className="text-xs font-medium text-muted-foreground">{t("avatarShape")}</p>
+        {/* Avatar shape */}
+        <div className="space-y-2.5 pt-5 mt-5 border-t border-zinc-100">
+          <p className="text-xs font-medium text-zinc-500">{t("avatarShape")}</p>
           <ShapePicker
             value={theme.avatar_shape}
             onChange={(v) => updateTheme({ avatar_shape: v as AvatarShape })}
@@ -263,9 +231,9 @@ export function HeaderPanel() {
           />
         </div>
 
-        {/* Avatar border — visual border previews */}
-        <div className="space-y-2.5 pt-2 border-t border-border/40">
-          <p className="text-xs font-medium text-muted-foreground">{t("avatarBorder")}</p>
+        {/* Avatar border */}
+        <div className="space-y-2.5 pt-5 mt-5 border-t border-zinc-100">
+          <p className="text-xs font-medium text-zinc-500">{t("avatarBorder")}</p>
           <BorderPicker
             value={theme.avatar_border}
             onChange={(v) => updateTheme({ avatar_border: v as AvatarBorder })}
@@ -280,16 +248,14 @@ export function HeaderPanel() {
             ]}
           />
         </div>
-      </SectionCard>
+      </section>
 
-      {/* ── Layout Card ── */}
-      <SectionCard
-        icon={<LayoutTemplate className="size-4" />}
-        title={t("profileLayout")}
-        className="bg-white"
-      >
+      {/* ── Layout ── */}
+      <section className="bg-white p-6 rounded-2xl border border-zinc-100">
+        <h2 className="text-lg font-bold text-zinc-900 mb-6">{t("profileLayout")}</h2>
+
         <div className="grid grid-cols-2 gap-3">
-          {/* Classic layout preview */}
+          {/* Classic layout preview — centered avatar, name, bio, links */}
           <button
             type="button"
             onClick={() => updateTheme({ profile_layout: "classic" as ProfileLayout })}
@@ -300,13 +266,14 @@ export function HeaderPanel() {
                 : "border-border hover:border-[#FF6B35]/40"
             )}
           >
-            <div className="flex flex-col items-center gap-1.5">
-              <div className="size-6 rounded-full bg-muted" />
-              <div className="h-1.5 w-10 rounded bg-muted" />
-              <div className="h-1 w-14 rounded bg-muted/60" />
-              <div className="w-full space-y-1 mt-1">
-                <div className="h-2.5 w-full rounded-full bg-muted/80" />
-                <div className="h-2.5 w-full rounded-full bg-muted/60" />
+            <div className="flex flex-col items-center gap-1.5 py-2">
+              <div className="size-8 rounded-full bg-[#FF6B35]/20" />
+              <div className="h-1.5 w-12 rounded-full bg-zinc-300" />
+              <div className="h-1 w-16 rounded-full bg-zinc-200" />
+              <div className="w-full space-y-1.5 mt-2">
+                <div className="h-3 w-full rounded-full bg-zinc-200/80" />
+                <div className="h-3 w-full rounded-full bg-zinc-200/60" />
+                <div className="h-3 w-full rounded-full bg-zinc-200/40" />
               </div>
             </div>
             <p className={cn(
@@ -317,7 +284,7 @@ export function HeaderPanel() {
             </p>
           </button>
 
-          {/* Hero layout preview */}
+          {/* Hero layout preview — large banner, overlapping avatar, bold header */}
           <button
             type="button"
             onClick={() => {
@@ -325,19 +292,22 @@ export function HeaderPanel() {
               updateTheme({ profile_layout: "hero" as ProfileLayout });
             }}
             className={cn(
-              "relative rounded-xl border-2 p-3 transition-all text-left",
+              "relative rounded-xl border-2 p-3 transition-all text-left overflow-hidden",
               theme.profile_layout === "hero"
                 ? "border-[#FF6B35] bg-orange-50/50 shadow-sm"
                 : "border-border hover:border-[#FF6B35]/40"
             )}
           >
-            <div className="flex flex-col items-center gap-1.5">
-              <div className="w-full h-6 rounded bg-muted/80" />
-              <div className="size-5 rounded-full bg-muted -mt-3 ring-2 ring-white" />
-              <div className="h-1.5 w-10 rounded bg-muted" />
-              <div className="w-full space-y-1 mt-0.5">
-                <div className="h-2.5 w-full rounded-full bg-muted/80" />
-                <div className="h-2.5 w-full rounded-full bg-muted/60" />
+            <div className="flex flex-col items-center">
+              {/* Banner area */}
+              <div className="w-full h-10 rounded-lg bg-gradient-to-br from-[#FF6B35]/30 to-[#8B5CF6]/20 -mx-1" />
+              {/* Overlapping avatar */}
+              <div className="size-9 rounded-full bg-[#FF6B35]/25 -mt-5 ring-[3px] ring-white shadow-sm" />
+              <div className="h-2 w-14 rounded-full bg-zinc-300 mt-1.5" />
+              <div className="h-1 w-10 rounded-full bg-zinc-200 mt-1" />
+              <div className="w-full space-y-1.5 mt-2">
+                <div className="h-3 w-full rounded-full bg-zinc-200/80" />
+                <div className="h-3 w-full rounded-full bg-zinc-200/60" />
               </div>
             </div>
             <p className={cn(
@@ -349,81 +319,79 @@ export function HeaderPanel() {
             </p>
           </button>
         </div>
-      </SectionCard>
+      </section>
 
-      {/* ── Title & Display Card ── */}
-      <SectionCard
-        icon={<Type className="size-4" />}
-        title={t("title")}
-        className="bg-orange-50/30"
-      >
-        {/* Display name input */}
-        <div className="space-y-1.5">
-          <Input
-            id="header-title"
-            value={profile?.display_name ?? ""}
-            onChange={(e) => updateProfile({ display_name: e.target.value.trim() || null })}
-            placeholder={t("yourName")}
-            maxLength={100}
-            className="bg-white border-border/60 focus-visible:ring-[#FF6B35]/30"
+      {/* ── Title & Display ── */}
+      <section className="bg-white p-6 rounded-2xl border border-zinc-100">
+        <h2 className="text-lg font-bold text-zinc-900 mb-6">{t("title")}</h2>
+
+        <div className="space-y-5">
+          {/* Display name input */}
+          <div className="space-y-1.5">
+            <Input
+              id="header-title"
+              value={profile?.display_name ?? ""}
+              onChange={(e) => updateProfile({ display_name: e.target.value.trim() || null })}
+              placeholder={t("yourName")}
+              maxLength={100}
+              className="bg-white border-zinc-200 focus-visible:ring-[#FF6B35]/30"
+            />
+          </div>
+
+          {/* Title style */}
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-zinc-500">{t("titleStyle")}</p>
+            <ToggleGroup
+              options={[
+                { value: "text" as TitleStyle, label: t("textStyle") },
+                { value: "logo" as TitleStyle, label: !isPro ? `${t("logoStyle")} ✦` : t("logoStyle") },
+              ]}
+              value={theme.title_style}
+              onChange={(v) => {
+                if (v === "logo" && !isPro) { setUpgradeOpen(true); return; }
+                updateTheme({ title_style: v });
+              }}
+            />
+          </div>
+
+          {/* Title size */}
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-zinc-500">{t("titleSizeLabel")}</p>
+            <ToggleGroup
+              options={[
+                { value: "small" as TitleSize, label: t("small") },
+                { value: "large" as TitleSize, label: t("large") },
+              ]}
+              value={theme.title_size}
+              onChange={(v) => updateTheme({ title_size: v })}
+            />
+          </div>
+
+          {/* Title color */}
+          <ColorInput
+            id="title-color"
+            label={t("titleColor")}
+            value={theme.title_color ?? theme.text_color}
+            onChange={(v) => updateTheme({ title_color: v })}
           />
         </div>
+      </section>
 
-        {/* Title style */}
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">{t("titleStyle")}</p>
-          <ToggleGroup
-            options={[
-              { value: "text" as TitleStyle, label: t("textStyle") },
-              { value: "logo" as TitleStyle, label: !isPro ? `${t("logoStyle")} ✦` : t("logoStyle") },
-            ]}
-            value={theme.title_style}
-            onChange={(v) => {
-              if (v === "logo" && !isPro) { setUpgradeOpen(true); return; }
-              updateTheme({ title_style: v });
-            }}
-          />
-        </div>
+      {/* ── Visibility ── */}
+      <section className="bg-white p-6 rounded-2xl border border-zinc-100">
+        <h2 className="text-lg font-bold text-zinc-900 mb-4">{t("visibility") || "Visibility"}</h2>
 
-        {/* Title size */}
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">{t("titleSizeLabel")}</p>
-          <ToggleGroup
-            options={[
-              { value: "small" as TitleSize, label: t("small") },
-              { value: "large" as TitleSize, label: t("large") },
-            ]}
-            value={theme.title_size}
-            onChange={(v) => updateTheme({ title_size: v })}
-          />
-        </div>
-
-        {/* Title color */}
-        <ColorInput
-          id="title-color"
-          label={t("titleColor")}
-          value={theme.title_color ?? theme.text_color}
-          onChange={(v) => updateTheme({ title_color: v })}
-        />
-      </SectionCard>
-
-      {/* ── Visibility Card ── */}
-      <SectionCard
-        icon={<EyeOff className="size-4" />}
-        title={t("visibility") || "Visibility"}
-        className="bg-white"
-      >
-        <div className="flex items-center justify-between rounded-xl bg-orange-50 border border-border/40 p-3.5">
+        <div className="flex items-center justify-between rounded-xl bg-zinc-50 border border-zinc-100 p-4">
           <div className="space-y-0.5">
-            <p className="text-sm font-medium text-foreground">{t("hideBio")}</p>
-            <p className="text-xs text-muted-foreground">{t("hideBioDesc")}</p>
+            <p className="text-sm font-medium text-zinc-900">{t("hideBio")}</p>
+            <p className="text-xs text-zinc-500">{t("hideBioDesc")}</p>
           </div>
           <Switch
             checked={theme.hide_bio}
             onCheckedChange={(v) => updateTheme({ hide_bio: v })}
           />
         </div>
-      </SectionCard>
+      </section>
 
       <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
     </div>
