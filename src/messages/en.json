@@ -213,7 +213,35 @@
       "quote3": "Finally, a link-in-bio tool that treats my brand with respect. The analytics are clear and the customization is endless.",
       "role3": "Tech Podcaster",
       "photoAlt": "Photo of {name}",
-      "featuredIn": "As featured in"
+      "featuredIn": "Works with your favorite platforms"
+    },
+    "midCta": {
+      "heading": "Ready to build yours?",
+      "button": "Start free trial",
+      "trustLine": "7-day free trial · No credit card to start · Cancel anytime"
+    },
+    "comparison": {
+      "title": "Why creators switch to Viopage",
+      "feature": "Feature",
+      "viopage": "Viopage Pro",
+      "linktreeFree": "Linktree Free",
+      "linktreePro": "Linktree Pro",
+      "premiumThemes": "Premium themes",
+      "premiumThemesViopage": "12 included",
+      "premiumThemesLtFree": "0",
+      "premiumThemesLtPro": "Limited",
+      "analytics": "Advanced analytics",
+      "customDomain": "Custom domain",
+      "removeBranding": "Remove branding",
+      "dragAndDrop": "Drag & drop builder",
+      "freeTrial": "Free trial",
+      "freeTrialViopage": "7 days full access",
+      "freeTrialLtFree": "N/A",
+      "freeTrialLtPro": "No",
+      "price": "Price",
+      "priceViopage": "From €7/mo",
+      "priceLtFree": "Free",
+      "priceLtPro": "€9/mo"
     },
     "pricingPreview": {
       "eyebrow": "PRICING",
@@ -236,7 +264,8 @@
       "proFeature4": "Advanced analytics & insights",
       "proFeature5": "Custom domain support",
       "proFeature6": "Priority support",
-      "proButton": "Start free trial"
+      "proButton": "Start free trial",
+      "cancelGuarantee": "Cancel anytime. No questions asked."
     },
     "cta": {
       "heading": "Your audience is",
@@ -266,14 +295,15 @@
       "terms": "Terms",
       "copyright": "© {year} Viopage. All rights reserved.",
       "tagline": "One link for everything you create.",
-      "ctaFooter": "Get started free"
+      "ctaFooter": "Start free trial"
     },
     "nav": {
       "login": "Log in",
-      "signup": "Sign up free",
+      "signup": "Start free trial",
       "features": "Features",
       "themes": "Themes",
-      "pricing": "Pricing"
+      "pricing": "Pricing",
+      "blog": "Blog"
     },
     "faq": {
       "eyebrow": "FAQ",

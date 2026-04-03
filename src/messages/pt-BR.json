@@ -214,7 +214,35 @@
       "quote3": "Finalmente, uma ferramenta de link-in-bio que trata minha marca com respeito. As análises são claras e a personalização é infinita.",
       "role3": "Podcaster de Tecnologia",
       "photoAlt": "Foto de {name}",
-      "featuredIn": "Como visto em"
+      "featuredIn": "Funciona com suas plataformas favoritas"
+    },
+    "midCta": {
+      "heading": "Pronto para criar o seu?",
+      "button": "Comece gratis",
+      "trustLine": "Teste gratis de 7 dias · Sem cartao para comecar · Cancele quando quiser"
+    },
+    "comparison": {
+      "title": "Por que criadores escolhem o Viopage",
+      "feature": "Recurso",
+      "viopage": "Viopage Pro",
+      "linktreeFree": "Linktree Free",
+      "linktreePro": "Linktree Pro",
+      "premiumThemes": "Temas premium",
+      "premiumThemesViopage": "12 inclusos",
+      "premiumThemesLtFree": "0",
+      "premiumThemesLtPro": "Limitado",
+      "analytics": "Analises avancadas",
+      "customDomain": "Dominio personalizado",
+      "removeBranding": "Remover marca",
+      "dragAndDrop": "Editor arrasta-e-solta",
+      "freeTrial": "Teste gratis",
+      "freeTrialViopage": "7 dias acesso completo",
+      "freeTrialLtFree": "N/A",
+      "freeTrialLtPro": "Nao",
+      "price": "Preco",
+      "priceViopage": "A partir de R$39/mes",
+      "priceLtFree": "Gratis",
+      "priceLtPro": "R$50/mes"
     },
     "pricingPreview": {
       "eyebrow": "PREÇOS",
@@ -237,7 +265,8 @@
       "proFeature4": "Análises e insights avançados",
       "proFeature5": "Suporte a domínio personalizado",
       "proFeature6": "Suporte prioritário",
-      "proButton": "Iniciar teste grátis"
+      "proButton": "Iniciar teste gratis",
+      "cancelGuarantee": "Cancele quando quiser. Sem perguntas."
     },
     "cta": {
       "heading": "Seu público está",
@@ -267,14 +296,15 @@
       "terms": "Termos",
       "copyright": "© {year} Viopage. Todos os direitos reservados.",
       "tagline": "Um link para tudo que você cria.",
-      "ctaFooter": "Comece grátis"
+      "ctaFooter": "Comece gratis"
     },
     "nav": {
       "login": "Entrar",
-      "signup": "Cadastre-se grátis",
+      "signup": "Comece gratis",
       "features": "Recursos",
       "themes": "Temas",
-      "pricing": "Preços"
+      "pricing": "Preços",
+      "blog": "Blog"
     },
     "faq": {
       "eyebrow": "Perguntas Frequentes",
