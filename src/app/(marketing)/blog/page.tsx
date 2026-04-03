@@ -3,6 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { getPostsByLocale } from "@/lib/blog/posts";
 import type { BlogPost } from "@/lib/blog/types";
+import { BlogCardImage } from "@/components/blog/blog-card-image";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://viopage.com";
 
@@ -20,15 +21,28 @@ export const metadata: Metadata = {
   },
 };
 
+const BLOG_TEXT = {
+  en: {
+    heading: "The Viopage Blog",
+    subtitle: "Tips, guides, and strategies for creators building their online presence.",
+    readMore: "Read more",
+    comingSoon: "Coming soon.",
+  },
+  "pt-BR": {
+    heading: "Blog Viopage",
+    subtitle: "Dicas, guias e estratégias para criadores construindo sua presença online.",
+    readMore: "Ler mais",
+    comingSoon: "Em breve.",
+  },
+} as const;
+
 function PostCard({ post }: { post: BlogPost }) {
   return (
     <Link
       href={`/blog/${post.slug}`}
       className="group flex flex-col rounded-2xl bg-white border border-stone-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
     >
-      <div className="aspect-[16/9] bg-gradient-to-br from-stone-100 to-stone-50 flex items-center justify-center">
-        <span className="text-4xl text-stone-300">V</span>
-      </div>
+      <BlogCardImage title={post.title} category={post.category} />
       <div className="p-6 flex flex-col flex-1">
         <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#FF6B35] mb-3">
           {post.category}
@@ -48,14 +62,14 @@ function PostCard({ post }: { post: BlogPost }) {
   );
 }
 
-function FeaturedPost({ post }: { post: BlogPost }) {
+function FeaturedPost({ post, locale }: { post: BlogPost; locale: "en" | "pt-BR" }) {
   return (
     <Link
       href={`/blog/${post.slug}`}
       className="group grid md:grid-cols-2 gap-8 rounded-2xl bg-white border border-stone-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
     >
-      <div className="aspect-[16/9] md:aspect-auto bg-gradient-to-br from-stone-100 to-stone-50 flex items-center justify-center min-h-[280px]">
-        <span className="text-6xl text-stone-300">V</span>
+      <div className="md:min-h-[280px]">
+        <BlogCardImage title={post.title} category={post.category} variant="hero" />
       </div>
       <div className="p-8 flex flex-col justify-center">
         <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#FF6B35] mb-3">
@@ -75,7 +89,7 @@ function FeaturedPost({ post }: { post: BlogPost }) {
           <span>{post.readTime}</span>
         </div>
         <span className="mt-4 text-[#FF6B35] font-medium text-sm">
-          Read more &rarr;
+          {BLOG_TEXT[locale].readMore} &rarr;
         </span>
       </div>
     </Link>
@@ -89,6 +103,8 @@ export default async function BlogIndexPage() {
   const posts = getPostsByLocale(locale);
   const [featured, ...rest] = posts;
 
+  const t = BLOG_TEXT[locale];
+
   if (!featured) {
     return (
       <section className="py-24 sm:py-32">
@@ -97,9 +113,9 @@ export default async function BlogIndexPage() {
             className="text-4xl sm:text-5xl font-bold text-stone-900 mb-4"
             style={{ fontFamily: "var(--font-display), 'Instrument Serif', Georgia, serif" }}
           >
-            <em>The Viopage Blog</em>
+            <em>{t.heading}</em>
           </h1>
-          <p className="text-lg text-stone-500">Coming soon.</p>
+          <p className="text-lg text-stone-500">{t.comingSoon}</p>
         </div>
       </section>
     );
@@ -114,16 +130,15 @@ export default async function BlogIndexPage() {
             className="text-4xl sm:text-5xl lg:text-6xl font-bold text-stone-900 mb-4"
             style={{ fontFamily: "var(--font-display), 'Instrument Serif', Georgia, serif" }}
           >
-            <em>The Viopage Blog</em>
+            <em>{t.heading}</em>
           </h1>
           <p className="text-lg text-stone-500 max-w-xl mx-auto">
-            Tips, guides, and strategies for creators building their online
-            presence.
+            {t.subtitle}
           </p>
         </div>
 
         {/* Featured post */}
-        <FeaturedPost post={featured} />
+        <FeaturedPost post={featured} locale={locale} />
 
         {/* Post grid */}
         {rest.length > 0 && (

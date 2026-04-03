@@ -6,15 +6,16 @@ import { ChevronDown } from "lucide-react";
 
 interface BlogFAQProps {
   faqs: { question: string; answer: string }[];
+  heading?: string;
 }
 
-export function BlogFAQ({ faqs }: BlogFAQProps) {
+export function BlogFAQ({ faqs, heading = "Frequently Asked Questions" }: BlogFAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
     <section className="mt-12 pt-8 border-t border-stone-200">
       <h2 className="text-2xl font-bold text-stone-900 mb-6">
-        Frequently Asked Questions
+        {heading}
       </h2>
       <div className="divide-y divide-stone-200">
         {faqs.map(({ question, answer }, index) => (

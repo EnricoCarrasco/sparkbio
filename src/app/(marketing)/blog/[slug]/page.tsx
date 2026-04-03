@@ -1,9 +1,32 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { allPosts, getPostBySlug, getRelatedPosts } from "@/lib/blog/posts";
 import type { BlogPost, ContentSection } from "@/lib/blog/types";
 import { BlogFAQ } from "@/components/blog/blog-faq";
+import { BlogCardImage } from "@/components/blog/blog-card-image";
+
+const POST_TEXT = {
+  en: {
+    by: "By",
+    onThisPage: "On this page",
+    relatedPosts: "Related Posts",
+    faqHeading: "Frequently Asked Questions",
+    ctaHeading: "Start building your link in bio today",
+    ctaSubtitle: "Join 60,000+ creators who trust Viopage. 7-day free trial, no commitment.",
+    ctaButton: "Start free trial",
+  },
+  "pt-BR": {
+    by: "Por",
+    onThisPage: "Nesta pagina",
+    relatedPosts: "Posts Relacionados",
+    faqHeading: "Perguntas Frequentes",
+    ctaHeading: "Comece a criar seu link na bio hoje",
+    ctaSubtitle: "Junte-se a mais de 60.000 criadores que confiam no Viopage. Teste gratis de 7 dias.",
+    ctaButton: "Iniciar teste gratis",
+  },
+} as const;
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://viopage.com";
 
@@ -137,11 +160,11 @@ function renderSection(section: ContentSection, index: number) {
   }
 }
 
-function RelatedPosts({ posts }: { posts: BlogPost[] }) {
+function RelatedPosts({ posts, locale }: { posts: BlogPost[]; locale: "en" | "pt-BR" }) {
   if (posts.length === 0) return null;
   return (
     <section className="mt-16 pt-12 border-t border-stone-200">
-      <h2 className="text-2xl font-bold text-stone-900 mb-8">Related Posts</h2>
+      <h2 className="text-2xl font-bold text-stone-900 mb-8">{POST_TEXT[locale].relatedPosts}</h2>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {posts.map((post) => (
           <Link
@@ -163,14 +186,14 @@ function RelatedPosts({ posts }: { posts: BlogPost[] }) {
   );
 }
 
-function TableOfContents({ sections }: { sections: ContentSection[] }) {
+function TableOfContents({ sections, locale }: { sections: ContentSection[]; locale: "en" | "pt-BR" }) {
   const headings = sections.filter((s) => s.type === "heading") as { type: "heading"; text: string }[];
   if (headings.length < 2) return null;
 
   return (
     <nav className="hidden xl:block sticky top-28 w-56 shrink-0 self-start">
       <p className="text-xs font-bold uppercase tracking-[0.15em] text-stone-400 mb-3">
-        On this page
+        {POST_TEXT[locale].onThisPage}
       </p>
       <ul className="space-y-2 border-l border-stone-200 pl-4">
         {headings.map((h, i) => (
@@ -193,6 +216,9 @@ export default async function BlogPostPage({ params }: Props) {
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
+  const allHeaders = await headers();
+  const locale = allHeaders.get("x-locale-override") === "pt-BR" ? "pt-BR" : "en" as const;
+  const t = POST_TEXT[locale];
   const related = getRelatedPosts(post);
 
   return (
@@ -217,7 +243,7 @@ export default async function BlogPostPage({ params }: Props) {
             {post.title}
           </h1>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-stone-400">
-            <span>By {post.author}</span>
+            <span>{t.by} {post.author}</span>
             <span>-</span>
             <span>{post.date}</span>
             <span>-</span>
@@ -225,26 +251,26 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         </header>
 
-        {/* Hero image placeholder */}
-        <div className="w-full aspect-[21/9] rounded-2xl bg-gradient-to-br from-stone-100 to-stone-50 mb-12 flex items-center justify-center">
-          <span className="text-6xl text-stone-200">V</span>
+        {/* Hero image */}
+        <div className="w-full rounded-2xl overflow-hidden mb-12">
+          <BlogCardImage title={post.title} category={post.category} variant="hero" />
         </div>
 
         {/* Content with ToC sidebar */}
         <div className="flex gap-12">
-          <TableOfContents sections={post.content} />
+          <TableOfContents sections={post.content} locale={locale} />
           <div className="max-w-3xl min-w-0 flex-1">
             {post.content.map((section, i) => renderSection(section, i))}
 
             {/* FAQ */}
             {post.faq.length > 0 && (
-              <BlogFAQ faqs={post.faq} />
+              <BlogFAQ faqs={post.faq} heading={t.faqHeading} />
             )}
           </div>
         </div>
 
         {/* Related Posts */}
-        <RelatedPosts posts={related} />
+        <RelatedPosts posts={related} locale={locale} />
 
         {/* Final CTA */}
         <div className="mt-16 rounded-2xl bg-gradient-to-r from-[#FF6B35] to-[#e55a28] p-12 text-center text-white">
@@ -252,16 +278,16 @@ export default async function BlogPostPage({ params }: Props) {
             className="text-3xl font-bold mb-4"
             style={{ fontFamily: "var(--font-display), 'Instrument Serif', Georgia, serif" }}
           >
-            <em>Start building your link in bio today</em>
+            <em>{t.ctaHeading}</em>
           </h2>
           <p className="text-white/80 mb-6 max-w-md mx-auto">
-            Join 60,000+ creators who trust Viopage. 7-day free trial, no commitment.
+            {t.ctaSubtitle}
           </p>
           <Link
             href="/register"
             className="inline-block rounded-full bg-white text-[#FF6B35] px-8 py-3 font-semibold hover:bg-orange-50 transition-colors"
           >
-            Start free trial
+            {t.ctaButton}
           </Link>
         </div>
       </div>
