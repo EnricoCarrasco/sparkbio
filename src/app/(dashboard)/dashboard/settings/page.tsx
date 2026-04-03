@@ -648,7 +648,7 @@ export default function SettingsPage() {
   const t = useTranslations("dashboard.settings");
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-[680px] mx-auto px-4 py-6 space-y-5">
       {/* Page heading */}
       <div>
         <h1 className="text-xl font-semibold text-foreground tracking-tight">

@@ -36,7 +36,7 @@ const SettingsPage = lazy(
 
 function TabFallback() {
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-[680px] mx-auto px-4 py-6 space-y-5">
       <Skeleton className="h-7 w-36" />
       <Skeleton className="h-40 w-full rounded-xl" />
       <Skeleton className="h-40 w-full rounded-xl" />
@@ -130,12 +130,12 @@ export default function DashboardLayout({
           {/* Main content — tab-based switching */}
           <main className="flex-1 overflow-y-auto pb-20 lg:pb-0">
             {/* Viopage logo — aligned with content max-width */}
-            <div className="sticky top-0 z-10 pointer-events-none">
-              <div className="max-w-[680px] mx-auto px-4 flex justify-end pt-2 -mb-20">
+            <div className="hidden lg:block pointer-events-none">
+              <div className="max-w-[680px] mx-auto px-4 flex justify-end pt-2 pb-1">
                 <img
                   src="/images/landing/viopage-icon.png"
                   alt="Viopage"
-                  className="h-14 sm:h-16 lg:h-20 w-auto select-none opacity-80"
+                  className="h-20 w-auto select-none opacity-80"
                 />
               </div>
             </div>

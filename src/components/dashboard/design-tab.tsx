@@ -63,11 +63,16 @@ const SUB_TABS: { key: DesignSubTab; labelKey: string; icon: React.ReactNode }[]
 
 function DesignSkeleton() {
   return (
-    <div className="p-6 space-y-4">
-      <Skeleton className="h-5 w-24" />
-      <Skeleton className="h-9 w-full" />
-      <Skeleton className="h-9 w-full" />
-      <Skeleton className="h-9 w-full" />
+    <div className="max-w-[680px] mx-auto px-4 py-6 space-y-5">
+      <div className="flex gap-1.5">
+        <Skeleton className="h-8 w-20 rounded-full" />
+        <Skeleton className="h-8 w-18 rounded-full" />
+        <Skeleton className="h-8 w-24 rounded-full" />
+        <Skeleton className="h-8 w-16 rounded-full" />
+        <Skeleton className="h-8 w-20 rounded-full" />
+      </div>
+      <Skeleton className="h-40 w-full rounded-xl" />
+      <Skeleton className="h-40 w-full rounded-xl" />
     </div>
   );
 }
@@ -84,10 +89,10 @@ export function DesignTab() {
   }
 
   return (
-    <div className="flex h-full">
-      {/* Sub-navigation sidebar */}
-      <div className="w-[140px] shrink-0 border-r border-border bg-white overflow-y-auto">
-        <nav className="flex flex-col gap-0.5 py-3 px-2">
+    <div className="max-w-[680px] mx-auto px-4 py-6 space-y-5">
+      {/* Horizontal scrollable sub-nav pills */}
+      <div className="overflow-x-auto -mx-4 px-4">
+        <nav className="flex gap-1.5 pb-0.5 min-w-max">
           {SUB_TABS.map(({ key, labelKey, icon }) => {
             const isActive = activeSubTab === key;
             return (
@@ -96,38 +101,29 @@ export function DesignTab() {
                 type="button"
                 onClick={() => setActiveSubTab(key)}
                 className={cn(
-                  "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-colors text-left",
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap cursor-pointer",
                   isActive
-                    ? "font-semibold text-foreground"
-                    : "font-normal text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                    ? "bg-foreground text-background"
+                    : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
                 )}
               >
-                <span
-                  className={cn(
-                    "transition-colors",
-                    isActive ? "text-foreground" : "text-muted-foreground"
-                  )}
-                >
-                  {icon}
-                </span>
-                <span className="truncate">{t(labelKey)}</span>
+                {icon}
+                <span>{t(labelKey)}</span>
               </button>
             );
           })}
         </nav>
       </div>
 
-      {/* Active sub-tab content */}
-      <div className="flex-1 overflow-y-auto bg-[#FAFAFA]">
-        <div className="px-6 pt-10 pb-6">
-          {activeSubTab === "header" && <HeaderPanel />}
-          {activeSubTab === "theme" && <ThemePanel />}
-          {activeSubTab === "wallpaper" && <WallpaperPanel />}
-          {activeSubTab === "text" && <TextPanel />}
-          {activeSubTab === "buttons" && <ButtonsPanel />}
-          {activeSubTab === "colors" && <ColorsPanel />}
-          {activeSubTab === "footer" && <FooterPanel />}
-        </div>
+      {/* Active panel */}
+      <div>
+        {activeSubTab === "header" && <HeaderPanel />}
+        {activeSubTab === "theme" && <ThemePanel />}
+        {activeSubTab === "wallpaper" && <WallpaperPanel />}
+        {activeSubTab === "text" && <TextPanel />}
+        {activeSubTab === "buttons" && <ButtonsPanel />}
+        {activeSubTab === "colors" && <ColorsPanel />}
+        {activeSubTab === "footer" && <FooterPanel />}
       </div>
     </div>
   );
