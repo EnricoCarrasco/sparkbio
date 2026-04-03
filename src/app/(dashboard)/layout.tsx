@@ -80,15 +80,9 @@ export default function DashboardLayout({
     }
   }, [searchParams, fetchSubscription]);
 
-  // Gate: redirect to /trial if no active subscription
   const router = useRouter();
-  useEffect(() => {
-    if (!subLoading && !isPro) {
-      router.replace("/trial");
-    }
-  }, [subLoading, isPro, router]);
 
-  if (subLoading || !isPro) {
+  if (subLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
         <Loader2 className="size-6 animate-spin text-[#FF6B35]" />

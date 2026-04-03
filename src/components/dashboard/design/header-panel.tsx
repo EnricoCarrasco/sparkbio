@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Camera } from "lucide-react";
+import { Camera, Crown } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useProfileStore } from "@/lib/stores/profile-store";
 import { useThemeStore } from "@/lib/stores/theme-store";
+import { useSubscriptionStore } from "@/lib/stores/subscription-store";
+import { UpgradeDialog } from "@/components/billing/upgrade-dialog";
 import { AVATAR_MAX_SIZE, AVATAR_ACCEPTED_TYPES } from "@/lib/constants";
 import { ToggleGroup } from "./toggle-group";
 import { ColorInput } from "./color-input";
@@ -23,8 +25,10 @@ export function HeaderPanel() {
   const uploadAvatar = useProfileStore((s) => s.uploadAvatar);
   const theme = useThemeStore((s) => s.theme);
   const updateTheme = useThemeStore((s) => s.updateTheme);
+  const isPro = useSubscriptionStore((s) => s.isPro);
 
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!theme) return null;
@@ -101,16 +105,19 @@ export function HeaderPanel() {
         </div>
       </div>
 
-      {/* Profile layout */}
+      {/* Profile layout — hero is Pro */}
       <div className="space-y-2">
         <Label>{t("profileLayout")}</Label>
         <ToggleGroup
           options={[
             { value: "classic" as ProfileLayout, label: t("classic") },
-            { value: "hero" as ProfileLayout, label: t("hero") },
+            { value: "hero" as ProfileLayout, label: !isPro ? `${t("hero")} ✦` : t("hero") },
           ]}
           value={theme.profile_layout}
-          onChange={(v) => updateTheme({ profile_layout: v })}
+          onChange={(v) => {
+            if (v === "hero" && !isPro) { setUpgradeOpen(true); return; }
+            updateTheme({ profile_layout: v });
+          }}
         />
       </div>
 
@@ -128,7 +135,7 @@ export function HeaderPanel() {
         />
       </div>
 
-      {/* Avatar border */}
+      {/* Avatar border — thick and glow are Pro */}
       <div className="space-y-2">
         <Label>{t("avatarBorder")}</Label>
         <ToggleGroup
@@ -136,11 +143,14 @@ export function HeaderPanel() {
             { value: "none" as AvatarBorder, label: t("noneBorder") },
             { value: "subtle" as AvatarBorder, label: t("subtle") },
             { value: "solid" as AvatarBorder, label: t("solidBorder") },
-            { value: "thick" as AvatarBorder, label: t("thick") },
-            { value: "glow" as AvatarBorder, label: t("glow") },
+            { value: "thick" as AvatarBorder, label: !isPro ? `${t("thick")} ✦` : t("thick") },
+            { value: "glow" as AvatarBorder, label: !isPro ? `${t("glow")} ✦` : t("glow") },
           ]}
           value={theme.avatar_border}
-          onChange={(v) => updateTheme({ avatar_border: v })}
+          onChange={(v) => {
+            if ((v === "thick" || v === "glow") && !isPro) { setUpgradeOpen(true); return; }
+            updateTheme({ avatar_border: v });
+          }}
         />
       </div>
 
@@ -156,16 +166,19 @@ export function HeaderPanel() {
         />
       </div>
 
-      {/* Title style */}
+      {/* Title style — logo is Pro */}
       <div className="space-y-2">
         <Label>{t("titleStyle")}</Label>
         <ToggleGroup
           options={[
             { value: "text" as TitleStyle, label: t("textStyle") },
-            { value: "logo" as TitleStyle, label: t("logoStyle") },
+            { value: "logo" as TitleStyle, label: !isPro ? `${t("logoStyle")} ✦` : t("logoStyle") },
           ]}
           value={theme.title_style}
-          onChange={(v) => updateTheme({ title_style: v })}
+          onChange={(v) => {
+            if (v === "logo" && !isPro) { setUpgradeOpen(true); return; }
+            updateTheme({ title_style: v });
+          }}
         />
       </div>
 
@@ -201,6 +214,8 @@ export function HeaderPanel() {
         </div>
         <p className="text-xs text-muted-foreground">{t("hideBioDesc")}</p>
       </div>
+
+      <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
     </div>
   );
 }

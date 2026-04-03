@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { useDashboardStore, type DesignSubTab } from "@/lib/stores/dashboard-store";
 import { useThemeStore } from "@/lib/stores/theme-store";
+import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HeaderPanel } from "./design/header-panel";
 import { ThemePanel } from "./design/theme-panel";
@@ -21,7 +22,11 @@ import {
   RectangleHorizontal,
   Palette,
   PanelBottom,
+  Crown,
 } from "lucide-react";
+
+/** Sub-tabs that contain Pro-only features — show a small Crown badge for free users */
+const PRO_SUB_TABS: DesignSubTab[] = ["wallpaper", "footer"];
 
 const SUB_TABS: { key: DesignSubTab; labelKey: string; icon: React.ReactNode }[] = [
   {
@@ -81,6 +86,7 @@ export function DesignTab() {
   const t = useTranslations("dashboard.design");
   const activeSubTab = useDashboardStore((s) => s.activeDesignSubTab);
   const setActiveSubTab = useDashboardStore((s) => s.setActiveDesignSubTab);
+  const isPro = useSubscriptionStore((s) => s.isPro);
   const themeLoading = useThemeStore((s) => s.loading);
   const theme = useThemeStore((s) => s.theme);
 
@@ -95,6 +101,7 @@ export function DesignTab() {
         <nav className="flex gap-1.5 pb-0.5 min-w-max">
           {SUB_TABS.map(({ key, labelKey, icon }) => {
             const isActive = activeSubTab === key;
+            const showProBadge = !isPro && PRO_SUB_TABS.includes(key);
             return (
               <button
                 key={key}
@@ -109,6 +116,9 @@ export function DesignTab() {
               >
                 {icon}
                 <span>{t(labelKey)}</span>
+                {showProBadge && (
+                  <Crown className={cn("size-3", isActive ? "text-amber-300" : "text-amber-500")} />
+                )}
               </button>
             );
           })}

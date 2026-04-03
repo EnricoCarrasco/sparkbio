@@ -755,7 +755,15 @@
     "trialGateDesc": "Insira seus dados de pagamento para desbloquear todos os recursos do Viopage. Você não será cobrado durante o período de teste.",
     "manageSubscription": "Gerenciar assinatura",
     "feature_hideFooter": "Ocultar marca Viopage",
-    "billedYearlyAmount": "Cobrado R$420 / ano"
+    "feature_premiumThemes": "14 temas premium de designer",
+    "feature_advancedButtons": "Estilos de botao glass, outline e sombra",
+    "feature_wallpapers": "Gradientes, padroes e wallpapers animados",
+    "feature_fullAnalytics": "Analytics completo com origens e geografia",
+    "feature_businessCard": "Gerador de cartao de visita com IA",
+    "billedYearlyAmount": "Cobrado R$420 / ano",
+    "upgradeToUnlock": "Atualize para o Pro para desbloquear",
+    "proOnlyStyles": "Estilos glass e outline sao Pro",
+    "proOnlyFonts": "Mais 7 fontes disponiveis com Pro"
   },
   "common": {
     "save": "Salvar",

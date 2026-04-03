@@ -757,7 +757,15 @@
     "trialGateDesc": "Enter your payment details to unlock all Viopage features. You won't be charged during the trial period.",
     "manageSubscription": "Manage subscription",
     "feature_hideFooter": "Hide Viopage branding",
-    "billedYearlyAmount": "Billed $84 / year"
+    "feature_premiumThemes": "14 premium designer themes",
+    "feature_advancedButtons": "Glass, outline & shadow button styles",
+    "feature_wallpapers": "Gradients, patterns & animated wallpapers",
+    "feature_fullAnalytics": "Full analytics with referrers & geography",
+    "feature_businessCard": "AI-powered business card generator",
+    "billedYearlyAmount": "Billed $84 / year",
+    "upgradeToUnlock": "Upgrade to Pro to unlock this feature",
+    "proOnlyStyles": "Glass & outline styles are Pro",
+    "proOnlyFonts": "7 more fonts available with Pro"
   },
   "common": {
     "save": "Save",

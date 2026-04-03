@@ -28,6 +28,11 @@ interface UpgradeDialogProps {
 // Pro feature list — extend as features are added
 // ---------------------------------------------------------------------------
 const PRO_FEATURES = [
+  "premiumThemes",
+  "advancedButtons",
+  "wallpapers",
+  "fullAnalytics",
+  "businessCard",
   "hideFooter",
 ] as const;
 

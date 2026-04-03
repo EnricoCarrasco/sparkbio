@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { useThemeStore } from "@/lib/stores/theme-store";
 import { PREMADE_GRADIENTS } from "@/lib/constants";
 import { ColorInput } from "./color-input";
+import { ProFeatureGate } from "@/components/billing/pro-feature-gate";
 import { cn } from "@/lib/utils";
 import type { WallpaperStyle } from "@/types";
 
@@ -123,151 +124,153 @@ export function WallpaperPanel() {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Wallpaper style grid */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-medium text-foreground">{t("wallpaperStyle")}</h3>
-        <div className="grid grid-cols-4 gap-2.5">
-          {wallpaperCards.map((card) => (
-            <WallpaperStyleCard
-              key={card.value}
-              label={card.label}
-              preview={card.preview}
-              isActive={activeStyle === card.value}
-              onClick={() => handleStyleChange(card.value)}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Fill: background color picker */}
-      {activeStyle === "fill" && (
-        <ColorInput
-          id="wallpaper-bg"
-          label={t("bgColor")}
-          value={theme.bg_color}
-          onChange={(v) => updateTheme({ bg_color: v })}
-        />
-      )}
-
-      {/* Gradient controls */}
-      {activeStyle === "gradient" && (
-        <>
-          {/* Gradient style toggle */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium text-foreground">{t("gradientStyle")}</h3>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => updateTheme({ wallpaper_gradient_style: "custom" })}
-                className={cn(
-                  "flex-1 py-2.5 rounded-full text-sm font-medium transition-all",
-                  theme.wallpaper_gradient_style !== "premade"
-                    ? "border-2 border-foreground bg-white shadow-sm text-foreground"
-                    : "border border-border bg-transparent text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {t("custom")}
-              </button>
-              <button
-                type="button"
-                onClick={() => updateTheme({ wallpaper_gradient_style: "premade" })}
-                className={cn(
-                  "flex-1 py-2.5 rounded-full text-sm font-medium transition-all",
-                  theme.wallpaper_gradient_style === "premade"
-                    ? "border-2 border-foreground bg-white shadow-sm text-foreground"
-                    : "border border-border bg-transparent text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {t("premade")}
-              </button>
-            </div>
-          </div>
-
-          {/* Custom: from/to color pickers */}
-          {theme.wallpaper_gradient_style !== "premade" && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <ColorInput
-                  id="gradient-from"
-                  label="From"
-                  value={theme.bg_gradient_from ?? theme.bg_color}
-                  onChange={(v) => updateTheme({ bg_gradient_from: v })}
-                />
-                <ColorInput
-                  id="gradient-to"
-                  label="To"
-                  value={theme.bg_gradient_to ?? "#FFFFFF"}
-                  onChange={(v) => updateTheme({ bg_gradient_to: v })}
-                />
-              </div>
-              <div
-                className="w-full h-8 rounded-lg border border-border"
-                style={{
-                  background: `linear-gradient(${theme.bg_gradient_direction ?? "to bottom"}, ${theme.bg_gradient_from ?? theme.bg_color}, ${theme.bg_gradient_to ?? "#FFFFFF"})`,
-                }}
+    <ProFeatureGate featureLabel={t("wallpaperStyle")}>
+      <div className="space-y-6">
+        {/* Wallpaper style grid */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-medium text-foreground">{t("wallpaperStyle")}</h3>
+          <div className="grid grid-cols-4 gap-2.5">
+            {wallpaperCards.map((card) => (
+              <WallpaperStyleCard
+                key={card.value}
+                label={card.label}
+                preview={card.preview}
+                isActive={activeStyle === card.value}
+                onClick={() => handleStyleChange(card.value)}
               />
-            </div>
-          )}
+            ))}
+          </div>
+        </div>
 
-          {/* Pre-made gradient swatches */}
-          {theme.wallpaper_gradient_style === "premade" && (
+        {/* Fill: background color picker */}
+        {activeStyle === "fill" && (
+          <ColorInput
+            id="wallpaper-bg"
+            label={t("bgColor")}
+            value={theme.bg_color}
+            onChange={(v) => updateTheme({ bg_color: v })}
+          />
+        )}
+
+        {/* Gradient controls */}
+        {activeStyle === "gradient" && (
+          <>
+            {/* Gradient style toggle */}
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-foreground">{t("gradientSwatches")}</h3>
-              <div className="grid grid-cols-6 gap-2.5">
-                {PREMADE_GRADIENTS.map((g) => {
-                  const isActive = theme.wallpaper_gradient_preset === g.name;
-                  return (
-                    <button
-                      key={g.name}
-                      type="button"
-                      title={g.name}
-                      onClick={() => {
-                        updateTheme({
-                          wallpaper_gradient_preset: g.name,
-                          bg_gradient_from: g.from,
-                          bg_gradient_to: g.to,
-                          bg_gradient_direction: theme.bg_gradient_direction ?? "to bottom",
-                        });
-                      }}
-                      className={cn(
-                        "w-full aspect-square rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35]",
-                        isActive
-                          ? "ring-2 ring-offset-2 ring-foreground scale-110 shadow-md"
-                          : "hover:scale-105"
-                      )}
-                      style={{
-                        background: `linear-gradient(135deg, ${g.from}, ${g.to})`,
-                      }}
-                    />
-                  );
-                })}
+              <h3 className="text-sm font-medium text-foreground">{t("gradientStyle")}</h3>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => updateTheme({ wallpaper_gradient_style: "custom" })}
+                  className={cn(
+                    "flex-1 py-2.5 rounded-full text-sm font-medium transition-all",
+                    theme.wallpaper_gradient_style !== "premade"
+                      ? "border-2 border-foreground bg-white shadow-sm text-foreground"
+                      : "border border-border bg-transparent text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {t("custom")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateTheme({ wallpaper_gradient_style: "premade" })}
+                  className={cn(
+                    "flex-1 py-2.5 rounded-full text-sm font-medium transition-all",
+                    theme.wallpaper_gradient_style === "premade"
+                      ? "border-2 border-foreground bg-white shadow-sm text-foreground"
+                      : "border border-border bg-transparent text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {t("premade")}
+                </button>
               </div>
             </div>
-          )}
-        </>
-      )}
 
-      {/* Animate toggle */}
-      <div className="flex items-center justify-between py-0.5">
-        <span className="text-sm font-medium text-foreground">{t("animate")}</span>
-        <Switch
-          checked={theme.wallpaper_animate}
-          onCheckedChange={(v) => updateTheme({ wallpaper_animate: v })}
-        />
-      </div>
+            {/* Custom: from/to color pickers */}
+            {theme.wallpaper_gradient_style !== "premade" && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <ColorInput
+                    id="gradient-from"
+                    label="From"
+                    value={theme.bg_gradient_from ?? theme.bg_color}
+                    onChange={(v) => updateTheme({ bg_gradient_from: v })}
+                  />
+                  <ColorInput
+                    id="gradient-to"
+                    label="To"
+                    value={theme.bg_gradient_to ?? "#FFFFFF"}
+                    onChange={(v) => updateTheme({ bg_gradient_to: v })}
+                  />
+                </div>
+                <div
+                  className="w-full h-8 rounded-lg border border-border"
+                  style={{
+                    background: `linear-gradient(${theme.bg_gradient_direction ?? "to bottom"}, ${theme.bg_gradient_from ?? theme.bg_color}, ${theme.bg_gradient_to ?? "#FFFFFF"})`,
+                  }}
+                />
+              </div>
+            )}
 
-      {/* Noise toggle */}
-      <div className="flex items-center justify-between py-0.5">
-        <div className="space-y-0.5">
-          <p className="text-sm font-medium text-foreground">{t("noise")}</p>
-          <p className="text-xs text-muted-foreground">{t("noiseDesc")}</p>
+            {/* Pre-made gradient swatches */}
+            {theme.wallpaper_gradient_style === "premade" && (
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium text-foreground">{t("gradientSwatches")}</h3>
+                <div className="grid grid-cols-6 gap-2.5">
+                  {PREMADE_GRADIENTS.map((g) => {
+                    const isActive = theme.wallpaper_gradient_preset === g.name;
+                    return (
+                      <button
+                        key={g.name}
+                        type="button"
+                        title={g.name}
+                        onClick={() => {
+                          updateTheme({
+                            wallpaper_gradient_preset: g.name,
+                            bg_gradient_from: g.from,
+                            bg_gradient_to: g.to,
+                            bg_gradient_direction: theme.bg_gradient_direction ?? "to bottom",
+                          });
+                        }}
+                        className={cn(
+                          "w-full aspect-square rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35]",
+                          isActive
+                            ? "ring-2 ring-offset-2 ring-foreground scale-110 shadow-md"
+                            : "hover:scale-105"
+                        )}
+                        style={{
+                          background: `linear-gradient(135deg, ${g.from}, ${g.to})`,
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Animate toggle */}
+        <div className="flex items-center justify-between py-0.5">
+          <span className="text-sm font-medium text-foreground">{t("animate")}</span>
+          <Switch
+            checked={theme.wallpaper_animate}
+            onCheckedChange={(v) => updateTheme({ wallpaper_animate: v })}
+          />
         </div>
-        <Switch
-          checked={theme.wallpaper_noise}
-          onCheckedChange={(v) => updateTheme({ wallpaper_noise: v })}
-        />
+
+        {/* Noise toggle */}
+        <div className="flex items-center justify-between py-0.5">
+          <div className="space-y-0.5">
+            <p className="text-sm font-medium text-foreground">{t("noise")}</p>
+            <p className="text-xs text-muted-foreground">{t("noiseDesc")}</p>
+          </div>
+          <Switch
+            checked={theme.wallpaper_noise}
+            onCheckedChange={(v) => updateTheme({ wallpaper_noise: v })}
+          />
+        </div>
       </div>
-    </div>
+    </ProFeatureGate>
   );
 }

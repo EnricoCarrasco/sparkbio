@@ -1,9 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useTranslations } from "next-intl";
+import { Crown } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useThemeStore } from "@/lib/stores/theme-store";
+import { useSubscriptionStore } from "@/lib/stores/subscription-store";
+import { UpgradeDialog } from "@/components/billing/upgrade-dialog";
 import { ColorInput } from "./color-input";
 import { VisualOptionPicker } from "./visual-option-picker";
 import { ToggleGroup } from "./toggle-group";
@@ -11,8 +14,11 @@ import type { ButtonStyleV2, ButtonCorner, ButtonShadow, LinkGap, ButtonFontSize
 
 export function ButtonsPanel() {
   const t = useTranslations("dashboard.design");
+  const tBilling = useTranslations("billing");
   const theme = useThemeStore((s) => s.theme);
   const updateTheme = useThemeStore((s) => s.updateTheme);
+  const isPro = useSubscriptionStore((s) => s.isPro);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   if (!theme) return null;
 
@@ -108,42 +114,88 @@ export function ButtonsPanel() {
     },
   ];
 
+  // Free users: only solid style, round/full corners, no shadow
+  function handleStyleChange(v: ButtonStyleV2) {
+    if (!isPro && v !== "solid") {
+      setUpgradeOpen(true);
+      return;
+    }
+    updateTheme({ button_style_v2: v });
+  }
+
+  function handleCornerChange(v: ButtonCorner) {
+    if (!isPro && v !== "round" && v !== "full") {
+      setUpgradeOpen(true);
+      return;
+    }
+    updateTheme({ button_corner: v });
+  }
+
+  function handleShadowChange(v: ButtonShadow) {
+    if (!isPro && v !== "none") {
+      setUpgradeOpen(true);
+      return;
+    }
+    updateTheme({ button_shadow: v });
+  }
+
   return (
     <div className="space-y-6">
       <h3 className="text-sm font-semibold text-foreground">{t("buttonsSection")}</h3>
 
-      {/* Button style */}
+      {/* Button style — glass and outline are Pro */}
       <div className="space-y-2">
         <Label>{t("buttonStyleLabel")}</Label>
         <VisualOptionPicker
-          options={styleOptions}
+          options={styleOptions.map((opt) => ({
+            ...opt,
+            label: opt.value !== "solid" && !isPro
+              ? `${opt.label} ✦`
+              : opt.label,
+          }))}
           value={theme.button_style_v2}
-          onChange={(v) => updateTheme({ button_style_v2: v })}
+          onChange={handleStyleChange}
           columns={3}
         />
+        {!isPro && (
+          <p className="text-[10px] text-amber-600 flex items-center gap-1">
+            <Crown className="size-3" />
+            {tBilling("proOnlyStyles")}
+          </p>
+        )}
       </div>
 
-      {/* Corner roundness */}
+      {/* Corner roundness — square and rounder are Pro */}
       <div className="space-y-2">
         <Label>{t("cornerRadius")}</Label>
         <VisualOptionPicker
-          options={cornerOptions}
+          options={cornerOptions.map((opt) => ({
+            ...opt,
+            label: (opt.value === "square" || opt.value === "rounder") && !isPro
+              ? `${opt.label} ✦`
+              : opt.label,
+          }))}
           value={theme.button_corner}
-          onChange={(v) => updateTheme({ button_corner: v })}
+          onChange={handleCornerChange}
         />
       </div>
 
-      {/* Button shadow */}
+      {/* Button shadow — all except none are Pro */}
       <div className="space-y-2">
         <Label>{t("buttonShadow")}</Label>
         <VisualOptionPicker
-          options={shadowOptions}
+          options={shadowOptions.map((opt) => ({
+            ...opt,
+            label: opt.value !== "none" && !isPro
+              ? `${opt.label} ✦`
+              : opt.label,
+          }))}
           value={theme.button_shadow}
-          onChange={(v) => updateTheme({ button_shadow: v })}
+          onChange={handleShadowChange}
         />
       </div>
 
-      {/* Link spacing */}
+      {/* Link spacing — free for all */}
       <div className="space-y-2">
         <Label>{t("linkSpacing")}</Label>
         <ToggleGroup
@@ -157,7 +209,7 @@ export function ButtonsPanel() {
         />
       </div>
 
-      {/* Button text size */}
+      {/* Button text size — free for all */}
       <div className="space-y-2">
         <Label>{t("buttonTextSize")}</Label>
         <ToggleGroup
@@ -171,7 +223,7 @@ export function ButtonsPanel() {
         />
       </div>
 
-      {/* Button color */}
+      {/* Button color — free for all */}
       <ColorInput
         id="btn-color"
         label={t("buttonColor")}
@@ -179,13 +231,15 @@ export function ButtonsPanel() {
         onChange={(v) => updateTheme({ button_color: v })}
       />
 
-      {/* Button text color */}
+      {/* Button text color — free for all */}
       <ColorInput
         id="btn-text-color"
         label={t("buttonTextColor")}
         value={theme.button_text_color}
         onChange={(v) => updateTheme({ button_text_color: v })}
       />
+
+      <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
     </div>
   );
 }
