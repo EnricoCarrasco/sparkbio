@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { motion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { Check } from "lucide-react";
 import { EASE, stagger, fadeUp } from "@/lib/motion-variants";
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -68,6 +71,15 @@ function AvatarStack() {
 
 export function Hero() {
   const t = useTranslations("landing.hero");
+  const [username, setUsername] = useState("");
+  const router = useRouter();
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const trimmed = username.trim().toLowerCase().replace(/\s+/g, "-");
+    if (!trimmed) return;
+    router.push(`/register?username=${encodeURIComponent(trimmed)}`);
+  }
 
   return (
     <section
@@ -115,24 +127,73 @@ export function Hero() {
               {t("subtitle")}
             </motion.p>
 
-            {/* CTA buttons */}
+            {/* ── Username claim form ── */}
+            <motion.div variants={itemVariants} className="mt-9 w-full max-w-[520px]">
+              <form onSubmit={handleSubmit}>
+                {/* Desktop: horizontal pill */}
+                <div className="hidden sm:flex items-center rounded-full border border-[#D4D4D4] bg-[#FAFAFA] shadow-[0_2px_16px_rgba(0,0,0,0.08)] pl-6 pr-1.5 py-1.5 transition-all focus-within:border-[#FF6B35] focus-within:ring-2 focus-within:ring-[#FF6B35]/20 focus-within:bg-white">
+                  <span className="text-[15px] text-[#777] shrink-0 select-none whitespace-nowrap font-medium">
+                    viopage.com/
+                  </span>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="yourname"
+                    aria-label="Enter your username"
+                    className="flex-1 min-w-0 bg-transparent border-none outline-none text-base text-[#111] font-medium placeholder:text-[#bbb] placeholder:font-normal px-1.5"
+                  />
+                  <button
+                    type="submit"
+                    className="shrink-0 rounded-full bg-[#FF6B35] px-6 py-3 text-[15px] font-semibold text-white transition-all hover:bg-[#E85A25] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-2 cursor-pointer"
+                  >
+                    {t("claim")}
+                  </button>
+                </div>
+
+                {/* Mobile: stacked layout */}
+                <div className="flex flex-col gap-3 sm:hidden">
+                  <div className="flex items-center rounded-2xl border border-[#D4D4D4] bg-[#FAFAFA] shadow-[0_2px_16px_rgba(0,0,0,0.08)] px-5 py-3.5 transition-all focus-within:border-[#FF6B35] focus-within:ring-2 focus-within:ring-[#FF6B35]/20 focus-within:bg-white">
+                    <span className="text-[15px] text-[#777] shrink-0 select-none whitespace-nowrap font-medium">
+                      viopage.com/
+                    </span>
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="yourname"
+                      aria-label="Enter your username"
+                      className="flex-1 min-w-0 bg-transparent border-none outline-none text-base text-[#111] font-medium placeholder:text-[#bbb] placeholder:font-normal px-1.5"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full rounded-2xl bg-[#FF6B35] py-3.5 text-[15px] font-semibold text-white transition-all hover:bg-[#E85A25] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-2 cursor-pointer"
+                  >
+                    {t("claim")}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+
+            {/* ── Trust badges ── */}
             <motion.div
               variants={itemVariants}
-              className="mt-9 flex flex-wrap items-center gap-3"
+              className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2"
             >
-              {/* Primary: solid orange pill */}
-              <Link
-                href="/register"
-                className="inline-flex items-center rounded-full px-7 py-3.5 text-[15px] font-semibold text-white transition-all duration-200 hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-2"
-                style={{ backgroundColor: "#FF6B35" }}
-              >
-                {t("claim")}
-              </Link>
+              {(["trustLine1", "trustLine2", "trustLine3"] as const).map((key) => (
+                <span key={key} className="flex items-center gap-1.5 text-[13px] text-[#555]">
+                  <Check size={13} className="text-[#FF6B35] shrink-0" strokeWidth={2.5} aria-hidden="true" />
+                  {t(key)}
+                </span>
+              ))}
+            </motion.div>
 
-              {/* Secondary: outline pill */}
+            {/* ── Secondary CTA ── */}
+            <motion.div variants={itemVariants} className="mt-3">
               <Link
                 href="#themes"
-                className="inline-flex items-center rounded-full border border-[#DDD] bg-white px-7 py-3.5 text-[15px] font-semibold text-[#333] transition-all duration-200 hover:bg-[#F5F5F5] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#333] focus-visible:ring-offset-2"
+                className="text-[13px] font-medium text-[#888] underline-offset-4 hover:underline hover:text-[#555] transition-colors"
               >
                 {t("ctaSecondary")}
               </Link>

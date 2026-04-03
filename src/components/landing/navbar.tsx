@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { EASE } from "@/lib/motion-variants";
 
@@ -19,25 +18,7 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const t = useTranslations("landing.nav");
-  const [hidden, setHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const lastScrollY = useRef(0);
-  const { scrollY } = useScroll();
-
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const diff = latest - lastScrollY.current;
-    lastScrollY.current = latest;
-
-    // Hide on scroll down (past 100px), show on scroll up
-    if (latest < 100) {
-      setHidden(false);
-    } else if (diff > 5) {
-      setHidden(true);
-      setMobileOpen(false);
-    } else if (diff < -5) {
-      setHidden(false);
-    }
-  });
 
   function handleNavLinkClick() {
     setMobileOpen(false);
@@ -46,7 +27,7 @@ export function Navbar() {
   return (
     <motion.header
       initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: hidden ? -120 : 0 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: EASE }}
       className="fixed top-4 left-4 right-4 z-50"
     >

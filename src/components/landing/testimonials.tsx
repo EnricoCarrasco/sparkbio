@@ -56,7 +56,7 @@ const TESTIMONIALS: TestimonialData[] = [
   },
 ];
 
-const PRESS_LOGOS = ["FORBES", "WIRED", "VOGUE", "THE VERGE", "GQ"] as const;
+const PLATFORMS = ["Instagram", "TikTok", "YouTube", "X / Twitter", "LinkedIn"] as const;
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -183,14 +183,14 @@ export function Testimonials() {
               {t("featuredIn")}
             </motion.p>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-              {PRESS_LOGOS.map((logo) => (
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {PLATFORMS.map((platform) => (
                 <motion.span
-                  key={logo}
+                  key={platform}
                   variants={pressFadeIn}
-                  className="text-[15px] font-bold tracking-[0.06em] text-[#ccc] transition-colors duration-200 hover:text-[#999] cursor-default select-none"
+                  className="rounded-full bg-[#F0EDF0] px-4 py-2 text-[13px] font-medium text-[#594139]"
                 >
-                  {logo}
+                  {platform}
                 </motion.span>
               ))}
             </div>

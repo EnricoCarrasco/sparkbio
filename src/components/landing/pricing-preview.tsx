@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useInView, AnimatePresence } from "framer-motion";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { EASE, stagger as _stagger, fadeUp as _fadeUp } from "@/lib/motion-variants";
 
@@ -27,10 +27,31 @@ function CheckItem({ children }: { children: React.ReactNode }) {
   );
 }
 
+function ComparisonCheck() {
+  return (
+    <CheckIcon
+      className="mx-auto h-4 w-4 text-[#22c55e]"
+      strokeWidth={2.5}
+      aria-hidden="true"
+    />
+  );
+}
+
+function ComparisonX() {
+  return (
+    <XIcon
+      className="mx-auto h-4 w-4 text-[#ccc]"
+      strokeWidth={2}
+      aria-hidden="true"
+    />
+  );
+}
+
 // ── Main export ───────────────────────────────────────────────────────────────
 
 export function PricingPreview() {
   const t = useTranslations("landing.pricingPreview");
+  const tc = useTranslations("landing.comparison");
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: "-60px" });
   const [isYearly, setIsYearly] = useState(false);
@@ -43,6 +64,57 @@ export function PricingPreview() {
     t("proFeature5"),
     t("proFeature6"),
   ] as const;
+
+  const COMPARISON_ROWS = [
+    {
+      label: tc("premiumThemes"),
+      viopage: tc("premiumThemesViopage"),
+      ltFree: tc("premiumThemesLtFree"),
+      ltPro: tc("premiumThemesLtPro"),
+    },
+    {
+      label: tc("analytics"),
+      viopage: "check",
+      ltFree: "x",
+      ltPro: "check",
+    },
+    {
+      label: tc("customDomain"),
+      viopage: "check",
+      ltFree: "x",
+      ltPro: "check",
+    },
+    {
+      label: tc("removeBranding"),
+      viopage: "check",
+      ltFree: "x",
+      ltPro: "check",
+    },
+    {
+      label: tc("dragAndDrop"),
+      viopage: "check",
+      ltFree: "check",
+      ltPro: "check",
+    },
+    {
+      label: tc("freeTrial"),
+      viopage: tc("freeTrialViopage"),
+      ltFree: tc("freeTrialLtFree"),
+      ltPro: tc("freeTrialLtPro"),
+    },
+    {
+      label: tc("price"),
+      viopage: tc("priceViopage"),
+      ltFree: tc("priceLtFree"),
+      ltPro: tc("priceLtPro"),
+    },
+  ] as const;
+
+  function renderCell(value: string) {
+    if (value === "check") return <ComparisonCheck />;
+    if (value === "x") return <ComparisonX />;
+    return <span className="text-[13px] text-[#555]">{value}</span>;
+  }
 
   return (
     <section
@@ -189,8 +261,62 @@ export function PricingPreview() {
                 >
                   {t("proButton")}
                 </Link>
+
+                {/* Cancel guarantee */}
+                <p className="mt-3 text-center text-[13px] text-[#999]">
+                  {t("cancelGuarantee")}
+                </p>
               </div>
             </motion.div>
+          </motion.div>
+
+          {/* ── Comparison table ── */}
+          <motion.div variants={fadeUp} className="mt-16 w-full">
+            <h3
+              className="text-center text-[22px] md:text-[28px] font-bold tracking-[-0.02em] text-[#1b1b1d] mb-8"
+              style={{ fontFamily: "var(--font-sans), 'Poppins', sans-serif" }}
+            >
+              {tc("title")}
+            </h3>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-[#eee]">
+                    <th className="py-3 pr-4 text-[13px] font-semibold text-[#999] uppercase tracking-[0.1em]">
+                      {tc("feature")}
+                    </th>
+                    <th className="py-3 px-4 text-center text-[13px] font-bold text-[#FF6B35] uppercase tracking-[0.1em]">
+                      {tc("viopage")}
+                    </th>
+                    <th className="py-3 px-4 text-center text-[13px] font-semibold text-[#999] uppercase tracking-[0.1em]">
+                      {tc("linktreeFree")}
+                    </th>
+                    <th className="py-3 pl-4 text-center text-[13px] font-semibold text-[#999] uppercase tracking-[0.1em]">
+                      {tc("linktreePro")}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {COMPARISON_ROWS.map((row) => (
+                    <tr key={row.label} className="border-b border-[#f5f5f5]">
+                      <td className="py-3.5 pr-4 text-[14px] font-medium text-[#333]">
+                        {row.label}
+                      </td>
+                      <td className="py-3.5 px-4 text-center">
+                        {renderCell(row.viopage)}
+                      </td>
+                      <td className="py-3.5 px-4 text-center">
+                        {renderCell(row.ltFree)}
+                      </td>
+                      <td className="py-3.5 pl-4 text-center">
+                        {renderCell(row.ltPro)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </motion.div>
         </motion.div>
       </div>

@@ -5,6 +5,7 @@ import { ThemeGallery } from "@/components/landing/theme-gallery";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { FeaturesBento } from "@/components/landing/features-bento";
 import { Testimonials } from "@/components/landing/testimonials";
+import { MidCTA } from "@/components/landing/mid-cta";
 import { PricingPreview } from "@/components/landing/pricing-preview";
 import { FAQ } from "@/components/landing/faq";
 import { CTA } from "@/components/landing/cta";
@@ -31,6 +32,7 @@ export default function LandingPage() {
       <HowItWorks />
       <FeaturesBento />
       <Testimonials />
+      <MidCTA />
       <PricingPreview />
       <FAQ />
       <CTA />
