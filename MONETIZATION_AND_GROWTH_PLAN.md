@@ -24,7 +24,7 @@ Your codebase is solid. Here's what's fully implemented and working:
 | Code Quality | High | Clean architecture, Zod validation, RLS, rate limiting |
 | Tests | None | No test framework set up yet |
 
-**Current pricing: Free tier + Pro at EUR 9/month or EUR 84/year (7-day trial)**
+**Current pricing: Pro only at EUR 9/month or EUR 84/year (7-day trial, no free tier — users must pay to access dashboard)**
 
 ### What's Missing (Gaps That Matter)
 
@@ -69,31 +69,113 @@ Your codebase is solid. Here's what's fully implemented and working:
 
 ## Part 3: Monetization Strategy
 
-### Recommended Pricing Tiers
+### Current State (What Needs to Change)
 
-| | Free | Pro | Business (new) |
-|---|------|-----|----------------|
-| **Price** | $0 | $7-9/mo ($5-7 annual) | $19-24/mo ($15-19 annual) |
-| **Links** | Unlimited | Unlimited | Unlimited |
-| **Themes** | 12 basic presets | All presets + advanced customization | Everything in Pro |
-| **Analytics** | Basic (total views/clicks, 7 days) | Full analytics (referrers, geo, devices, unlimited history) | Everything in Pro + export |
-| **Branding** | "Made with Viopage" badge | Remove badge | Remove badge |
-| **Custom domain** | No | Yes (1 domain) | Yes (unlimited) |
-| **Email collection** | No | Yes (collect emails) | Yes + basic automations |
-| **Commerce** | No | Digital products (5% fee) | Digital products (0% fee) |
-| **Business Card** | No | Yes | Yes |
-| **AI Features** | No | Basic AI (bio writer, link suggestions) | Full AI suite |
-| **Support** | Community | Email | Priority |
+Right now there is **no free tier**. After signup, users are immediately redirected to `/trial` with no way to skip. The dashboard layout (`(dashboard)/layout.tsx`) checks `isPro` and redirects non-subscribers back to `/trial`. The only feature currently gated behind `isPro` is **hide footer** (`footer-panel.tsx` + `theme-store.ts`). Curated themes show Pro badges but the click handler is a no-op.
+
+**This means**: users who don't pay immediately just leave. They never create a profile, never share a link, and never advertise Viopage. You lose the viral loop entirely.
+
+### Recommended Change: Real Free Tier + Feature Gating
+
+**Implementation**: Remove the `/trial` redirect from `(dashboard)/layout.tsx`. Let all users access the dashboard. Gate specific features behind `isPro` checks instead.
+
+### Detailed Free vs Pro Feature Breakdown
+
+#### LINKS & SOCIAL ICONS
+
+| Feature | Free | Pro |
+|---------|------|-----|
+| Number of links | **Up to 5 links** | Unlimited |
+| Social icons | **Up to 4 icons** | Unlimited |
+| Drag-and-drop reorder | Yes | Yes |
+| Toggle link visibility | Yes | Yes |
+| Link types (URL, Pix, Email, WhatsApp) | Yes | Yes |
+
+**Why limit to 5 links**: Unlimited links on free is what Linktree does, but 5 links is genuinely useful for most creators (Instagram allows 5 links natively now). It gives them a working profile while creating a natural upgrade moment when they outgrow it. This is the most visible "I need more" trigger.
+
+#### THEME & DESIGN
+
+| Feature | Free | Pro |
+|---------|------|-----|
+| Theme presets (12 basic) | Yes | Yes |
+| Curated/premium themes | No (show locked with Pro badge) | Yes |
+| Custom background color | Yes | Yes |
+| Custom text color | Yes | Yes |
+| Custom button color | Yes | Yes |
+| Font selection (10 fonts) | **3 fonts** (Inter, Poppins, DM Sans) | All 10 fonts |
+| Avatar shape (circle/rounded/square) | Yes | Yes |
+| Avatar border style | **Basic only** (none, subtle) | All 5 styles |
+| Button style (basic) | **2 styles** (rounded, pill) | All 5+ styles |
+| Button gap | Yes | Yes |
+| Wallpaper styles (gradient, blur, pattern) | No (show locked) | Yes |
+| Gradient presets (9 options) | No | Yes |
+| Animated wallpapers | No | Yes |
+| Advanced button v2 (solid/glass/outline) | No | Yes |
+| Button corner options | No | Yes |
+| Button shadow options | No | Yes |
+| Profile layout (classic/hero) | **Classic only** | Both |
+| Title customization (font, size, logo) | No | Yes |
+| Hide Viopage footer | No | Yes |
+
+**Why gate design this way**: Free users get a good-looking profile with basic customization. They can see the advanced options (wallpapers, gradients, hero layout) but they're locked with Pro badges and an upgrade button. This creates "I want that" desire every time they visit the design tab.
+
+#### ANALYTICS
+
+| Feature | Free | Pro |
+|---------|------|-----|
+| Total page views (all time) | Yes | Yes |
+| Total link clicks (all time) | Yes | Yes |
+| Click-through rate | Yes | Yes |
+| Time range: last 7 days | Yes | Yes |
+| Time range: last 30 days | No | Yes |
+| Time range: all-time history | No | Yes |
+| Views-per-day chart | **Last 7 days only** | Full history |
+| Top links by clicks | **Top 3** | Top 5+ |
+| Per-link detailed analytics | No (show locked) | Yes |
+| Traffic sources (referrers) | No (show locked) | Yes |
+| Geographic breakdown | No (show locked) | Yes |
+| Device/browser/OS breakdown | No (show locked) | Yes |
+
+**Why gate analytics this way**: Basic stats (totals + 7-day trend) give free users proof their profile is working. But the moment they wonder "where is my traffic coming from?" or "which country are my visitors in?" — that's the upgrade trigger. Analytics is the #1 reason creators upgrade on Linktree.
+
+#### BUSINESS CARD & AI
+
+| Feature | Free | Pro |
+|---------|------|-----|
+| Business card generator | No | Yes |
+| AI logo generation | No | Yes |
+| AI background generation | No | Yes |
+| QR code on profile | Yes | Yes |
+| PWA / Add to Home Screen | Yes | Yes |
+
+#### BRANDING & PROFILE
+
+| Feature | Free | Pro |
+|---------|------|-----|
+| Public profile at viopage.com/username | Yes | Yes |
+| "Made with Viopage" clickable badge | **Always shown** (links to signup) | Can be hidden |
+| Custom domain | No (future feature) | Yes (future feature) |
+| SEO (Open Graph, JSON-LD) | Yes | Yes |
+| Profile bio | Yes | Yes |
+| Display name | Yes | Yes |
+
+### Pricing
+
+| | Free | Pro |
+|---|------|-----|
+| **Monthly** | EUR 0 | EUR 9/month |
+| **Yearly** | EUR 0 | EUR 84/year (EUR 7/mo, save 22%) |
+| **Trial** | - | 7-day free trial |
 
 ### Why This Structure Works
 
-1. **Free tier is genuinely useful** - unlimited links + basic themes + basic analytics. Stanford research shows successful freemium delivers 40-50% of full product value free. If the free tier sucks, users leave (they don't upgrade).
+1. **Free tier is genuinely useful** - 5 links + basic themes + basic analytics + working public profile. Stanford research shows successful freemium delivers 40-50% of full product value free. If the free tier sucks, users leave (they don't upgrade).
 
-2. **"Made with Viopage" badge on free** - this is your #1 growth engine. Beacons attributes 77% of signups to this. ClickFunnels attributes ~$12M ARR to their "powered by" badge. Every free profile is an ad for Viopage.
+2. **"Made with Viopage" clickable badge on free** - this is your #1 growth engine. Beacons attributes 77% of signups to this. ClickFunnels attributes ~$12M ARR to their "powered by" badge. Every free profile is an ad for Viopage.
 
-3. **Custom domains drive upgrades** - professional domains increase CTR 30-50%. Beacons gives first year free on Pro. This is the #1 upgrade trigger alongside removing branding.
+3. **Upgrade triggers are natural, not annoying** - users hit limits organically (6th link, wanting referrer data, wanting a gradient wallpaper) rather than being locked out entirely. Show locked features with Pro badges so they know what they're missing.
 
-4. **Business tier for monetizing creators** - 0% platform fee vs 5% on Pro (vs Beacons' 9% on free, Linktree's 12% on free). This is a strong selling point.
+4. **No Business tier yet** - keep it simple with Free + Pro until you have 1,000+ paying users. Then consider adding a Business tier with commerce, 0% fees, and advanced features. Don't over-segment too early.
 
 ### Conversion Expectations
 
