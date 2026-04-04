@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { isLightColor } from "@/lib/color-utils";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -19,7 +20,11 @@ function detectPlatform(): Platform {
   return "desktop";
 }
 
-export function AddToHomeButton() {
+interface AddToHomeButtonProps {
+  bgColor?: string;
+}
+
+export function AddToHomeButton({ bgColor }: AddToHomeButtonProps) {
   const t = useTranslations("addToHome");
   const [platform, setPlatform] = useState<Platform>("desktop");
   const [open, setOpen] = useState(false);
@@ -47,6 +52,8 @@ export function AddToHomeButton() {
     setOpen(true);
   }, []);
 
+  const isDark = bgColor ? !isLightColor(bgColor) : false;
+
   // Only render on mobile
   if (platform === "desktop") return null;
 
@@ -63,6 +70,7 @@ export function AddToHomeButton() {
           src="/images/landing/viopage-icon.png"
           alt="Viopage"
           className="h-16 w-auto"
+          style={isDark ? { filter: "brightness(0) invert(1)" } : undefined}
         />
       </button>
 

@@ -8,6 +8,7 @@ import { useProfileStore } from "@/lib/stores/profile-store";
 import { useSocialStore } from "@/lib/stores/social-store";
 import { Phone, Mail, Globe } from "lucide-react";
 import { getBrandIconPath } from "@/lib/brand-icons";
+import { isLightColor } from "@/lib/color-utils";
 
 // The card renders at a fixed internal width so fonts/elements stay crisp.
 // CSS scale() shrinks it to fit the container on any screen.
@@ -51,13 +52,6 @@ interface CardPreviewProps {
   demoMode?: boolean;
 }
 
-function isLightColor(hex: string) {
-  const c = hex.replace("#", "");
-  const r = parseInt(c.substring(0, 2), 16);
-  const g = parseInt(c.substring(2, 4), 16);
-  const b = parseInt(c.substring(4, 6), 16);
-  return (r * 299 + g * 587 + b * 114) / 1000 > 140;
-}
 
 export function CardPreview({ cardRef, demoMode = false }: CardPreviewProps) {
   const t = useTranslations("dashboard.businessCard");

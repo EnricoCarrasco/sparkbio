@@ -43,11 +43,33 @@ function buildBackgroundStyle(theme: PublicProfile["theme"]): React.CSSPropertie
   return { backgroundColor: bg_color };
 }
 
+function buildGoogleFontsUrl(theme: PublicProfile["theme"]): string | null {
+  const families = new Set<string>();
+  if (theme.font_family) families.add(theme.font_family);
+  if (theme.title_font) families.add(theme.title_font);
+  if (families.size === 0) return null;
+  const params = [...families]
+    .map((f) => `family=${f.replace(/ /g, "+")}:wght@300;400;500;600;700`)
+    .join("&");
+  return `https://fonts.googleapis.com/css2?${params}&display=swap`;
+}
+
 export function ProfilePage({ data }: ProfilePageProps) {
   const { profile, links, theme, social_icons, subscription } = data;
   const t = useTranslations("publicProfile");
 
   const backgroundStyle = useMemo(() => buildBackgroundStyle(theme), [theme]);
+  const fontsUrl = useMemo(() => buildGoogleFontsUrl(theme), [theme]);
+
+  useEffect(() => {
+    if (!fontsUrl) return;
+    const existing = document.querySelector(`link[href="${fontsUrl}"]`);
+    if (existing) return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = fontsUrl;
+    document.head.appendChild(link);
+  }, [fontsUrl]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -144,68 +166,69 @@ export function ProfilePage({ data }: ProfilePageProps) {
       {/* Non-rendering analytics tracker */}
       <AnalyticsTracker profileId={profile.id} />
 
-      {/* Content column — footer pushed to bottom via flex-grow spacer */}
-      <main className="w-full max-w-[680px] mx-auto flex flex-col items-center gap-6 px-4 py-12 md:py-16 relative z-10 min-h-screen">
+      {/* Content column — content centers vertically when sparse, footer stays at bottom */}
+      <main className="w-full max-w-[680px] mx-auto flex flex-col items-center px-4 relative z-10 flex-1">
         {/* Add to Home Screen button (mobile only) */}
-        <AddToHomeButton />
-        {/* Profile header */}
-        <ProfileHeader profile={profile} textColor={theme.text_color} theme={theme} />
+        <AddToHomeButton bgColor={theme.bg_color} />
 
-        {/* Social icons row (icon-mode only) */}
-        {bubbleIcons.length > 0 && (
-          <SocialIconsBar socialIcons={bubbleIcons} textColor={theme.text_color} />
-        )}
+        {/* Content wrapper — centers vertically when space is available */}
+        <div className="flex-1 w-full flex flex-col items-center justify-center gap-6 py-12 md:py-16">
+          {/* Profile header */}
+          <ProfileHeader profile={profile} textColor={theme.text_color} theme={theme} />
 
-        {/* Grid-mode social icons — large brand circles */}
-        {gridIcons.length > 0 && (
-          <SocialGrid icons={gridIcons} />
-        )}
+          {/* Social icons row (icon-mode only) */}
+          {bubbleIcons.length > 0 && (
+            <SocialIconsBar socialIcons={bubbleIcons} textColor={theme.text_color} />
+          )}
 
-        {/* Link buttons + button-mode social icons */}
-        {(activeLinks.length > 0 || buttonIcons.length > 0) && (
-          <div className={`w-full flex flex-col ${
-            theme.link_gap === "compact" ? "gap-2" :
-            theme.link_gap === "relaxed" ? "gap-5" :
-            "gap-3"
-          }`}>
-            {/* Button-mode social icons first */}
-            {buttonIcons
-              .sort((a, b) => a.position - b.position)
-              .map((si, index) => (
-                <SocialButton
-                  key={si.id}
-                  icon={si}
+          {/* Grid-mode social icons — large brand circles */}
+          {gridIcons.length > 0 && (
+            <SocialGrid icons={gridIcons} />
+          )}
+
+          {/* Link buttons + button-mode social icons */}
+          {(activeLinks.length > 0 || buttonIcons.length > 0) && (
+            <div className={`w-full flex flex-col ${
+              theme.link_gap === "compact" ? "gap-2" :
+              theme.link_gap === "relaxed" ? "gap-5" :
+              "gap-3"
+            }`}>
+              {/* Button-mode social icons first */}
+              {buttonIcons
+                .sort((a, b) => a.position - b.position)
+                .map((si, index) => (
+                  <SocialButton
+                    key={si.id}
+                    icon={si}
+                    profileId={profile.id}
+                    theme={theme}
+                    index={index}
+                  />
+                ))}
+              {/* Regular links */}
+              {activeLinks.map((link, index) => (
+                <ProfileLink
+                  key={link.id}
+                  link={link}
                   profileId={profile.id}
                   theme={theme}
-                  index={index}
+                  index={buttonIcons.length + index}
                 />
               ))}
-            {/* Regular links */}
-            {activeLinks.map((link, index) => (
-              <ProfileLink
-                key={link.id}
-                link={link}
-                profileId={profile.id}
-                theme={theme}
-                index={buttonIcons.length + index}
-              />
-            ))}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
 
-        {/* Spacer — pushes footer to bottom when content is sparse */}
-        <div className="flex-1" />
-
-        {/* Viopage branding CTA */}
+        {/* Viopage branding CTA — pinned at bottom */}
         {showFooter && (
           <a
             href="https://viopage.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 mb-2 inline-flex items-center justify-center rounded-full bg-[#FF6B35] px-5 py-2.5 text-white shadow-md hover:shadow-lg hover:brightness-110 active:scale-[0.98] transition-all max-w-full whitespace-nowrap"
+            className="mb-4 inline-flex items-center justify-center rounded-full bg-[#FF6B35] px-5 py-2.5 text-white shadow-md hover:shadow-lg hover:brightness-110 active:scale-[0.98] transition-all max-w-full whitespace-nowrap"
           >
             <span className="text-[13px] sm:text-sm font-semibold truncate">
-              viopage · {t("joinCta", { username: profile.username })}
+              {t("joinCta", { username: profile.username })}
             </span>
           </a>
         )}

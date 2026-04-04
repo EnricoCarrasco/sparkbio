@@ -17,11 +17,11 @@ function getCornerRadius(corner: string): string {
   }
 }
 
-function getShadow(shadow: string): string {
+function getShadow(shadow: string, color: string): string {
   switch (shadow) {
-    case "soft": return "0 2px 4px rgba(0,0,0,0.1)";
-    case "strong": return "0 4px 12px rgba(0,0,0,0.2)";
-    case "hard": return "4px 4px 0 rgba(0,0,0,0.8)";
+    case "soft": return `0 2px 8px ${color}20, 0 1px 3px ${color}15`;
+    case "strong": return `0 4px 16px ${color}30, 0 2px 6px ${color}20`;
+    case "hard": return `3px 3px 0 ${color}40`;
     default: return "none";
   }
 }
@@ -44,7 +44,7 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
   const title = icon.display_title || platformLabel;
 
   const borderRadius = getCornerRadius(button_corner);
-  const boxShadow = getShadow(button_shadow);
+  const boxShadow = getShadow(button_shadow, button_color);
 
   const outerStyle: React.CSSProperties = {
     display: "flex",
@@ -52,13 +52,13 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
     gap: "12px",
     width: "100%",
     minHeight: "56px",
-    padding: "10px 20px",
+    padding: "12px 20px",
     fontSize: ({ small: "13px", medium: "15px", large: "17px" })[theme.button_font_size] ?? "15px",
     fontWeight: 600,
-    letterSpacing: "0.01em",
+    letterSpacing: "0.02em",
     cursor: "pointer",
     textDecoration: "none",
-    transition: "opacity 0.15s ease",
+    transition: "all 0.2s ease",
     lineHeight: 1.4,
     wordBreak: "break-word",
     borderRadius,
@@ -67,15 +67,15 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
 
   switch (button_style_v2) {
     case "glass":
-      outerStyle.backgroundColor = `${button_color}33`;
+      outerStyle.backgroundColor = `${button_color}22`;
       outerStyle.color = button_color;
-      outerStyle.border = `1px solid ${button_color}66`;
-      outerStyle.backdropFilter = "blur(12px)";
+      outerStyle.border = `1px solid ${button_color}44`;
+      outerStyle.backdropFilter = "blur(16px) saturate(1.5)";
       break;
     case "outline":
       outerStyle.backgroundColor = "transparent";
       outerStyle.color = button_color;
-      outerStyle.border = `2px solid ${button_color}`;
+      outerStyle.border = `1.5px solid ${button_color}`;
       break;
     case "solid":
     default:
@@ -162,9 +162,9 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
           aria-label={title}
           style={outerStyle}
           onClick={handlePixCopy}
-          whileHover={{ scale: 1.02, opacity: 0.92 }}
-          whileTap={{ scale: 0.97, opacity: 0.85 }}
-          transition={{ duration: 0.15, ease: "easeOut" }}
+          whileHover={{ scale: 1.015, y: -1 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
         >
           {innerContent}
         </motion.button>
@@ -176,9 +176,9 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
           aria-label={title}
           style={outerStyle}
           onClick={isInIframe ? (e: React.MouseEvent) => { e.preventDefault(); window.open(icon.url, "_blank", "noopener,noreferrer"); } : fireAnalytics}
-          whileHover={{ scale: 1.02, opacity: 0.92 }}
-          whileTap={{ scale: 0.97, opacity: 0.85 }}
-          transition={{ duration: 0.15, ease: "easeOut" }}
+          whileHover={{ scale: 1.015, y: -1 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
         >
           {innerContent}
         </motion.a>

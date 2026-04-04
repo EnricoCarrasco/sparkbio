@@ -20,11 +20,11 @@ function getCornerRadius(corner: string): string {
   }
 }
 
-function getShadow(shadow: string): string {
+function getShadow(shadow: string, color: string): string {
   switch (shadow) {
-    case "soft": return "0 2px 4px rgba(0,0,0,0.1)";
-    case "strong": return "0 4px 12px rgba(0,0,0,0.2)";
-    case "hard": return "4px 4px 0 rgba(0,0,0,0.8)";
+    case "soft": return `0 2px 8px ${color}20, 0 1px 3px ${color}15`;
+    case "strong": return `0 4px 16px ${color}30, 0 2px 6px ${color}20`;
+    case "hard": return `3px 3px 0 ${color}40`;
     default: return "none";
   }
 }
@@ -40,18 +40,18 @@ function getLinkStyles(theme: Theme): React.CSSProperties {
     justifyContent: "center",
     width: "100%",
     minHeight: "56px",
-    padding: "12px 24px",
+    padding: "14px 24px",
     fontSize: fontSizeMap[button_font_size] ?? "15px",
     fontWeight: 600,
-    letterSpacing: "0.01em",
+    letterSpacing: "0.02em",
     cursor: "pointer",
     textDecoration: "none",
-    transition: "opacity 0.15s ease",
+    transition: "all 0.2s ease",
     lineHeight: 1.4,
     textAlign: "center",
     wordBreak: "break-word",
     borderRadius: getCornerRadius(button_corner),
-    boxShadow: getShadow(button_shadow),
+    boxShadow: getShadow(button_shadow, button_color),
   };
 
   // Use new v2 style if available, fall back to legacy
@@ -61,18 +61,18 @@ function getLinkStyles(theme: Theme): React.CSSProperties {
     case "glass":
       return {
         ...base,
-        backgroundColor: `${button_color}33`,
+        backgroundColor: `${button_color}22`,
         color: button_color,
-        border: `1px solid ${button_color}66`,
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
+        border: `1px solid ${button_color}44`,
+        backdropFilter: "blur(16px) saturate(1.5)",
+        WebkitBackdropFilter: "blur(16px) saturate(1.5)",
       };
     case "outline":
       return {
         ...base,
         backgroundColor: "transparent",
         color: button_color,
-        border: `2px solid ${button_color}`,
+        border: `1.5px solid ${button_color}`,
       };
     case "solid":
     default:
@@ -129,9 +129,9 @@ export function ProfileLink({ link, profileId, theme, index }: ProfileLinkProps)
         rel="noopener noreferrer"
         style={styles}
         onClick={handleClick}
-        whileHover={{ scale: 1.02, opacity: 0.92 }}
-        whileTap={{ scale: 0.97, opacity: 0.85 }}
-        transition={{ duration: 0.15, ease: "easeOut" }}
+        whileHover={{ scale: 1.015, y: -1 }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
       >
         {link.title}
       </motion.a>
