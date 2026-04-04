@@ -806,19 +806,111 @@ export const FeatureHighlight: React.FC<{ variant: string }> = () => {
 
 ### Batch Render ALL Videos at Once
 
+**Option 1: CLI (quick test)**
 ```bash
-# Render a single video (test first)
 cd videos
-npx remotion render ThemeShowcase theme-midnight out/midnight.mp4
 
-# Render ALL theme videos in one command
-npx remotion render --concurrency=4 ThemeShowcase out/
+# Render a single video first
+npx remotion render theme-midnight out/midnight.mp4
 
-# Or use this script to render every composition:
+# Render every composition in the project
 for comp in $(npx remotion compositions src/Root.tsx --quiet); do
   echo "Rendering $comp..."
   npx remotion render "$comp" "out/${comp}.mp4"
 done
+```
+
+**Option 2: Node Script (recommended for 20+ videos)**
+
+This is the proper pattern — bundle once, render many. Create `videos/render-all.mjs`:
+
+```js
+import { bundle } from "@remotion/bundler";
+import { renderMedia, selectComposition } from "@remotion/renderer";
+import path from "path";
+
+// Install: npm i @remotion/bundler @remotion/renderer
+const THEMES = [
+  { name: "Viopage Default", bg: "#FAFAFA", text: "#1E1E2E", button: "#FF6B35", buttonText: "#FFF", tier: "free" },
+  { name: "Midnight", bg: "#0F0F23", text: "#E8E8E8", button: "#6366F1", buttonText: "#FFF", tier: "free" },
+  { name: "Ocean Breeze", bg: "#E0F7FA", text: "#004D40", button: "#00897B", buttonText: "#FFF", tier: "free" },
+  { name: "Sunset", bg: "#FFF3E0", text: "#BF360C", button: "#FF5722", buttonText: "#FFF", tier: "free" },
+  { name: "Minimal", bg: "#FFFFFF", text: "#111111", button: "#111111", buttonText: "#FFF", tier: "free" },
+  { name: "Cream", bg: "#FFFDE7", text: "#3E2723", button: "#795548", buttonText: "#FFF", tier: "free" },
+  { name: "Rose Gold", bg: "#FDF2F8", text: "#831843", button: "#EC4899", buttonText: "#FFF", tier: "pro" },
+  { name: "Neon Tokyo", bg: "#0A0A1A", text: "#00FFD1", button: "#7C3AED", buttonText: "#FFF", tier: "pro" },
+  { name: "Sage Garden", bg: "#F0FDF4", text: "#14532D", button: "#22C55E", buttonText: "#FFF", tier: "pro" },
+  { name: "Arctic", bg: "#EFF6FF", text: "#1E3A5F", button: "#3B82F6", buttonText: "#FFF", tier: "pro" },
+  { name: "Coral Reef", bg: "#FFF1F0", text: "#7F1D1D", button: "#F43F5E", buttonText: "#FFF", tier: "pro" },
+  { name: "Lavender Dream", bg: "#FAF5FF", text: "#581C87", button: "#A855F7", buttonText: "#FFF", tier: "pro" },
+  { name: "Charcoal", bg: "#1C1C1E", text: "#F5F5F7", button: "#FF9F0A", buttonText: "#1C1C1E", tier: "pro" },
+  { name: "Mocha", bg: "#2C1810", text: "#F5E6D3", button: "#D4A574", buttonText: "#2C1810", tier: "pro" },
+  { name: "Cyberpunk", bg: "#0D0221", text: "#FF00FF", button: "#00FFFF", buttonText: "#0D0221", tier: "pro" },
+  { name: "Emerald Noir", bg: "#022C22", text: "#D1FAE5", button: "#10B981", buttonText: "#FFF", tier: "pro" },
+  { name: "Peach Sorbet", bg: "#FFF7ED", text: "#9A3412", button: "#FB923C", buttonText: "#FFF", tier: "pro" },
+  { name: "Monochrome", bg: "#18181B", text: "#FAFAFA", button: "#FAFAFA", buttonText: "#18181B", tier: "pro" },
+  { name: "Royal Velvet", bg: "#1E1B4B", text: "#E0E7FF", button: "#818CF8", buttonText: "#FFF", tier: "pro" },
+  { name: "Cotton Candy", bg: "#FDF2F8", text: "#701A75", button: "#E879F9", buttonText: "#FFF", tier: "pro" },
+];
+
+const start = async () => {
+  console.log("Bundling project...");
+  const bundleLocation = await bundle({
+    entryPoint: path.resolve("./src/index.ts"),
+  });
+
+  console.log(`Rendering ${THEMES.length} theme videos...`);
+  for (const theme of THEMES) {
+    const id = `theme-${theme.name.toLowerCase().replace(/\s/g, "-")}`;
+    const composition = await selectComposition({
+      serveUrl: bundleLocation,
+      id,
+      inputProps: { theme },
+    });
+
+    await renderMedia({
+      composition,
+      serveUrl: bundleLocation,
+      codec: "h264",
+      outputLocation: `out/${id}.mp4`,
+      inputProps: { theme },
+    });
+
+    console.log(`Done: ${id}.mp4`);
+  }
+
+  console.log(`All ${THEMES.length} videos rendered to out/`);
+};
+
+start();
+```
+
+**Run it:**
+```bash
+cd videos
+node render-all.mjs
+# Output: out/theme-viopage-default.mp4, out/theme-midnight.mp4, ... (20 files)
+```
+
+**Estimated time:** ~90 seconds per video = ~30 minutes for all 20 themes on a decent machine.
+
+### Useful Remotion Templates & Repos to Reference
+
+| Repo | What It Does | Why It's Useful |
+|------|-------------|-----------------|
+| `remotion-dev/template-tiktok` | TikTok videos with auto-captions via Whisper | Ready-made caption animations |
+| `remotion-dev/template-prompt-to-motion-graphics-saas` | AI prompt → motion graphics | Skills system for typography, transitions |
+| `Raazi305/remotion-saas-showcase` | SaaS demos with device frames (phone/laptop/tablet) | Phone mockup components ready to use |
+| `lyonjs/shortvid.io` | Social media promo videos from JSON data | Data-driven bulk generation pattern |
+| `alexfernandez803/remotion-dataset` | Rendering videos from a JSON dataset | Batch render reference |
+
+**To start from a template:**
+```bash
+# TikTok template (includes auto-captions)
+npx create-video@latest --template tiktok
+
+# Blank template (build from scratch)
+npx create-video@latest --template blank
 ```
 
 ### Full Video Production Plan with Remotion
