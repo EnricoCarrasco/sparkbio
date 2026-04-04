@@ -542,3 +542,378 @@ Tired of paying for Linktree? I just launched Viopage — a free link-in-bio too
 - Trial -> paid conversion (target: 3-8%)
 - Cost per signup from ads (target: under $5)
 - Best performing channel (double down on it)
+
+---
+
+## Phase 7: Remotion — Batch-Generate Videos Programmatically
+
+### What is Remotion?
+
+Remotion is a React framework for creating videos with code. You write React components, and Remotion renders them to MP4/WebM. Perfect for Viopage because:
+
+- **Batch render 20+ videos** from a single template (one per theme)
+- **Vertical video** (1080x1920) for TikTok/Reels/Shorts natively
+- **Use your actual theme data** from `constants.ts` — colors, fonts, button styles
+- **Animated text, transitions, phone mockups** — all in React
+- **Free** for personal/small company use (under $1M revenue)
+- **Local rendering** with CLI — no cloud costs needed
+
+### Setup
+
+```bash
+# Create Remotion project inside the repo
+npx create-video@latest videos --template blank
+cd videos
+npm install
+```
+
+This creates a `videos/` folder with a Remotion project. You can import your theme constants directly.
+
+### Composition Config for Vertical Video (TikTok/Reels/Shorts)
+
+```tsx
+// videos/src/Root.tsx
+import { Composition } from "remotion";
+import { ThemeShowcase } from "./ThemeShowcase";
+import { FeatureHighlight } from "./FeatureHighlight";
+import { VsLinktree } from "./VsLinktree";
+import { THEMES } from "./data/themes";
+
+export const RemotionRoot: React.FC = () => {
+  return (
+    <>
+      {/* One composition per theme — batch render all 20 */}
+      {THEMES.map((theme) => (
+        <Composition
+          key={theme.name}
+          id={`theme-${theme.name.toLowerCase().replace(/\s/g, "-")}`}
+          component={ThemeShowcase}
+          width={1080}
+          height={1920}
+          fps={30}
+          durationInFrames={450} // 15 seconds
+          defaultProps={{ theme }}
+        />
+      ))}
+
+      {/* Feature highlight videos */}
+      <Composition
+        id="stop-paying-linktree"
+        component={FeatureHighlight}
+        width={1080}
+        height={1920}
+        fps={30}
+        durationInFrames={450}
+        defaultProps={{ variant: "price-comparison" }}
+      />
+
+      <Composition
+        id="vs-linktree"
+        component={VsLinktree}
+        width={1080}
+        height={1920}
+        fps={30}
+        durationInFrames={600} // 20 seconds
+      />
+    </>
+  );
+};
+```
+
+### Theme Data File (Copy from Your Constants)
+
+```tsx
+// videos/src/data/themes.ts
+export const THEMES = [
+  // Free themes
+  { name: "Viopage Default", bg: "#FAFAFA", text: "#1E1E2E", button: "#FF6B35", buttonText: "#FFF", tier: "free" },
+  { name: "Midnight", bg: "#0F0F23", text: "#E8E8E8", button: "#6366F1", buttonText: "#FFF", tier: "free" },
+  { name: "Ocean Breeze", bg: "#E0F7FA", text: "#004D40", button: "#00897B", buttonText: "#FFF", tier: "free" },
+  { name: "Sunset", bg: "#FFF3E0", text: "#BF360C", button: "#FF5722", buttonText: "#FFF", tier: "free" },
+  { name: "Minimal", bg: "#FFFFFF", text: "#111111", button: "#111111", buttonText: "#FFF", tier: "free" },
+  { name: "Cream", bg: "#FFFDE7", text: "#3E2723", button: "#795548", buttonText: "#FFF", tier: "free" },
+  // Premium themes
+  { name: "Rose Gold", bg: "#FDF2F8", text: "#831843", button: "#EC4899", buttonText: "#FFF", tier: "pro" },
+  { name: "Neon Tokyo", bg: "#0A0A1A", text: "#00FFD1", button: "#7C3AED", buttonText: "#FFF", tier: "pro" },
+  { name: "Sage Garden", bg: "#F0FDF4", text: "#14532D", button: "#22C55E", buttonText: "#FFF", tier: "pro" },
+  { name: "Arctic", bg: "#EFF6FF", text: "#1E3A5F", button: "#3B82F6", buttonText: "#FFF", tier: "pro" },
+  { name: "Coral Reef", bg: "#FFF1F0", text: "#7F1D1D", button: "#F43F5E", buttonText: "#FFF", tier: "pro" },
+  { name: "Lavender Dream", bg: "#FAF5FF", text: "#581C87", button: "#A855F7", buttonText: "#FFF", tier: "pro" },
+  { name: "Charcoal", bg: "#1C1C1E", text: "#F5F5F7", button: "#FF9F0A", buttonText: "#1C1C1E", tier: "pro" },
+  { name: "Mocha", bg: "#2C1810", text: "#F5E6D3", button: "#D4A574", buttonText: "#2C1810", tier: "pro" },
+  { name: "Cyberpunk", bg: "#0D0221", text: "#FF00FF", button: "#00FFFF", buttonText: "#0D0221", tier: "pro" },
+  { name: "Emerald Noir", bg: "#022C22", text: "#D1FAE5", button: "#10B981", buttonText: "#FFF", tier: "pro" },
+  { name: "Peach Sorbet", bg: "#FFF7ED", text: "#9A3412", button: "#FB923C", buttonText: "#FFF", tier: "pro" },
+  { name: "Monochrome", bg: "#18181B", text: "#FAFAFA", button: "#FAFAFA", buttonText: "#18181B", tier: "pro" },
+  { name: "Royal Velvet", bg: "#1E1B4B", text: "#E0E7FF", button: "#818CF8", buttonText: "#FFF", tier: "pro" },
+  { name: "Cotton Candy", bg: "#FDF2F8", text: "#701A75", button: "#E879F9", buttonText: "#FFF", tier: "pro" },
+];
+```
+
+### Example Component: Theme Showcase Video
+
+```tsx
+// videos/src/ThemeShowcase.tsx
+import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
+
+type Theme = { name: string; bg: string; text: string; button: string; buttonText: string; tier: string };
+
+export const ThemeShowcase: React.FC<{ theme: Theme }> = ({ theme }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  // Animations
+  const titleY = spring({ frame, fps, from: -50, to: 0, durationInFrames: 20 });
+  const phoneScale = spring({ frame: frame - 10, fps, from: 0.8, to: 1, durationInFrames: 25 });
+  const phoneOpacity = interpolate(frame, [10, 25], [0, 1], { extrapolateRight: "clamp" });
+  const ctaOpacity = interpolate(frame, [360, 390], [0, 1], { extrapolateRight: "clamp" });
+
+  return (
+    <AbsoluteFill style={{ backgroundColor: "#000", justifyContent: "center", alignItems: "center" }}>
+      {/* Title */}
+      <div style={{
+        position: "absolute", top: 120,
+        transform: `translateY(${titleY}px)`,
+        color: "#FFF", fontSize: 56, fontWeight: 800, textAlign: "center",
+        padding: "0 60px",
+      }}>
+        {theme.tier === "pro" ? "PRO" : "FREE"} Theme: {theme.name}
+      </div>
+
+      {/* Phone mockup */}
+      <div style={{
+        transform: `scale(${phoneScale})`,
+        opacity: phoneOpacity,
+        width: 380, height: 780,
+        borderRadius: 40, overflow: "hidden",
+        border: "4px solid #333",
+        backgroundColor: theme.bg,
+        display: "flex", flexDirection: "column",
+        alignItems: "center", padding: "40px 24px",
+        gap: 16,
+      }}>
+        {/* Avatar */}
+        <div style={{
+          width: 80, height: 80, borderRadius: "50%",
+          background: theme.button, opacity: 0.3,
+        }} />
+        {/* Name */}
+        <div style={{ color: theme.text, fontSize: 24, fontWeight: 700 }}>@creator</div>
+        <div style={{ color: theme.text, fontSize: 14, opacity: 0.7 }}>Content Creator & Designer</div>
+        {/* Buttons */}
+        {["My Website", "YouTube Channel", "Latest Project", "Shop"].map((label, i) => {
+          const buttonDelay = 15 + i * 8;
+          const btnOpacity = interpolate(frame, [buttonDelay, buttonDelay + 10], [0, 1], { extrapolateRight: "clamp" });
+          const btnY = spring({ frame: frame - buttonDelay, fps, from: 30, to: 0 });
+          return (
+            <div key={label} style={{
+              width: "100%", padding: "16px", borderRadius: 12,
+              backgroundColor: theme.button, color: theme.buttonText,
+              textAlign: "center", fontSize: 16, fontWeight: 600,
+              opacity: btnOpacity, transform: `translateY(${btnY}px)`,
+            }}>
+              {label}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* CTA */}
+      <div style={{
+        position: "absolute", bottom: 120,
+        opacity: ctaOpacity, color: "#FFF",
+        fontSize: 36, fontWeight: 700, textAlign: "center",
+      }}>
+        viopage.com — Try it free
+      </div>
+
+      {/* Tier badge */}
+      {theme.tier === "pro" && (
+        <div style={{
+          position: "absolute", top: 60, right: 60,
+          background: "linear-gradient(135deg, #FFD700, #FFA500)",
+          color: "#000", padding: "8px 20px", borderRadius: 20,
+          fontSize: 20, fontWeight: 800,
+        }}>
+          PRO
+        </div>
+      )}
+    </AbsoluteFill>
+  );
+};
+```
+
+### Example Component: "Stop Paying for Linktree" Video
+
+```tsx
+// videos/src/FeatureHighlight.tsx
+import { AbsoluteFill, useCurrentFrame, interpolate, Sequence } from "remotion";
+
+export const FeatureHighlight: React.FC<{ variant: string }> = () => {
+  const frame = useCurrentFrame();
+
+  return (
+    <AbsoluteFill style={{ backgroundColor: "#000" }}>
+      {/* Scene 1: Hook (0-4 sec) */}
+      <Sequence from={0} durationInFrames={120}>
+        <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", padding: 60 }}>
+          <div style={{
+            color: "#FF4444", fontSize: 72, fontWeight: 900,
+            textAlign: "center", lineHeight: 1.2,
+            opacity: interpolate(frame, [0, 15], [0, 1], { extrapolateRight: "clamp" }),
+          }}>
+            You're paying $24/month for Linktree?
+          </div>
+        </AbsoluteFill>
+      </Sequence>
+
+      {/* Scene 2: Solution (4-10 sec) */}
+      <Sequence from={120} durationInFrames={180}>
+        <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", padding: 60 }}>
+          <div style={{ color: "#FFF", fontSize: 48, fontWeight: 700, textAlign: "center", lineHeight: 1.4 }}>
+            Viopage gives you{"\n"}
+            <span style={{ color: "#FF6B35" }}>20 designer themes</span>{"\n"}
+            for <span style={{ color: "#00FF88", fontSize: 64 }}>FREE</span>
+          </div>
+        </AbsoluteFill>
+      </Sequence>
+
+      {/* Scene 3: Features (10-13 sec) */}
+      <Sequence from={300} durationInFrames={90}>
+        <AbsoluteFill style={{ justifyContent: "center", padding: "0 80px", gap: 30 }}>
+          {["Drag & drop builder", "Built-in analytics", "Social media icons", "Mobile optimized"].map((feat, i) => (
+            <div key={feat} style={{
+              color: "#FFF", fontSize: 40, fontWeight: 600,
+              opacity: interpolate(frame - 300, [i * 8, i * 8 + 10], [0, 1], { extrapolateRight: "clamp" }),
+            }}>
+              ✓ {feat}
+            </div>
+          ))}
+        </AbsoluteFill>
+      </Sequence>
+
+      {/* Scene 4: CTA (13-15 sec) */}
+      <Sequence from={390} durationInFrames={60}>
+        <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", gap: 20 }}>
+          <div style={{ color: "#FF6B35", fontSize: 64, fontWeight: 900 }}>viopage.com</div>
+          <div style={{ color: "#FFF", fontSize: 32, opacity: 0.8 }}>Free. No credit card needed.</div>
+        </AbsoluteFill>
+      </Sequence>
+    </AbsoluteFill>
+  );
+};
+```
+
+### Batch Render ALL Videos at Once
+
+```bash
+# Render a single video (test first)
+cd videos
+npx remotion render ThemeShowcase theme-midnight out/midnight.mp4
+
+# Render ALL theme videos in one command
+npx remotion render --concurrency=4 ThemeShowcase out/
+
+# Or use this script to render every composition:
+for comp in $(npx remotion compositions src/Root.tsx --quiet); do
+  echo "Rendering $comp..."
+  npx remotion render "$comp" "out/${comp}.mp4"
+done
+```
+
+### Full Video Production Plan with Remotion
+
+| # | Video | Composition ID | Duration | What It Shows |
+|---|-------|---------------|----------|---------------|
+| 1-20 | Theme showcase (one per theme) | `theme-*` | 15 sec | Phone mockup with theme colors, buttons animating in |
+| 21 | "Stop Paying for Linktree" | `stop-paying-linktree` | 15 sec | Price shock hook → Viopage features → CTA |
+| 22 | "Free vs Pro" | `free-vs-pro` | 20 sec | Side-by-side themes, tier comparison |
+| 23 | "Viopage vs Linktree" | `vs-linktree` | 20 sec | Split screen comparison, feature checklist |
+| 24 | "60 Second Setup" | `setup-tutorial` | 60 sec | Animated walkthrough of signup → publish flow |
+| 25 | "3 Reasons to Switch" | `reasons-to-switch` | 20 sec | Kinetic text with 3 bullet points |
+| 26 | "Which Theme Are You?" | `theme-quiz` | 30 sec | Rapid theme cycling, engagement hook |
+| 27-28 | Portuguese versions | `*-pt` | Various | Same videos with PT-BR text overlays |
+
+**Total: ~28 videos from one `npx remotion render` batch run.**
+
+### Remotion CLI Cheat Sheet
+
+```bash
+# Preview in browser (live reload)
+npx remotion preview
+
+# List all compositions
+npx remotion compositions src/Root.tsx
+
+# Render single video
+npx remotion render <CompositionId> out/video.mp4
+
+# Render with custom props (override theme)
+npx remotion render theme-showcase out/custom.mp4 --props='{"theme":{"name":"Custom","bg":"#000"}}'
+
+# Render as GIF (for Twitter)
+npx remotion render <CompositionId> out/preview.gif --image-format=png
+
+# Render all at once (parallel)
+npx remotion render --concurrency=4
+```
+
+### Claude Prompts for Generating More Remotion Components
+
+**Generate a new video template:**
+```
+Write a Remotion React component for a 15-second vertical video (1080x1920, 30fps = 450 frames). 
+The video should show a "before and after" comparison:
+- Left side: boring plain Linktree page (white bg, gray buttons)
+- Right side: beautiful Viopage theme with the colors I provide
+- Use Remotion's interpolate() and spring() for smooth animations
+- Scene 1 (0-5s): "Your bio link" with boring side
+- Scene 2 (5-10s): Slide transition to "Could look like this" with Viopage side
+- Scene 3 (10-15s): CTA "viopage.com - Free"
+Props: { themeName: string, bgColor: string, buttonColor: string, textColor: string }
+```
+
+**Generate a text animation component:**
+```
+Write a Remotion React component for kinetic typography. 15-second vertical video (1080x1920).
+Text to animate (one line at a time with spring animations):
+"Linktree charges $24/month"
+"For a white page"
+"With boring buttons"
+"Viopage gives you"
+"20 designer themes"
+"For FREE"
+"viopage.com"
+Each line should spring in from below, hold for 1.5s, then fade. 
+Black background, white text, accent color #FF6B35 for key words.
+Use Remotion's Sequence, spring(), and interpolate().
+```
+
+**Generate a feature comparison component:**
+```
+Write a Remotion React component for a side-by-side comparison video. 
+20 seconds, vertical (1080x1920, 30fps = 600 frames).
+Left column: "Linktree Free" with red X marks
+Right column: "Viopage Free" with green checkmarks
+Features to compare (animate in one by one):
+1. Designer themes: X vs CHECK (6 free)
+2. Analytics: X vs CHECK  
+3. Custom buttons: X vs CHECK
+4. Social icons: X vs CHECK
+5. No branding: X vs X (both no)
+6. Price: $0 vs $0
+End with: "Same price. Way more features. viopage.com"
+Use spring animations for each row appearing.
+```
+
+**Generate a theme carousel component:**
+```
+Write a Remotion React component that cycles through themes rapidly like a slot machine.
+30 seconds, vertical (1080x1920, 30fps).
+Accept a themes array prop with {name, bg, button, text} objects.
+Animation: Phone mockup in center. Every 1.5 seconds, the phone's colors 
+smoothly transition to the next theme (background, buttons, text all animate).
+Show theme name below the phone. End on the last theme with text:
+"20 themes. All free to try. viopage.com"
+Use Remotion's interpolateColors() for smooth color transitions.
+```
