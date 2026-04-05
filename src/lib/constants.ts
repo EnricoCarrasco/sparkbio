@@ -500,6 +500,9 @@ export const PREMADE_GRADIENTS = [
 export const AVATAR_MAX_SIZE = 2 * 1024 * 1024; // 2MB
 export const AVATAR_ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
+export const HERO_MAX_SIZE = 5 * 1024 * 1024; // 5MB
+export const HERO_ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
 export const PLANS = {
   free: {
     name: "Free",

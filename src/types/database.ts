@@ -98,6 +98,7 @@ export interface Theme {
   title_font: string | null;
   hide_bio: boolean;
   button_font_size: ButtonFontSize;
+  hero_image_url: string | null;
 }
 
 export interface SocialIcon {

@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Camera, Crown } from "lucide-react";
+import { Camera, Crown, ImagePlus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { useProfileStore } from "@/lib/stores/profile-store";
 import { useThemeStore } from "@/lib/stores/theme-store";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { UpgradeDialog } from "@/components/billing/upgrade-dialog";
-import { AVATAR_MAX_SIZE, AVATAR_ACCEPTED_TYPES } from "@/lib/constants";
+import { AVATAR_MAX_SIZE, AVATAR_ACCEPTED_TYPES, HERO_MAX_SIZE, HERO_ACCEPTED_TYPES } from "@/lib/constants";
 import { ToggleGroup } from "./toggle-group";
 import { ColorInput } from "./color-input";
 import { Switch } from "@/components/ui/switch";
@@ -130,11 +130,15 @@ export function HeaderPanel() {
   const uploadAvatar = useProfileStore((s) => s.uploadAvatar);
   const theme = useThemeStore((s) => s.theme);
   const updateTheme = useThemeStore((s) => s.updateTheme);
+  const uploadHeroImage = useThemeStore((s) => s.uploadHeroImage);
+  const removeHeroImage = useThemeStore((s) => s.removeHeroImage);
   const isPro = useSubscriptionStore((s) => s.isPro);
 
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [heroUploading, setHeroUploading] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const heroInputRef = useRef<HTMLInputElement>(null);
 
   if (!theme) return null;
 
@@ -160,6 +164,35 @@ export function HeaderPanel() {
       setAvatarUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
+  }
+
+  async function handleHeroChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!HERO_ACCEPTED_TYPES.includes(file.type)) {
+      toast.error("Please upload a JPEG, PNG, or WebP image");
+      return;
+    }
+    if (file.size > HERO_MAX_SIZE) {
+      toast.error("Image must be smaller than 5MB");
+      return;
+    }
+    setHeroUploading(true);
+    try {
+      const url = await uploadHeroImage(file);
+      if (url) toast.success("Hero image updated");
+      else toast.error("Failed to upload hero image");
+    } catch {
+      toast.error("Failed to upload hero image");
+    } finally {
+      setHeroUploading(false);
+      if (heroInputRef.current) heroInputRef.current.value = "";
+    }
+  }
+
+  async function handleHeroRemove() {
+    await removeHeroImage();
+    toast.success("Hero image removed");
   }
 
   const initials = (profile?.display_name || profile?.username || "?")
@@ -320,6 +353,73 @@ export function HeaderPanel() {
           </button>
         </div>
       </section>
+
+      {/* ── Hero Image (only when hero layout selected) ── */}
+      {theme.profile_layout === "hero" && (
+        <section className="bg-white p-6 rounded-2xl border border-zinc-100">
+          <h2 className="text-lg font-bold text-zinc-900 mb-4">{t("heroImage")}</h2>
+
+          {theme.hero_image_url ? (
+            <div className="space-y-3">
+              <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-zinc-100">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={theme.hero_image_url}
+                  alt="Hero"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => heroInputRef.current?.click()}
+                  disabled={heroUploading}
+                  className="flex-1 gap-1.5 text-white font-semibold"
+                  style={{ background: "linear-gradient(135deg, #FF6B35, #E8501A)" }}
+                >
+                  <ImagePlus className="size-3.5" />
+                  {heroUploading ? t("uploading") : t("uploadHeroImage")}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={handleHeroRemove}
+                  disabled={heroUploading}
+                  className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50"
+                >
+                  <Trash2 className="size-3.5" />
+                  {t("removeHeroImage")}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={() => heroInputRef.current?.click()}
+                disabled={heroUploading}
+                className="w-full aspect-[4/5] rounded-xl border-2 border-dashed border-zinc-200 hover:border-[#FF6B35]/40 transition-colors flex flex-col items-center justify-center gap-2 cursor-pointer"
+              >
+                <ImagePlus className="size-8 text-zinc-300" />
+                <span className="text-sm font-medium text-zinc-400">
+                  {heroUploading ? t("uploading") : t("uploadHeroImage")}
+                </span>
+                <span className="text-xs text-zinc-400">{t("heroImageDesc")}</span>
+              </button>
+            </div>
+          )}
+
+          <input
+            ref={heroInputRef}
+            type="file"
+            accept={HERO_ACCEPTED_TYPES.join(",")}
+            className="sr-only"
+            onChange={handleHeroChange}
+          />
+        </section>
+      )}
 
       {/* ── Title & Display ── */}
       <section className="bg-white p-6 rounded-2xl border border-zinc-100">

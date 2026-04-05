@@ -10,6 +10,8 @@ interface ThemeState {
   setTheme: (theme: Theme | null) => void;
   fetchTheme: () => Promise<void>;
   updateTheme: (updates: Partial<Theme>) => Promise<void>;
+  uploadHeroImage: (file: File) => Promise<string | null>;
+  removeHeroImage: () => Promise<void>;
 }
 
 const debouncedSave = createDebouncedSave(500);
@@ -62,5 +64,35 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
         console.error("[theme-store] save failed:", error.message, error);
       }
     });
+  },
+
+  uploadHeroImage: async (file: File) => {
+    const { theme } = get();
+    if (!theme) return null;
+
+    const supabase = createClient();
+    const fileExt = file.name.split(".").pop();
+    const filePath = `${theme.user_id}/hero.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("hero-images")
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) {
+      console.error("[theme-store] hero upload failed:", uploadError.message);
+      return null;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from("hero-images")
+      .getPublicUrl(filePath);
+
+    const heroImageUrl = `${publicUrl}?t=${Date.now()}`;
+    await get().updateTheme({ hero_image_url: heroImageUrl });
+    return heroImageUrl;
+  },
+
+  removeHeroImage: async () => {
+    await get().updateTheme({ hero_image_url: null });
   },
 }));
