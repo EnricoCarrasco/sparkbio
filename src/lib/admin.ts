@@ -20,5 +20,12 @@ export async function getAdminUser(): Promise<{
   }
 
   const isAdmin = ADMIN_EMAILS.includes(user.email.toLowerCase());
+
+  if (isAdmin) {
+    console.log(`[admin] authenticated: ${user.email}`);
+  } else {
+    console.warn(`[admin] unauthorized access attempt: ${user.email}`);
+  }
+
   return { isAdmin, email: user.email, userId: user.id };
 }

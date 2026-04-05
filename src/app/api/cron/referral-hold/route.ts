@@ -1,12 +1,22 @@
+import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function GET(request: NextRequest) {
-  // --- Verify Vercel Cron secret ---
+  // --- Verify Vercel Cron secret (timing-safe) ---
   const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
-  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || !authHeader) {
+    return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
+  }
+
+  const expected = Buffer.from(`Bearer ${cronSecret}`);
+  const received = Buffer.from(authHeader);
+  if (
+    expected.length !== received.length ||
+    !crypto.timingSafeEqual(expected, received)
+  ) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 

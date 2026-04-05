@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Profile } from "@/types";
 import { createClient } from "@/lib/supabase/client";
+import { AVATAR_MAX_SIZE, AVATAR_ACCEPTED_TYPES } from "@/lib/constants";
 
 interface ProfileState {
   profile: Profile | null;
@@ -58,8 +59,13 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     const { profile } = get();
     if (!profile) return null;
 
+    // Validate file size and type (defense-in-depth; UI also checks)
+    if (file.size > AVATAR_MAX_SIZE) return null;
+    if (!AVATAR_ACCEPTED_TYPES.includes(file.type)) return null;
+
     const supabase = createClient();
-    const fileExt = file.name.split(".").pop();
+    const extMap: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" };
+    const fileExt = extMap[file.type] ?? "png";
     const filePath = `${profile.id}/avatar.${fileExt}`;
 
     const { error: uploadError } = await supabase.storage

@@ -3,6 +3,7 @@ import type { Theme } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { createDebouncedSave } from "@/lib/utils/debounced-save";
+import { HERO_MAX_SIZE, HERO_ACCEPTED_TYPES } from "@/lib/constants";
 
 interface ThemeState {
   theme: Theme | null;
@@ -69,6 +70,10 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
   uploadHeroImage: async (file: File) => {
     const { theme } = get();
     if (!theme) return null;
+
+    // Validate file size and type (defense-in-depth; UI also checks)
+    if (file.size > HERO_MAX_SIZE) return null;
+    if (!HERO_ACCEPTED_TYPES.includes(file.type)) return null;
 
     const supabase = createClient();
     const filePath = `${theme.user_id}/hero`;

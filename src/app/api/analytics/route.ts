@@ -2,40 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { analyticsEventSchema } from "@/lib/validators/analytics";
 import { UAParser } from "ua-parser-js";
+import { createRateLimiter, getClientIp } from "@/lib/rate-limit";
 
-// In-memory rate limiter: IP -> last request timestamp (ms)
-const rateLimitMap = new Map<string, number>();
-
-// Prune the map every 5 minutes to prevent unbounded growth
-setInterval(
-  () => {
-    const cutoff = Date.now() - 60_000;
-    for (const [ip, ts] of rateLimitMap.entries()) {
-      if (ts < cutoff) rateLimitMap.delete(ip);
-    }
-  },
-  5 * 60 * 1000
-);
-
-function getClientIp(request: NextRequest): string {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    request.headers.get("x-real-ip") ??
-    "unknown"
-  );
-}
+// 1 request per second per IP
+const limiter = createRateLimiter(1_000, 1);
 
 export async function POST(request: NextRequest) {
   // --- Rate limiting ---
   const clientIp = getClientIp(request);
-  const now = Date.now();
-  const lastRequest = rateLimitMap.get(clientIp);
-
-  if (lastRequest !== undefined && now - lastRequest < 1_000) {
+  if (limiter(clientIp).limited) {
     return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 });
   }
-
-  rateLimitMap.set(clientIp, now);
 
   // --- Parse body ---
   let body: unknown;
@@ -52,6 +29,18 @@ export async function POST(request: NextRequest) {
   }
 
   const { profile_id, link_id, event_type, referrer } = parsed.data;
+
+  // --- Verify profile exists (prevents analytics for non-existent profiles) ---
+  const supabase = createAdminClient();
+  const { data: profileExists } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", profile_id)
+    .single();
+
+  if (!profileExists) {
+    return NextResponse.json({ ok: false, error: "not_found" }, { status: 400 });
+  }
 
   // --- Parse user agent ---
   // UAParser v2 is a plain function, not a constructor
@@ -73,7 +62,6 @@ export async function POST(request: NextRequest) {
   const city = rawCity ? decodeURIComponent(rawCity) : null;
 
   // --- Insert into Supabase ---
-  const supabase = createAdminClient();
   const { error } = await supabase.from("analytics_events").insert({
     profile_id,
     link_id: link_id ?? null,

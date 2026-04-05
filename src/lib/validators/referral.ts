@@ -28,10 +28,21 @@ export const referralSignupSchema = z.object({
  * Validates a payout request submitted by a referrer from the earnings dashboard.
  * `destination` is the PayPal email address or Pix key depending on `method`.
  */
-export const referralPayoutSchema = z.object({
-  method: z.enum(["paypal", "pix"]),
-  destination: z.string().min(3).max(255),
-});
+export const referralPayoutSchema = z
+  .object({
+    method: z.enum(["paypal", "pix"]),
+    // Only allow alphanumeric + common email/pix chars — blocks HTML/script injection
+    destination: z.string().min(3).max(255).regex(/^[a-zA-Z0-9@._+\-]+$/),
+  })
+  .refine(
+    (data) => {
+      if (data.method === "paypal") {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.destination);
+      }
+      return true;
+    },
+    { message: "Invalid PayPal email format", path: ["destination"] },
+  );
 
 export type ReferralClickInput = z.infer<typeof referralClickSchema>;
 export type ReferralCaptureInput = z.infer<typeof referralCaptureSchema>;

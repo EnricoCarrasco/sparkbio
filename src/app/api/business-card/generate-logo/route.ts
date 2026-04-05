@@ -3,6 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import Replicate from "replicate";
 import { generateLogoSchema } from "@/lib/validators/business-card";
 import { extractReplicateUrl } from "@/lib/replicate";
+import { createRateLimiter } from "@/lib/rate-limit";
+
+// 5 requests per 10 minutes per user
+const limiter = createRateLimiter(10 * 60 * 1000, 5);
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   // Auth
@@ -10,6 +14,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  // Rate limit
+  if (limiter(user.id).limited) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
 
   // Parse body
@@ -23,7 +32,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // Validate
   const parsed = generateLogoSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "validation_error", details: parsed.error.issues }, { status: 400 });
+    return NextResponse.json({ error: "validation_error" }, { status: 400 });
   }
 
   const { description } = parsed.data;
