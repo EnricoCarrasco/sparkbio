@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
       "font-src 'self'",
       "connect-src 'self' https://lbouculyhpqcnmvyrofo.supabase.co https://*.supabase.co wss://*.supabase.co https://api.lemonsqueezy.com",
       "frame-src https://cdn.lemonsqueezy.com",
-      "frame-ancestors 'none'",
+      "frame-ancestors 'self'",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
         headers: [
           { key: "Content-Security-Policy", value: csp },
           { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
             key: "Strict-Transport-Security",
