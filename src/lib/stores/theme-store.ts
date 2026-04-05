@@ -71,12 +71,11 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
     if (!theme) return null;
 
     const supabase = createClient();
-    const fileExt = file.name.split(".").pop();
-    const filePath = `${theme.user_id}/hero.${fileExt}`;
+    const filePath = `${theme.user_id}/hero`;
 
     const { error: uploadError } = await supabase.storage
       .from("hero-images")
-      .upload(filePath, file, { upsert: true });
+      .upload(filePath, file, { upsert: true, contentType: file.type });
 
     if (uploadError) {
       console.error("[theme-store] hero upload failed:", uploadError.message);
@@ -87,12 +86,16 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
       .from("hero-images")
       .getPublicUrl(filePath);
 
-    const heroImageUrl = `${publicUrl}?t=${Date.now()}`;
-    await get().updateTheme({ hero_image_url: heroImageUrl });
-    return heroImageUrl;
+    await get().updateTheme({ hero_image_url: publicUrl });
+    return publicUrl;
   },
 
   removeHeroImage: async () => {
+    const { theme } = get();
+    if (!theme) return;
+
+    const supabase = createClient();
+    await supabase.storage.from("hero-images").remove([`${theme.user_id}/hero`]);
     await get().updateTheme({ hero_image_url: null });
   },
 }));

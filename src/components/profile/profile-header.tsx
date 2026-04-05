@@ -133,7 +133,7 @@ export function ProfileHeader({ profile, textColor, theme }: ProfileHeaderProps)
             </div>
           ) : (
             <div
-              className="w-full aspect-[4/5] md:aspect-[3/4] rounded-2xl relative overflow-hidden"
+              className="w-full aspect-[3/1] rounded-2xl relative overflow-hidden"
               style={{
                 background: `linear-gradient(135deg, ${bannerColor}90, ${bannerColor}40)`,
               }}

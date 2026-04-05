@@ -361,7 +361,7 @@ export function HeaderPanel() {
 
           {theme.hero_image_url ? (
             <div className="space-y-3">
-              <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-zinc-100">
+              <div className="relative w-full aspect-[2/1] rounded-xl overflow-hidden bg-zinc-100">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={theme.hero_image_url}
@@ -400,7 +400,7 @@ export function HeaderPanel() {
                 type="button"
                 onClick={() => heroInputRef.current?.click()}
                 disabled={heroUploading}
-                className="w-full aspect-[4/5] rounded-xl border-2 border-dashed border-zinc-200 hover:border-[#FF6B35]/40 transition-colors flex flex-col items-center justify-center gap-2 cursor-pointer"
+                className="w-full aspect-[2/1] rounded-xl border-2 border-dashed border-zinc-200 hover:border-[#FF6B35]/40 transition-colors flex flex-col items-center justify-center gap-2 cursor-pointer"
               >
                 <ImagePlus className="size-8 text-zinc-300" />
                 <span className="text-sm font-medium text-zinc-400">
