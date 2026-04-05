@@ -10,10 +10,32 @@ interface GoogleOAuthButtonProps {
 export function GoogleOAuthButton({ label }: GoogleOAuthButtonProps) {
   const handleClick = async () => {
     const supabase = createClient();
+
+    // Pass referral code through OAuth redirect if present
+    const callbackUrl = new URL(
+      "/auth/callback",
+      process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+    );
+    const refCookie = document.cookie
+      .split("; ")
+      .find((c) => c.startsWith("viopage_ref="))
+      ?.split("=")[1];
+    const refLS = (() => {
+      try {
+        const stored = localStorage.getItem("viopage_ref");
+        if (!stored) return null;
+        const parsed = JSON.parse(stored);
+        const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+        return Date.now() - parsed.captured_at < thirtyDaysMs ? parsed.code : null;
+      } catch { return null; }
+    })();
+    const refCode = refCookie || refLS;
+    if (refCode) callbackUrl.searchParams.set("ref", refCode);
+
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || window.location.origin}/auth/callback`,
+        redirectTo: callbackUrl.toString(),
       },
     });
   };

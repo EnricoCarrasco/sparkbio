@@ -43,6 +43,11 @@ export interface Profile {
   bio: string | null;
   avatar_url: string | null;
   business_card_settings: Record<string, unknown> | null;
+  referral_code: string | null;
+  referred_by: string | null;
+  payout_method: "paypal" | "pix" | null;
+  payout_destination: string | null;
+  has_chosen_username: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -155,4 +160,64 @@ export interface PublicProfile {
   theme: Theme;
   social_icons: SocialIcon[];
   subscription: PublicSubscription | null;
+}
+
+// ── Referral system types ───────────────────────────────────────────────────
+
+export type ReferralEventType = "click" | "signup" | "conversion";
+
+export type ReferralEarningStatus = "pending" | "available" | "paid" | "cancelled";
+
+export type ReferralPayoutStatus = "requested" | "processing" | "completed" | "failed";
+
+export type PayoutMethod = "paypal" | "pix";
+
+export interface ReferralEvent {
+  id: string;
+  referrer_id: string;
+  referred_id: string | null;
+  event_type: ReferralEventType;
+  referral_code: string;
+  ip_hash: string | null;
+  user_agent: string | null;
+  created_at: string;
+}
+
+export interface ReferralEarning {
+  id: string;
+  referrer_id: string;
+  referred_id: string | null;
+  subscription_id: string;
+  amount_cents: number;
+  status: ReferralEarningStatus;
+  hold_until: string;
+  payout_id: string | null;
+  paid_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ReferralPayout {
+  id: string;
+  referrer_id: string;
+  amount_cents: number;
+  currency: string;
+  payout_method: PayoutMethod;
+  payout_destination: string | null;
+  status: ReferralPayoutStatus;
+  admin_notes: string | null;
+  processed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ReferralStats {
+  totalEarnedCents: number;
+  pendingCents: number;
+  availableCents: number;
+  paidOutCents: number;
+  clickCount: number;
+  signupCount: number;
+  conversionCount: number;
+  nearestHoldDate: string | null;
 }

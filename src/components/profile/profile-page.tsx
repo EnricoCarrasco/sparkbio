@@ -219,13 +219,20 @@ export function ProfilePage({ data }: ProfilePageProps) {
           )}
         </div>
 
-        {/* Viopage branding CTA — pinned at bottom */}
+        {/* Viopage branding CTA — pinned at bottom, includes referral code */}
         {showFooter && (
           <a
-            href="https://viopage.com"
+            href={`${process.env.NEXT_PUBLIC_SITE_URL ?? "https://viopage.com"}/?ref=${profile.referral_code ?? profile.username}`}
             target="_blank"
             rel="noopener noreferrer"
             className="mb-4 inline-flex items-center justify-center rounded-full bg-[#FF6B35] px-5 py-2.5 text-white shadow-md hover:shadow-lg hover:brightness-110 active:scale-[0.98] transition-all max-w-full whitespace-nowrap"
+            onClick={() => {
+              const code = profile.referral_code ?? profile.username;
+              navigator.sendBeacon(
+                "/api/referral/click",
+                new Blob([JSON.stringify({ referral_code: code })], { type: "application/json" })
+              );
+            }}
           >
             <span className="text-[13px] sm:text-sm font-semibold truncate">
               {t("joinCta", { username: profile.username })}

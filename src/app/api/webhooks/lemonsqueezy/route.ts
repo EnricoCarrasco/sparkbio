@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { processReferralConversion, cancelPendingReferralEarnings } from "@/lib/referral";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -177,6 +178,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   if (upsertError) {
     console.error("[webhook] subscription upsert error:", upsertError.message);
     return NextResponse.json({ error: "db_error" }, { status: 500 });
+  }
+
+  // --- Referral conversion tracking (only on confirmed payment, not trial) ---
+  if (status === "active") {
+    await processReferralConversion(
+      userId,
+      String(subscriptionId),
+      String(attributes.variant_id)
+    );
+  }
+  if (status === "cancelled" || status === "expired") {
+    await cancelPendingReferralEarnings(String(subscriptionId));
   }
 
   // --- On cancellation / expiry: remove premium perks ---

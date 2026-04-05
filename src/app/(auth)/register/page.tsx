@@ -82,8 +82,34 @@ export default function RegisterPage() {
     if (user) {
       await supabase
         .from("profiles")
-        .update({ username: data.username.toLowerCase() })
+        .update({ username: data.username.toLowerCase(), has_chosen_username: true })
         .eq("id", user.id);
+    }
+
+    // Attribute referral if a referral cookie/localStorage exists
+    if (user) {
+      const refCode = document.cookie
+        .split("; ")
+        .find((c) => c.startsWith("viopage_ref="))
+        ?.split("=")[1];
+      const lsRef = (() => {
+        try {
+          const stored = localStorage.getItem("viopage_ref");
+          if (!stored) return null;
+          const parsed = JSON.parse(stored);
+          const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+          return Date.now() - parsed.captured_at < thirtyDaysMs ? parsed.code : null;
+        } catch { return null; }
+      })();
+      const code = refCode || lsRef;
+      if (code) {
+        fetch("/api/referral/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ referral_code: code }),
+        }).catch(() => {});
+        localStorage.removeItem("viopage_ref");
+      }
     }
 
     // Send new users straight to the dashboard (free tier)

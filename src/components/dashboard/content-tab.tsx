@@ -639,7 +639,7 @@ function ContentTabInner() {
 
   return (
     <div className="max-w-[680px] mx-auto px-4 py-6 space-y-5">
-      {/* ── Top bar: Links tab ── */}
+      {/* ── Top bar: Links / Earn tabs ── */}
       <div className="flex items-center">
         <div className="flex items-center gap-5">
           <button
@@ -648,6 +648,12 @@ function ContentTabInner() {
           >
             {t("linksTab")}
           </button>
+          <a
+            href="/earn"
+            className="text-base font-medium text-muted-foreground hover:text-foreground pb-0.5 transition-colors"
+          >
+            {t("earnTab")}
+          </a>
         </div>
       </div>
 

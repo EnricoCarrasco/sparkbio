@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   FileText,
@@ -11,6 +11,7 @@ import {
   ExternalLink,
   LogOut,
   ChevronLeft,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -38,6 +39,20 @@ export function Sidebar({ onNavigate }: SidebarProps) {
   const profile = useProfileStore((s) => s.profile);
   const activeTab = useDashboardStore((s) => s.activeTab);
   const setActiveTab = useDashboardStore((s) => s.setActiveTab);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "").split(",").map(e => e.trim().toLowerCase()).filter(Boolean);
+    if (adminEmails.length === 0) {
+      // Fallback: check via admin API
+      fetch("/api/admin/stats").then(r => setIsAdmin(r.ok)).catch(() => {});
+    } else {
+      const supabase = createClient();
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (user?.email) setIsAdmin(adminEmails.includes(user.email.toLowerCase()));
+      });
+    }
+  }, []);
 
   async function handleSignOut() {
     const supabase = createClient();
@@ -89,6 +104,22 @@ export function Sidebar({ onNavigate }: SidebarProps) {
           );
         })}
       </nav>
+
+      {/* Admin link */}
+      {isAdmin && (
+        <div className="flex flex-col items-center px-1 mt-2">
+          <button
+            type="button"
+            onClick={() => { router.push("/admin"); onNavigate(); }}
+            className="flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-2.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          >
+            <ShieldCheck className="size-5" strokeWidth={1.5} />
+            <span className="text-[10px] font-medium leading-tight">
+              Admin
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Bottom actions */}
       <div className="flex flex-col items-center gap-1 px-1 mt-auto">

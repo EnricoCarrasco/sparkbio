@@ -23,6 +23,7 @@ export const RESERVED_USERNAMES = [
   "terms",
   "about",
   "contact",
+  "earn",
   "features",
   "home",
   "profile",
@@ -512,6 +513,12 @@ export const PLANS = {
     trialDays: 7,
   },
 } as const;
+
+// ── Referral system ─────────────────────────────────────────────────────────
+
+export const REFERRAL_COMMISSION_PERCENT = 20;
+export const REFERRAL_HOLD_DAYS = 30;
+export const REFERRAL_MIN_PAYOUT_CENTS = 5000; // $50.00
 
 // ── Subscription helpers ─────────────────────────────────────────────────────
 
