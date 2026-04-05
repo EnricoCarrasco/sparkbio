@@ -521,7 +521,7 @@ export const PLANS = {
 
 export const REFERRAL_COMMISSION_PERCENT = 20;
 export const REFERRAL_HOLD_DAYS = 30;
-export const REFERRAL_MIN_PAYOUT_CENTS = 5000; // $50.00
+export const REFERRAL_MIN_PAYOUT_CENTS = 2000; // $20.00
 
 // ── Subscription helpers ─────────────────────────────────────────────────────
 
