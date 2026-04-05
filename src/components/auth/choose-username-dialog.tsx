@@ -28,6 +28,7 @@ export function ChooseUsernameDialog({ open }: { open: boolean }) {
   const [status, setStatus] = useState<Status>("idle");
   const [submitting, setSubmitting] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const latestUsernameRef = useRef("");
 
   const checkAvailability = useCallback(async (value: string) => {
     const normalized = value.toLowerCase().trim();
@@ -56,6 +57,9 @@ export function ChooseUsernameDialog({ open }: { open: boolean }) {
       .eq("username", normalized)
       .maybeSingle();
 
+    // Discard stale response if the user has typed more since this query fired
+    if (normalized !== latestUsernameRef.current) return;
+
     setStatus(existing ? "taken" : "available");
   }, []);
 
@@ -63,6 +67,8 @@ export function ChooseUsernameDialog({ open }: { open: boolean }) {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     const normalized = username.toLowerCase().trim();
+    latestUsernameRef.current = normalized;
+
     if (!normalized) {
       setStatus("idle");
       return;

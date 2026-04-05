@@ -6,13 +6,13 @@ import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const poppins = Poppins({
-  variable: "--font-sans",
+  variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
 });
 
 const instrumentSerif = Instrument_Serif({
-  variable: "--font-display",
+  variable: "--font-instrument",
   subsets: ["latin"],
   weight: "400",
   style: ["normal", "italic"],

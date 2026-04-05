@@ -361,38 +361,30 @@ export function HeaderPanel() {
 
           {theme.hero_image_url ? (
             <div className="space-y-3">
-              <div className="relative w-full aspect-[2/1] rounded-xl overflow-hidden bg-zinc-100">
+              <button
+                type="button"
+                onClick={() => heroInputRef.current?.click()}
+                disabled={heroUploading}
+                className="relative w-full aspect-[3/2] max-h-[160px] rounded-xl overflow-hidden bg-zinc-100 cursor-pointer hover:opacity-80 transition-opacity"
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={theme.hero_image_url}
                   alt="Hero"
                   className="w-full h-full object-cover"
                 />
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={() => heroInputRef.current?.click()}
-                  disabled={heroUploading}
-                  className="flex-1 gap-1.5 text-white font-semibold"
-                  style={{ background: "linear-gradient(135deg, #FF6B35, #E8501A)" }}
-                >
-                  <ImagePlus className="size-3.5" />
-                  {heroUploading ? t("uploading") : t("uploadHeroImage")}
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={handleHeroRemove}
-                  disabled={heroUploading}
-                  className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50"
-                >
-                  <Trash2 className="size-3.5" />
-                  {t("removeHeroImage")}
-                </Button>
-              </div>
+              </button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={handleHeroRemove}
+                disabled={heroUploading}
+                className="w-full gap-1.5 text-red-600 border-red-200 hover:bg-red-50"
+              >
+                <Trash2 className="size-3.5" />
+                {t("removeHeroImage")}
+              </Button>
             </div>
           ) : (
             <div className="space-y-3">

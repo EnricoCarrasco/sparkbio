@@ -86,7 +86,9 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
       .from("hero-images")
       .getPublicUrl(filePath);
 
-    await get().updateTheme({ hero_image_url: publicUrl });
+    // Append cache-buster so browser/Next.js don't serve the old image
+    const freshUrl = `${publicUrl}?t=${Date.now()}`;
+    await get().updateTheme({ hero_image_url: freshUrl });
     return publicUrl;
   },
 

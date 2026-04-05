@@ -122,13 +122,14 @@ export function ProfileHeader({ profile, textColor, theme }: ProfileHeaderProps)
           transition={{ duration: 0.45, ease: "easeOut", delay: 0.2 }}
         >
           {heroImageUrl ? (
-            <div className="relative w-full aspect-[4/5] md:aspect-[3/4]">
+            <div className="relative w-full aspect-[5/2] max-h-[150px] overflow-hidden rounded-2xl">
               <Image
                 src={heroImageUrl}
                 alt={`${displayName} hero`}
                 fill
-                className="object-cover rounded-2xl"
+                className="object-cover"
                 sizes="(max-width: 768px) 100vw, 680px"
+                unoptimized
               />
             </div>
           ) : (

@@ -57,6 +57,7 @@ export function usePreviewIframe() {
     theme?.title_font,
     theme?.hide_bio,
     theme?.button_font_size,
+    theme?.hero_image_url,
     socialIcons,
   ]);
 
