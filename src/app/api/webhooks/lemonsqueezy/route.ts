@@ -180,8 +180,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "db_error" }, { status: 500 });
   }
 
-  // --- Referral conversion tracking (only on confirmed payment, not trial) ---
-  if (status === "active") {
+  // --- Referral conversion tracking (on trial or active — 30-day hold covers trial cancellations) ---
+  if (status === "active" || status === "on_trial") {
     await processReferralConversion(
       userId,
       String(subscriptionId),
