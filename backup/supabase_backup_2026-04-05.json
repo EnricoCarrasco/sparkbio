@@ -1,0 +1,34 @@
+{
+  "backup_date": "2026-04-05",
+  "project_id": "lbouculyhpqcnmvyrofo",
+  "tables": {
+    "profiles": {
+      "count": 8,
+      "note": "Full data captured in conversation context via MCP execute_sql"
+    },
+    "themes": {
+      "count": 8,
+      "note": "Full data captured in conversation context via MCP execute_sql"
+    },
+    "social_icons": {
+      "count": 15,
+      "note": "Full data captured in conversation context via MCP execute_sql"
+    },
+    "links": {
+      "count": 0,
+      "note": "Empty table"
+    },
+    "subscriptions": {
+      "count": 7,
+      "note": "Full data captured in conversation context via MCP execute_sql"
+    },
+    "analytics_events": {
+      "count": 79,
+      "note": "Event log, not backed up individually"
+    }
+  },
+  "functions": ["get_public_profile", "handle_new_user", "update_updated_at_column"],
+  "migrations": 14,
+  "rls_policies": 18,
+  "schema_backup": "See backup/migrations_2026-04-05/ for all migration SQL files"
+}

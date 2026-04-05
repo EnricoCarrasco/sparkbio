@@ -184,7 +184,7 @@ function ChangeUsernameSection() {
         }
 
         // Persist
-        await updateProfile({ username: newUsername });
+        await updateProfile({ username: newUsername, has_chosen_username: true });
         toast.success("Username updated successfully");
         reset();
       } catch {

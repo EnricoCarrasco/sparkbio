@@ -23,6 +23,7 @@ import { useSocialStore } from "@/lib/stores/social-store";
 import { useDashboardStore } from "@/lib/stores/dashboard-store";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ChooseUsernameDialog } from "@/components/auth/choose-username-dialog";
 
 const BusinessCardTab = lazy(() => import("@/components/dashboard/business-card/business-card-tab").then((m) => ({ default: m.BusinessCardTab })));
 
@@ -61,6 +62,8 @@ export default function DashboardLayout({
   const isPro = useSubscriptionStore((s) => s.isPro);
   const subLoading = useSubscriptionStore((s) => s.loading);
   const activeTab = useDashboardStore((s) => s.activeTab);
+  const profile = useProfileStore((s) => s.profile);
+  const profileLoading = useProfileStore((s) => s.loading);
 
   useEffect(() => {
     fetchProfile();
@@ -161,6 +164,11 @@ export default function DashboardLayout({
 
       {/* Mobile preview FAB + bottom sheet */}
       <MobilePreviewFAB />
+
+      {/* Username selection dialog for OAuth signups */}
+      <ChooseUsernameDialog
+        open={!profileLoading && profile !== null && !profile.has_chosen_username}
+      />
     </div>
   );
 }
