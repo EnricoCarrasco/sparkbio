@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Crown } from "lucide-react";
+import { Crown, DollarSign } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useThemeStore } from "@/lib/stores/theme-store";
@@ -38,6 +39,24 @@ export function FooterPanel() {
           <UpgradeButton />
         )}
       </div>
+
+      {/* Earn commission motivation */}
+      <Link
+        href="/earn"
+        className="flex items-start gap-3 p-4 rounded-xl border border-green-200 bg-green-50 hover:bg-green-100 transition-colors cursor-pointer"
+      >
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100">
+          <DollarSign className="h-4 w-4 text-green-600" />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-green-800">
+            {t("earnCommissionTitle")}
+          </p>
+          <p className="text-xs text-green-600 mt-0.5">
+            {t("earnCommissionDesc")}
+          </p>
+        </div>
+      </Link>
     </div>
   );
 }
