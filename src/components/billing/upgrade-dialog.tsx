@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Crown, Check, Loader2, X, Sparkles } from "lucide-react";
+import { useGeoPricing } from "@/hooks/use-geo-pricing";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -68,6 +69,7 @@ function FloatingParticle({ delay, x, size }: { delay: number; x: number; size: 
 // ---------------------------------------------------------------------------
 export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
   const t = useTranslations("billing");
+  const geo = useGeoPricing();
   const [interval, setInterval] = useState<BillingInterval>("yearly");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -77,7 +79,7 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ interval }),
+        body: JSON.stringify({ interval, country: geo.country }),
       });
 
       if (!res.ok) {
@@ -203,7 +205,7 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
                         : "text-zinc-500 hover:text-zinc-900",
                     ].join(" ")}
                   >
-                    {t("monthly")} {t("monthlyPrice")}
+                    {t("monthly")} {geo.monthlyDisplay}/{geo.isBR ? "mês" : "mo"}
                   </button>
                   <button
                     type="button"
@@ -215,7 +217,7 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
                         : "text-zinc-500 hover:text-zinc-900",
                     ].join(" ")}
                   >
-                    {t("yearly")} {t("yearlyPrice")}
+                    {t("yearly")} {geo.yearlyPerMonth}/{geo.isBR ? "mês" : "mo"}
                   </button>
                   {/* Animated save badge */}
                   <motion.div

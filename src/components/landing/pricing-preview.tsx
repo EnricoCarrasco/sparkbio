@@ -6,6 +6,7 @@ import { motion, useInView, AnimatePresence } from "framer-motion";
 import { CheckIcon, XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { EASE, stagger as _stagger, fadeUp as _fadeUp } from "@/lib/motion-variants";
+import { useGeoPricing } from "@/hooks/use-geo-pricing";
 
 // ── Animation constants ───────────────────────────────────────────────────────
 
@@ -52,6 +53,7 @@ function ComparisonX() {
 export function PricingPreview() {
   const t = useTranslations("landing.pricingPreview");
   const tc = useTranslations("landing.comparison");
+  const geo = useGeoPricing();
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: "-60px" });
   const [isYearly, setIsYearly] = useState(false);
@@ -104,7 +106,7 @@ export function PricingPreview() {
     },
     {
       label: tc("price"),
-      viopage: tc("priceViopage"),
+      viopage: `${geo.yearlyPerMonth}/${geo.isBR ? "mês" : "mo"}`,
       ltFree: tc("priceLtFree"),
       ltPro: tc("priceLtPro"),
     },
@@ -222,11 +224,11 @@ export function PricingPreview() {
                         transition={{ duration: 0.2, ease: EASE }}
                         className="block"
                       >
-                        {isYearly ? t("proYearlyPrice") : t("proMonthlyPrice")}
+                        {isYearly ? geo.yearlyPerMonth : geo.monthlyDisplay}
                       </motion.span>
                     </AnimatePresence>
                   </span>
-                  <span className="text-[14px] text-[#999]">{t("proPeriod")}</span>
+                  <span className="text-[14px] text-[#999]">{geo.isBR ? "/mês" : t("proPeriod")}</span>
                 </div>
 
                 <AnimatePresence>
@@ -238,7 +240,7 @@ export function PricingPreview() {
                       transition={{ duration: 0.2, ease: EASE }}
                       className="overflow-hidden text-[13px] text-[#999]"
                     >
-                      {t("proBilledYearly")}
+                      {geo.yearlyDisplay}
                     </motion.p>
                   )}
                 </AnimatePresence>

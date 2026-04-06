@@ -8,8 +8,14 @@ export function initLemonSqueezy() {
 }
 
 export const VARIANT_IDS = {
-  monthly: process.env.LEMONSQUEEZY_MONTHLY_VARIANT_ID!,
-  yearly: process.env.LEMONSQUEEZY_YEARLY_VARIANT_ID!,
+  monthly: {
+    default: process.env.LEMONSQUEEZY_MONTHLY_VARIANT_ID!,
+    BR: process.env.LEMONSQUEEZY_MONTHLY_BR_VARIANT_ID!,
+  },
+  yearly: {
+    default: process.env.LEMONSQUEEZY_YEARLY_VARIANT_ID!,
+    BR: process.env.LEMONSQUEEZY_YEARLY_BR_VARIANT_ID!,
+  },
 } as const;
 
 export const STORE_ID = process.env.LEMONSQUEEZY_STORE_ID!;

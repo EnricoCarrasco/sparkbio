@@ -1,6 +1,18 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
+function setGeoCookie(response: NextResponse, request: NextRequest) {
+  const country = request.headers.get("x-vercel-ip-country") ?? "";
+  if (country) {
+    response.cookies.set("geo-country", country, {
+      path: "/",
+      httpOnly: false,
+      maxAge: 86400,
+    });
+  }
+  return response;
+}
+
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
@@ -14,11 +26,12 @@ export async function proxy(request: NextRequest) {
       request: { headers: requestHeaders },
     });
     response.cookies.set("NEXT_LOCALE", "pt-BR", { path: "/" });
-    return response;
+    return setGeoCookie(response, request);
   }
 
   // For all other routes: refresh Supabase auth session + handle auth redirects
-  return updateSession(request);
+  const response = await updateSession(request);
+  return setGeoCookie(response, request);
 }
 
 export const config = {

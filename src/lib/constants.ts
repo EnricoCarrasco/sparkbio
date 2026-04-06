@@ -514,6 +514,11 @@ export const PLANS = {
     yearlyPrice: 7,
     yearlyTotal: 84,
     trialDays: 7,
+    br: {
+      monthlyPrice: 25,
+      yearlyPrice: 18,
+      yearlyTotal: 219,
+    },
   },
 } as const;
 

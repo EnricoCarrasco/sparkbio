@@ -41,10 +41,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
+  // --- Determine country for geo-pricing ---
+  // Prefer Vercel's IP-based header (reliable, can't be spoofed by client)
+  // Fallback to client-provided country param
+  const headerCountry = request.headers.get("x-vercel-ip-country");
+  const bodyCountry =
+    body !== null && typeof body === "object" && "country" in body
+      ? (body as Record<string, unknown>).country
+      : undefined;
+  const country = headerCountry || (typeof bodyCountry === "string" ? bodyCountry : "");
+  const region: "BR" | "default" = country === "BR" ? "BR" : "default";
+
   // --- Resolve variant ID ---
-  const variantId = VARIANT_IDS[interval];
+  const variantId = VARIANT_IDS[interval][region];
   if (!variantId) {
-    // Environment variable not configured
     return NextResponse.json(
       { error: "variant_not_configured" },
       { status: 400 }
@@ -59,8 +69,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     checkoutData: {
       email: user.email,
       custom: {
-        // Passed back to our webhook via payload.meta.custom_data.user_id
-        // so we can link the subscription to the correct Supabase user.
         user_id: user.id,
       },
     },
