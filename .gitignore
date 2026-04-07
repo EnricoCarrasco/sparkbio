@@ -44,3 +44,6 @@ yarn-error.log*
 next-env.d.ts
 .claude/skills/ui-ux-pro-max/scripts/__pycache__/
 .serena/
+
+# claude cookbooks reference
+claude-cookbooks-main/

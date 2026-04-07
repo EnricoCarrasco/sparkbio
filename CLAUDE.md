@@ -115,3 +115,12 @@ LEMONSQUEEZY_YEARLY_VARIANT_ID
 ## Database
 
 6 tables: `profiles`, `links`, `themes`, `social_icons`, `analytics_events`, `subscriptions`. Migrations in `supabase/migrations/`. The `themes` table has both legacy fields (`button_style`, `bg_color`) and v2 design fields (`button_style_v2`, `button_corner`, `button_shadow`, `wallpaper_style`, etc.). The `subscriptions` table stores LemonSqueezy subscription state (one per user, service_role write only).
+
+## Tools
+
+- **rembg** — AI background removal CLI (U2Net). Usage: `rembg i input.jpg output.png`. Installed via pipx.
+- **nano-banana** — AI image generation CLI (Gemini). Usage: `nano-banana "prompt" -s 2K -m pro`. Supports `-t` for transparent, `-r` for reference images.
+
+## Reference: Claude Cookbooks
+
+The `claude-cookbooks-main/` folder contains the official Anthropic Claude Cookbooks (gitignored). When implementing Claude API features, AI SDK integrations, or agent patterns, always check this folder first for canonical examples and best practices before relying on training data.

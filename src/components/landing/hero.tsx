@@ -228,11 +228,11 @@ export function Hero() {
               }}
             >
               <Image
-                src="/images/landing/phone-mockups.png"
+                src="/images/landing/phone-mockups-nobg.png"
                 alt="Professional link-in-bio pages displayed on mobile phones — Viopage bio link builder for creators"
                 width={1200}
-                height={1080}
-                className="w-full max-w-[400px] sm:max-w-[500px] md:max-w-[650px] lg:max-w-[540px] xl:max-w-[600px] h-auto object-contain"
+                height={900}
+                className="w-full max-w-[500px] sm:max-w-[600px] md:max-w-[750px] lg:max-w-[620px] xl:max-w-[720px] h-auto object-contain"
                 priority
               />
             </motion.div>
