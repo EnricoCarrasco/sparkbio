@@ -125,7 +125,7 @@ export default function DashboardLayout({
         {/* Content + preview row */}
         <div className="flex flex-1 overflow-hidden">
           {/* Main content — tab-based switching */}
-          <main className="flex-1 overflow-y-auto pb-20 lg:pb-0">
+          <main data-dashboard-main className="flex-1 overflow-y-auto lg:pb-0">
             {/* Viopage logo — aligned with content max-width */}
             <div className="hidden lg:block pointer-events-none">
               <div className="max-w-[680px] mx-auto px-4 flex justify-end pt-2 pb-1">

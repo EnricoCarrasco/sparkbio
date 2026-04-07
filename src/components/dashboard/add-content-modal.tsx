@@ -215,7 +215,7 @@ export function AddContentModal({
           </div>
 
           {/* Right content */}
-          <div className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto py-3 px-4 md:py-4 md:px-5">
+          <div className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto py-3 px-4 md:py-4 md:px-5 pb-safe">
             {/* Add custom link button */}
             <button
               type="button"

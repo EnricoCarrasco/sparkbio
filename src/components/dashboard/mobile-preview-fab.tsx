@@ -32,7 +32,8 @@ export function MobilePreviewFAB() {
         type="button"
         onClick={() => setSheetOpen(true)}
         aria-label={t("livePreview")}
-        className="fixed bottom-8 right-5 z-40 lg:hidden size-14 rounded-full bg-[#FF6B35] text-white shadow-lg shadow-[#FF6B35]/25 flex items-center justify-center active:scale-95 transition-transform"
+        className="fixed z-40 lg:hidden size-14 rounded-full bg-[#FF6B35] text-white shadow-lg shadow-[#FF6B35]/25 flex items-center justify-center active:scale-95 transition-transform"
+        style={{ bottom: "calc(2rem + env(safe-area-inset-bottom, 0px))", right: "1.25rem" }}
       >
         <Eye className="size-6" />
       </button>
@@ -43,7 +44,7 @@ export function MobilePreviewFAB() {
           side="bottom"
           showCloseButton={false}
           className="rounded-t-2xl p-0 gap-0 flex flex-col"
-          style={{ height: "92vh", maxHeight: "92vh" }}
+          style={{ height: "92dvh", maxHeight: "92dvh" }}
         >
           {/* Drag handle */}
           <div className="flex justify-center pt-3 pb-1 shrink-0">

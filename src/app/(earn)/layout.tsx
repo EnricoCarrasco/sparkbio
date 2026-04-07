@@ -143,12 +143,12 @@ export default function EarnLayout({
         </header>
 
         {/* Scrollable page content */}
-        <main className="flex-1 overflow-y-auto pb-20 lg:pb-0">
+        <main data-dashboard-main className="flex-1 overflow-y-auto lg:pb-0">
           {children}
         </main>
 
         {/* ── Mobile bottom navigation ─────────────────────── */}
-        <nav className="flex lg:hidden items-center justify-around h-16 border-t border-border bg-white shrink-0 fixed bottom-0 left-0 right-0 z-20">
+        <nav className="flex lg:hidden items-center justify-around h-16 border-t border-border bg-white shrink-0 fixed bottom-0 left-0 right-0 z-20 pb-safe">
           {MOBILE_NAV_KEYS.map((item) => {
             const Icon = item.icon;
             const active = isItemActive(item);

@@ -138,4 +138,13 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+@media (max-width: 1023px) {
+  [data-dashboard-main] {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  }
 }
