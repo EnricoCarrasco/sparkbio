@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Link } from "@/types";
 import { createClient } from "@/lib/supabase/client";
+import { triggerRevalidation } from "@/lib/utils/revalidate";
 
 interface LinkState {
   links: Link[];
@@ -54,6 +55,7 @@ export const useLinkStore = create<LinkState>((set, get) => ({
 
     if (data && !error) {
       set({ links: [...links, data] });
+      triggerRevalidation();
     }
   },
 
@@ -71,6 +73,8 @@ export const useLinkStore = create<LinkState>((set, get) => ({
 
     if (error) {
       set({ links: prevLinks });
+    } else {
+      triggerRevalidation();
     }
   },
 
@@ -86,6 +90,8 @@ export const useLinkStore = create<LinkState>((set, get) => ({
 
     if (error) {
       set({ links: prevLinks });
+    } else {
+      triggerRevalidation();
     }
   },
 
@@ -111,6 +117,7 @@ export const useLinkStore = create<LinkState>((set, get) => ({
         supabase.from("links").update({ position: l.position }).eq("id", l.id)
       )
     );
+    triggerRevalidation();
   },
 
   toggleLink: async (id) => {

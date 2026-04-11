@@ -167,7 +167,7 @@ export function ProfilePage({ data }: ProfilePageProps) {
       <AnalyticsTracker profileId={profile.id} />
 
       {/* Content column — content centers vertically when sparse, footer stays at bottom */}
-      <main className="w-full max-w-[680px] mx-auto flex flex-col items-center px-4 relative z-10 flex-1">
+      <main className="w-full max-w-[480px] mx-auto flex flex-col items-center px-4 relative z-10 flex-1">
         {/* Add to Home Screen button (mobile only) */}
         <AddToHomeButton bgColor={theme.bg_color} />
 

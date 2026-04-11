@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/avatar";
 import { useProfileStore } from "@/lib/stores/profile-store";
 import { AVATAR_MAX_SIZE, AVATAR_ACCEPTED_TYPES } from "@/lib/constants";
+import { AvatarCropDialog } from "@/components/dashboard/avatar-crop-dialog";
 
 const BIO_MAX_LENGTH = 300;
 
@@ -30,6 +31,8 @@ export function ProfileEditor() {
   const [bio, setBio] = useState(profile?.bio ?? "");
   const [saving, setSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [cropOpen, setCropOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -54,7 +57,7 @@ export function ProfileEditor() {
     }
   }
 
-  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -68,21 +71,29 @@ export function ProfileEditor() {
       return;
     }
 
+    setCropSrc(URL.createObjectURL(file));
+    setCropOpen(true);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function handleCropDone(croppedFile: File) {
+    setCropOpen(false);
+    setCropSrc(null);
     setAvatarUploading(true);
     try {
-      const url = await uploadAvatar(file);
-      if (url) {
-        toast.success("Photo updated");
-      } else {
-        toast.error("Failed to upload photo");
-      }
+      const url = await uploadAvatar(croppedFile);
+      if (url) toast.success("Photo updated");
+      else toast.error("Failed to upload photo");
     } catch {
       toast.error("Failed to upload photo");
     } finally {
       setAvatarUploading(false);
-      // Reset input so the same file can be re-selected after an error
-      if (fileInputRef.current) fileInputRef.current.value = "";
     }
+  }
+
+  function handleCropCancel() {
+    setCropOpen(false);
+    setCropSrc(null);
   }
 
   const initials = (profile?.display_name || profile?.username || "?")
@@ -193,6 +204,13 @@ export function ProfileEditor() {
       >
         {saving ? "Saving…" : t("save")}
       </Button>
+
+      <AvatarCropDialog
+        open={cropOpen}
+        imageSrc={cropSrc}
+        onCropDone={handleCropDone}
+        onCancel={handleCropCancel}
+      />
     </div>
   );
 }

@@ -17,6 +17,7 @@ import { ColorInput } from "./color-input";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import type { ProfileLayout, TitleSize, TitleStyle, AvatarShape, AvatarBorder } from "@/types";
+import { AvatarCropDialog } from "@/components/dashboard/avatar-crop-dialog";
 
 // ---------------------------------------------------------------------------
 // Visual shape picker — shows actual shape previews instead of text buttons
@@ -137,12 +138,16 @@ export function HeaderPanel() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [heroUploading, setHeroUploading] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [cropOpen, setCropOpen] = useState(false);
+  const [heroCropSrc, setHeroCropSrc] = useState<string | null>(null);
+  const [heroCropOpen, setHeroCropOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const heroInputRef = useRef<HTMLInputElement>(null);
 
   if (!theme) return null;
 
-  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!AVATAR_ACCEPTED_TYPES.includes(file.type)) {
@@ -153,20 +158,32 @@ export function HeaderPanel() {
       toast.error("Image must be smaller than 2MB");
       return;
     }
+    setCropSrc(URL.createObjectURL(file));
+    setCropOpen(true);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function handleCropDone(croppedFile: File) {
+    setCropOpen(false);
+    setCropSrc(null);
     setAvatarUploading(true);
     try {
-      const url = await uploadAvatar(file);
+      const url = await uploadAvatar(croppedFile);
       if (url) toast.success("Photo updated");
       else toast.error("Failed to upload photo");
     } catch {
       toast.error("Failed to upload photo");
     } finally {
       setAvatarUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }
 
-  async function handleHeroChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleCropCancel() {
+    setCropOpen(false);
+    setCropSrc(null);
+  }
+
+  function handleHeroChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!HERO_ACCEPTED_TYPES.includes(file.type)) {
@@ -177,17 +194,29 @@ export function HeaderPanel() {
       toast.error("Image must be smaller than 5MB");
       return;
     }
+    setHeroCropSrc(URL.createObjectURL(file));
+    setHeroCropOpen(true);
+    if (heroInputRef.current) heroInputRef.current.value = "";
+  }
+
+  async function handleHeroCropDone(croppedFile: File) {
+    setHeroCropOpen(false);
+    setHeroCropSrc(null);
     setHeroUploading(true);
     try {
-      const url = await uploadHeroImage(file);
+      const url = await uploadHeroImage(croppedFile);
       if (url) toast.success("Hero image updated");
       else toast.error("Failed to upload hero image");
     } catch {
       toast.error("Failed to upload hero image");
     } finally {
       setHeroUploading(false);
-      if (heroInputRef.current) heroInputRef.current.value = "";
     }
+  }
+
+  function handleHeroCropCancel() {
+    setHeroCropOpen(false);
+    setHeroCropSrc(null);
   }
 
   async function handleHeroRemove() {
@@ -486,6 +515,21 @@ export function HeaderPanel() {
       </section>
 
       <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
+      <AvatarCropDialog
+        open={cropOpen}
+        imageSrc={cropSrc}
+        onCropDone={handleCropDone}
+        onCancel={handleCropCancel}
+      />
+      <AvatarCropDialog
+        open={heroCropOpen}
+        imageSrc={heroCropSrc}
+        onCropDone={handleHeroCropDone}
+        onCancel={handleHeroCropCancel}
+        aspect={5 / 2}
+        cropShape="rect"
+        title="Crop hero image"
+      />
     </div>
   );
 }

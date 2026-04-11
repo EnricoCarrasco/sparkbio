@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { ProfilePage } from "@/components/profile/profile-page";
@@ -7,7 +8,7 @@ import { generatePersonJsonLd } from "@/lib/json-ld";
 
 type Props = { params: Promise<{ username: string }> };
 
-async function fetchPublicProfile(username: string): Promise<PublicProfile | null> {
+const fetchPublicProfile = cache(async function fetchPublicProfile(username: string): Promise<PublicProfile | null> {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_public_profile", {
     p_username: username,
@@ -18,7 +19,7 @@ async function fetchPublicProfile(username: string): Promise<PublicProfile | nul
   }
 
   return data as PublicProfile;
-}
+});
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;

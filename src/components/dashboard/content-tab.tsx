@@ -48,6 +48,7 @@ import { ProfileEditDialog } from "@/components/dashboard/profile-edit-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getIconForPlatform, getPlatformLabel } from "@/lib/social-icon-map";
 import { AVATAR_MAX_SIZE, AVATAR_ACCEPTED_TYPES } from "@/lib/constants";
+import { AvatarCropDialog } from "@/components/dashboard/avatar-crop-dialog";
 import { BrandIcon } from "@/components/ui/brand-icon";
 import { cn } from "@/lib/utils";
 import { useLinkClickCounts } from "@/lib/hooks/use-link-click-counts";
@@ -102,6 +103,8 @@ function CompactProfileHeader({ onEditProfile }: { onEditProfile: () => void }) 
   const uploadAvatar = useProfileStore((s) => s.uploadAvatar);
   const socialIcons = useSocialStore((s) => s.socialIcons);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [cropOpen, setCropOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const initials = (profile?.display_name || profile?.username || "?")
@@ -112,7 +115,7 @@ function CompactProfileHeader({ onEditProfile }: { onEditProfile: () => void }) 
     .filter((s) => s.is_active)
     .sort((a, b) => a.position - b.position);
 
-  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!AVATAR_ACCEPTED_TYPES.includes(file.type)) {
@@ -123,17 +126,29 @@ function CompactProfileHeader({ onEditProfile }: { onEditProfile: () => void }) 
       toast.error(t("toastFileTooLarge"));
       return;
     }
+    setCropSrc(URL.createObjectURL(file));
+    setCropOpen(true);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function handleCropDone(croppedFile: File) {
+    setCropOpen(false);
+    setCropSrc(null);
     setAvatarUploading(true);
     try {
-      const url = await uploadAvatar(file);
+      const url = await uploadAvatar(croppedFile);
       if (url) toast.success(t("toastPhotoUpdated"));
       else toast.error(t("toastUploadFailed"));
     } catch {
       toast.error(t("toastUploadFailed"));
     } finally {
       setAvatarUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     }
+  }
+
+  function handleCropCancel() {
+    setCropOpen(false);
+    setCropSrc(null);
   }
 
   return (
@@ -199,6 +214,13 @@ function CompactProfileHeader({ onEditProfile }: { onEditProfile: () => void }) 
           </div>
         )}
       </div>
+
+      <AvatarCropDialog
+        open={cropOpen}
+        imageSrc={cropSrc}
+        onCropDone={handleCropDone}
+        onCancel={handleCropCancel}
+      />
     </div>
   );
 }

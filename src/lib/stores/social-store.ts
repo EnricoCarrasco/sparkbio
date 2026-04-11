@@ -1,10 +1,12 @@
 import { create } from "zustand";
 import type { SocialIcon, SocialPlatform, SocialDisplayMode } from "@/types";
 import { createClient } from "@/lib/supabase/client";
+import { triggerRevalidation } from "@/lib/utils/revalidate";
 
 interface SocialState {
   socialIcons: SocialIcon[];
   loading: boolean;
+  setSocialIcons: (icons: SocialIcon[]) => void;
   fetchSocialIcons: () => Promise<void>;
   addSocialIcon: (
     platform: SocialPlatform,
@@ -21,6 +23,8 @@ interface SocialState {
 export const useSocialStore = create<SocialState>((set, get) => ({
   socialIcons: [],
   loading: false,
+
+  setSocialIcons: (icons) => set({ socialIcons: icons }),
 
   fetchSocialIcons: async () => {
     set({ loading: true });
@@ -69,6 +73,7 @@ export const useSocialStore = create<SocialState>((set, get) => ({
 
     if (data && !error) {
       set({ socialIcons: [...socialIcons, data] });
+      triggerRevalidation();
     }
   },
 
@@ -91,6 +96,8 @@ export const useSocialStore = create<SocialState>((set, get) => ({
 
     if (error) {
       set({ socialIcons: prevIcons });
+    } else {
+      triggerRevalidation();
     }
   },
 
@@ -109,6 +116,8 @@ export const useSocialStore = create<SocialState>((set, get) => ({
 
     if (error) {
       set({ socialIcons: prevIcons });
+    } else {
+      triggerRevalidation();
     }
   },
 
@@ -145,5 +154,6 @@ export const useSocialStore = create<SocialState>((set, get) => ({
           .eq("id", icon.id)
       )
     );
+    triggerRevalidation();
   },
 }));

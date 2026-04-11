@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Crown, Check, Loader2, X, Sparkles } from "lucide-react";
 import { useGeoPricing } from "@/hooks/use-geo-pricing";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,18 @@ type BillingInterval = "monthly" | "yearly";
 interface UpgradeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+}
+
+declare global {
+  interface Window {
+    createLemonSqueezy?: () => void;
+    LemonSqueezy?: {
+      Url: {
+        Open: (url: string) => void;
+      };
+      Setup: (options: { eventHandler: (event: { event: string }) => void }) => void;
+    };
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -65,6 +78,35 @@ function FloatingParticle({ delay, x, size }: { delay: number; x: number; size: 
 }
 
 // ---------------------------------------------------------------------------
+// Load LemonSqueezy script dynamically
+// ---------------------------------------------------------------------------
+let lemonScriptLoaded = false;
+
+function loadLemonSqueezyScript(): Promise<void> {
+  if (lemonScriptLoaded && window.LemonSqueezy) return Promise.resolve();
+
+  return new Promise((resolve) => {
+    // Check if script already exists in DOM
+    if (document.querySelector('script[src*="lemon.js"]')) {
+      window.createLemonSqueezy?.();
+      lemonScriptLoaded = true;
+      resolve();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://app.lemonsqueezy.com/js/lemon.js";
+    script.async = true;
+    script.onload = () => {
+      window.createLemonSqueezy?.();
+      lemonScriptLoaded = true;
+      resolve();
+    };
+    document.head.appendChild(script);
+  });
+}
+
+// ---------------------------------------------------------------------------
 // UpgradeDialog
 // ---------------------------------------------------------------------------
 export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
@@ -72,6 +114,61 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
   const geo = useGeoPricing();
   const [interval, setInterval] = useState<BillingInterval>("yearly");
   const [isLoading, setIsLoading] = useState(false);
+  const [lemonReady, setLemonReady] = useState(false);
+  const fetchSubscription = useSubscriptionStore((s) => s.fetchSubscription);
+
+  // Load LemonSqueezy script when dialog opens
+  useEffect(() => {
+    if (!open) return;
+    loadLemonSqueezyScript().then(() => {
+      // Set up event handler for checkout events
+      window.LemonSqueezy?.Setup({
+        eventHandler: (event: { event: string }) => {
+          if (
+            event.event === "Checkout.Success" ||
+            event.event === "Checkout.Close" ||
+            event.event === "close"
+          ) {
+            startPolling();
+          }
+        },
+      });
+      setLemonReady(true);
+    });
+  }, [open]);
+
+  // Poll for subscription after checkout overlay closes
+  const startPolling = useCallback(() => {
+    let attempts = 0;
+    const maxAttempts = 20; // 20 * 2s = 40s max wait
+
+    async function check() {
+      attempts++;
+      try {
+        const res = await fetch("/api/checkout/status");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.hasSubscription) {
+            // Subscription confirmed -- refresh store and close dialog
+            await fetchSubscription();
+            onOpenChange(false);
+            toast.success(t("welcomePro"));
+            return;
+          }
+        }
+      } catch { /* ignore */ }
+
+      if (attempts >= maxAttempts) {
+        // Timeout -- still close and refresh (webhook might be delayed)
+        await fetchSubscription();
+        onOpenChange(false);
+        return;
+      }
+      setTimeout(check, 2000);
+    }
+
+    setTimeout(check, 2000);
+  }, [fetchSubscription, onOpenChange, t]);
 
   const handleUpgrade = async () => {
     setIsLoading(true);
@@ -94,7 +191,14 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
         return;
       }
 
-      window.location.href = url;
+      // Open LemonSqueezy overlay instead of redirecting
+      if (lemonReady && window.LemonSqueezy) {
+        onOpenChange(false); // Close upgrade dialog so overlay is on top
+        window.LemonSqueezy.Url.Open(url);
+      } else {
+        // Fallback: redirect if script failed to load
+        window.location.href = url;
+      }
     } catch {
       toast.error(t("checkoutError"));
     } finally {

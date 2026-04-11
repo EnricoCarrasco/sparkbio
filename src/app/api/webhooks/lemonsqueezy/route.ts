@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { after } from "next/server";
 import crypto from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { processReferralConversion, cancelPendingReferralEarnings } from "@/lib/referral";
@@ -180,36 +181,39 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "db_error" }, { status: 500 });
   }
 
-  // --- Referral conversion tracking (on trial or active — 30-day hold covers trial cancellations) ---
-  if (status === "active" || status === "on_trial") {
-    await processReferralConversion(
-      userId,
-      String(subscriptionId),
-      String(attributes.variant_id)
-    );
-  }
-  if (status === "cancelled" || status === "expired") {
-    await cancelPendingReferralEarnings(String(subscriptionId));
-  }
-
-  // --- On cancellation / expiry: remove premium perks ---
-  // Reset hide_footer so the Viopage footer is shown again on the public profile.
-  if (status === "cancelled" || status === "expired") {
-    const { error: themeError } = await supabase
-      .from("themes")
-      .update({ hide_footer: false })
-      .eq("user_id", userId);
-
-    if (themeError) {
-      // Non-fatal: the subscription row is already correct. Log and continue.
-      console.error(
-        "[webhook] failed to reset hide_footer for user:",
+  // --- Background work: referral processing + premium perk resets ---
+  // Run after the response is sent to improve webhook response time.
+  after(async () => {
+    // Referral conversion tracking (on trial or active — 30-day hold covers trial cancellations)
+    if (status === "active" || status === "on_trial") {
+      await processReferralConversion(
         userId,
-        "|",
-        themeError.message
+        String(subscriptionId),
+        String(attributes.variant_id)
       );
     }
-  }
+    if (status === "cancelled" || status === "expired") {
+      await cancelPendingReferralEarnings(String(subscriptionId));
+    }
+
+    // On cancellation / expiry: remove premium perks
+    // Reset hide_footer so the Viopage footer is shown again on the public profile.
+    if (status === "cancelled" || status === "expired") {
+      const { error: themeError } = await supabase
+        .from("themes")
+        .update({ hide_footer: false })
+        .eq("user_id", userId);
+
+      if (themeError) {
+        console.error(
+          "[webhook] failed to reset hide_footer for user:",
+          userId,
+          "|",
+          themeError.message
+        );
+      }
+    }
+  });
 
   return NextResponse.json({ ok: true });
 }

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { createDebouncedSave } from "@/lib/utils/debounced-save";
 import { HERO_MAX_SIZE, HERO_ACCEPTED_TYPES } from "@/lib/constants";
+import { triggerRevalidation } from "@/lib/utils/revalidate";
 
 interface ThemeState {
   theme: Theme | null;
@@ -16,6 +17,10 @@ interface ThemeState {
 }
 
 const debouncedSave = createDebouncedSave(500);
+
+// Track which fields have been modified since the last successful save.
+// The debounced save only sends these fields instead of the entire 30+ field theme.
+let dirtyKeys = new Set<string>();
 
 export const useThemeStore = create<ThemeState>((set, get) => ({
   theme: null,
@@ -54,15 +59,35 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
     // Optimistic update (instant UI)
     set({ theme: { ...theme, ...updates } });
 
-    // Debounced save — reads latest state from store so all accumulated changes are saved
+    // Accumulate which fields changed
+    for (const key of Object.keys(updates)) {
+      if (key !== "id" && key !== "user_id") {
+        dirtyKeys.add(key);
+      }
+    }
+
+    // Debounced save — only sends the accumulated dirty fields
     debouncedSave(async () => {
       const current = get().theme;
-      if (!current) return;
+      if (!current || dirtyKeys.size === 0) return;
+
+      // Build payload from only the dirty fields
+      const payload: Record<string, unknown> = {};
+      for (const key of dirtyKeys) {
+        payload[key] = (current as unknown as Record<string, unknown>)[key];
+      }
+
+      const keysToSave = new Set(dirtyKeys);
+      dirtyKeys = new Set<string>();
+
       const supabase = createClient();
-      const { id, user_id, ...fields } = current;
-      const { error } = await supabase.from("themes").update(fields).eq("id", id);
+      const { error } = await supabase.from("themes").update(payload).eq("id", current.id);
       if (error) {
+        // Re-add keys so next debounce retries them
+        for (const key of keysToSave) dirtyKeys.add(key);
         console.error("[theme-store] save failed:", error.message, error);
+      } else {
+        triggerRevalidation();
       }
     });
   },

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import type { Profile } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { AVATAR_MAX_SIZE, AVATAR_ACCEPTED_TYPES } from "@/lib/constants";
+import { triggerRevalidation } from "@/lib/utils/revalidate";
 
 interface ProfileState {
   profile: Profile | null;
@@ -52,6 +53,8 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     if (error) {
       // Revert on error
       set({ profile });
+    } else {
+      triggerRevalidation();
     }
   },
 

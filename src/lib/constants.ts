@@ -221,6 +221,24 @@ export const THEME_PRESETS_BASIC = [
     hide_bio: false,
     button_font_size: "medium" as const,
   },
+  {
+    name: "Sportpoeder",
+    bg_color: "#3B6FF0",
+    text_color: "#FFFFFF",
+    button_color: "#FFFFFF",
+    button_text_color: "#1E285F",
+    button_style: "rounded" as const,
+    button_style_v2: "solid" as const,
+    button_corner: "round" as const,
+    button_shadow: "none" as const,
+    font_family: "Montserrat",
+    avatar_shape: "rounded" as const,
+    avatar_border: "none" as const,
+    link_gap: "normal" as const,
+    title_font: null,
+    hide_bio: false,
+    button_font_size: "medium" as const,
+  },
 ] as const;
 
 // ── Premium themes (Pro tier) ───────────────────────────────────────────────
