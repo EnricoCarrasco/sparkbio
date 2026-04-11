@@ -138,7 +138,7 @@ export function AddContentModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!top-auto md:!top-1/2 !left-0 md:!left-1/2 !bottom-0 md:!bottom-auto !translate-x-0 md:!-translate-x-1/2 !translate-y-0 md:!-translate-y-1/2 !max-w-full md:!max-w-2xl !rounded-b-none md:!rounded-b-xl rounded-t-2xl p-0 gap-0 overflow-hidden max-h-[85dvh] md:max-h-none flex flex-col [&>*]:min-w-0">
+      <DialogContent className="!top-0 md:!top-1/2 !left-0 md:!left-1/2 !bottom-0 md:!bottom-auto !translate-x-0 md:!-translate-x-1/2 !translate-y-0 md:!-translate-y-1/2 !max-w-full md:!max-w-2xl !rounded-none md:!rounded-xl p-0 gap-0 overflow-hidden h-[100dvh] md:h-auto md:max-h-none flex flex-col [&>*]:min-w-0">
         {/* Header */}
         <DialogHeader className="px-5 md:px-6 pt-4 md:pt-5 pb-0">
           <DialogTitle className="text-lg font-bold">{t("title")}</DialogTitle>

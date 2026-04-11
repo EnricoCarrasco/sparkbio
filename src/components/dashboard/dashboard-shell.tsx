@@ -105,7 +105,7 @@ export function DashboardShell({
   return (
     <div className="flex h-screen overflow-hidden bg-[#FAFAFA]">
       {/* Desktop sidebar - narrow icon-only */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-[88px] lg:shrink-0 border-r border-border bg-white">
+      <aside className="hidden lg:flex lg:flex-col lg:w-[100px] lg:shrink-0 border-r border-border bg-white">
         <Sidebar onNavigate={() => {}} />
       </aside>
 
@@ -120,7 +120,7 @@ export function DashboardShell({
             >
               <Menu className="size-5" />
             </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-[88px]">
+            <SheetContent side="left" className="p-0 w-[100px]">
               <Sidebar onNavigate={() => setMobileOpen(false)} />
             </SheetContent>
           </Sheet>
