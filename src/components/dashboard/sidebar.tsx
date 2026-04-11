@@ -90,14 +90,14 @@ export function Sidebar({ onNavigate }: SidebarProps) {
               type="button"
               onClick={() => handleTabClick(key)}
               className={cn(
-                "flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-2.5 transition-colors",
+                "flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-3 transition-colors",
                 isActive
                   ? "bg-[#FF6B35]/10 text-[#FF6B35]"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
               <Icon className="size-5" strokeWidth={isActive ? 2 : 1.5} />
-              <span className="text-[10px] font-medium leading-tight">
+              <span className="text-[11px] font-medium leading-tight">
                 {t(labelKey)}
               </span>
             </button>
@@ -111,10 +111,10 @@ export function Sidebar({ onNavigate }: SidebarProps) {
           <button
             type="button"
             onClick={() => { router.push("/admin"); onNavigate(); }}
-            className="flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-2.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            className="flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-3 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           >
             <ShieldCheck className="size-5" strokeWidth={1.5} />
-            <span className="text-[10px] font-medium leading-tight">
+            <span className="text-[11px] font-medium leading-tight">
               Admin
             </span>
           </button>
@@ -129,10 +129,10 @@ export function Sidebar({ onNavigate }: SidebarProps) {
             href={`/${profile.username}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-2.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            className="flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-3 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           >
             <ExternalLink className="size-5" strokeWidth={1.5} />
-            <span className="text-[10px] font-medium leading-tight">
+            <span className="text-[11px] font-medium leading-tight">
               {t("viewProfile")}
             </span>
           </a>
@@ -146,10 +146,10 @@ export function Sidebar({ onNavigate }: SidebarProps) {
         {/* Sign out */}
         <button
           onClick={handleSignOut}
-          className="flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-2.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          className="flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-3 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
         >
           <LogOut className="size-5" strokeWidth={1.5} />
-          <span className="text-[10px] font-medium leading-tight">
+          <span className="text-[11px] font-medium leading-tight">
             {t("signOut")}
           </span>
         </button>

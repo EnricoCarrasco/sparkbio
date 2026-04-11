@@ -186,7 +186,7 @@ function CompactProfileHeader({ onEditProfile }: { onEditProfile: () => void }) 
           onClick={onEditProfile}
           className="text-left w-full group"
         >
-          <h2 className="text-base font-bold text-foreground leading-tight truncate group-hover:text-primary transition-colors cursor-pointer">
+          <h2 className="text-base font-semibold tracking-tight text-foreground leading-tight truncate group-hover:text-primary transition-colors cursor-pointer">
             {profile?.display_name || profile?.username || "Your Name"}
           </h2>
           {profile?.bio ? (
@@ -311,7 +311,7 @@ function SocialIconCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "rounded-2xl bg-orange-50 border border-border/60 shadow-sm",
+        "rounded-2xl bg-orange-50 border border-border/60 shadow-sm hover:shadow-md transition-shadow",
         isDragging && "shadow-lg opacity-80 z-50"
       )}
     >
@@ -666,13 +666,13 @@ function ContentTabInner() {
         <div className="flex items-center gap-5">
           <button
             type="button"
-            className="text-base font-bold text-foreground border-b-2 border-foreground pb-0.5"
+            className="text-lg font-semibold tracking-tight text-foreground border-b-2 border-foreground pb-0.5"
           >
             {t("linksTab")}
           </button>
           <a
             href="/earn"
-            className="text-base font-medium text-muted-foreground hover:text-foreground pb-0.5 transition-colors"
+            className="text-lg font-medium tracking-tight text-muted-foreground hover:text-foreground pb-0.5 transition-colors"
           >
             {t("earnTab")}
           </a>
@@ -682,7 +682,7 @@ function ContentTabInner() {
       {/* ── Compact profile section (click name/bio to edit) ── */}
       <CompactProfileHeader onEditProfile={() => setProfileEditOpen(true)} />
 
-      {/* ── Big purple "+ Add" button ── */}
+      {/* ── "+ Add" button ── */}
       <button
         ref={addButtonRef}
         type="button"
@@ -690,10 +690,7 @@ function ContentTabInner() {
           setAddModalOpen(true);
           if (step === "add-button") setStep("whatsapp-hint");
         }}
-        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-full text-white font-semibold text-sm transition-all hover:opacity-90 active:scale-[0.98]"
-        style={{
-          background: "linear-gradient(135deg, #FF6B35, #E8501A)",
-        }}
+        className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#FF6B35] text-white font-semibold text-sm transition-all hover:opacity-90 active:scale-[0.98]"
       >
         <Plus className="size-4" strokeWidth={2.5} />
         {t("addLink")}

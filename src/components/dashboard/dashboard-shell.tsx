@@ -135,16 +135,6 @@ export function DashboardShell({
         <div className="flex flex-1 overflow-hidden">
           {/* Main content — tab-based switching */}
           <main data-dashboard-main className="flex-1 overflow-y-auto lg:pb-0">
-            {/* Viopage logo — aligned with content max-width */}
-            <div className="hidden lg:block pointer-events-none">
-              <div className="max-w-[680px] mx-auto px-4 flex justify-end pt-2 pb-1">
-                <img
-                  src="/images/landing/viopage-icon.png"
-                  alt="Viopage"
-                  className="h-20 w-auto select-none opacity-80"
-                />
-              </div>
-            </div>
             {activeTab === "content" && <ContentTab />}
             {activeTab === "design" && <DesignTab />}
             {activeTab === "analytics" && (
