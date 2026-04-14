@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Inter, Poppins, Instrument_Serif } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
@@ -58,6 +59,10 @@ export default async function RootLayout({
           {children}
           <Toaster />
         </NextIntlClientProvider>
+        <Script
+          src="https://app.lemonsqueezy.com/js/lemon.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
