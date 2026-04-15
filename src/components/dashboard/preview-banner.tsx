@@ -62,8 +62,8 @@ export function PreviewBanner() {
 
   const { count } = countPreviewedProCategories(theme);
   if (count === 0) return null;
-
-  const canRestore = theme.pre_pro_snapshot != null;
+  // Restore is always offered when Pro features are active — the store falls
+  // back to the public-page strip if no snapshot was captured.
 
   return (
     <>
@@ -88,16 +88,14 @@ export function PreviewBanner() {
             {t("upgradeCta")}
           </span>
         </button>
-        {canRestore && (
-          <button
-            type="button"
-            onClick={() => restorePreProSnapshot()}
-            className="flex w-full items-center justify-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
-          >
-            <RotateCcw className="size-3" />
-            {t("restorePrePro")}
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => restorePreProSnapshot()}
+          className="flex w-full items-center justify-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
+        >
+          <RotateCcw className="size-3" />
+          {t("restorePrePro")}
+        </button>
       </div>
       <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
     </>

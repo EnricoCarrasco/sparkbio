@@ -8,6 +8,7 @@ import { triggerRevalidation } from "@/lib/utils/revalidate";
 import {
   countPreviewedProCategories,
   snapshotFreeFields,
+  stripProFields,
   PRO_FIELDS_RESET,
 } from "@/lib/pro-fields";
 
@@ -113,18 +114,44 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
     });
   },
 
-  /** Restore the creator's theme to the snapshot taken when they first tried
-   *  a Pro feature. Applies the snapshot fields, resets all Pro fields to
-   *  their free defaults, and clears the snapshot so a new one can be
-   *  captured next time they experiment. */
+  /** Bring the editor back in sync with what the public page shows.
+   *
+   *  Two cases:
+   *  - A snapshot exists (captured when the creator first tried a Pro
+   *    feature): restore those exact free-tier values plus reset all Pro
+   *    fields to defaults. This preserves their custom colors from that
+   *    moment.
+   *  - No snapshot (e.g. they already had Pro fields set before the
+   *    snapshot feature shipped): fall back to the same strip the public
+   *    page uses — so the editor matches the live page exactly.
+   *
+   *  Either way the snapshot is cleared so a new experimentation cycle
+   *  can capture a fresh one. */
   restorePreProSnapshot: async () => {
     const { theme } = get();
-    if (!theme?.pre_pro_snapshot) return;
-    await get().updateTheme({
-      ...theme.pre_pro_snapshot,
-      ...PRO_FIELDS_RESET,
-      pre_pro_snapshot: null,
-    });
+    if (!theme) return;
+
+    if (theme.pre_pro_snapshot) {
+      await get().updateTheme({
+        ...theme.pre_pro_snapshot,
+        ...PRO_FIELDS_RESET,
+        pre_pro_snapshot: null,
+      });
+      return;
+    }
+
+    // Fallback: apply the same strip the public page uses. Compute a diff
+    // so we only send changed fields to the server.
+    const stripped = stripProFields(theme);
+    const diff: Record<string, unknown> = {};
+    for (const key of Object.keys(stripped)) {
+      const k = key as keyof Theme;
+      if (stripped[k] !== theme[k]) {
+        diff[key] = stripped[k];
+      }
+    }
+    if (Object.keys(diff).length === 0) return;
+    await get().updateTheme(diff as Partial<Theme>);
   },
 
   uploadHeroImage: async (file: File) => {
