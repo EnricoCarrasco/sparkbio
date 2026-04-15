@@ -16,7 +16,7 @@ const NAV_LINKS = [
   { key: "blog" as const, href: "/blog" },
 ] as const;
 
-export function Navbar() {
+export function Navbar({ isAuthenticated = false }: { isAuthenticated?: boolean }) {
   const t = useTranslations("landing.nav");
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -70,21 +70,30 @@ export function Navbar() {
                 <LanguageSwitcher variant="dark" />
               </div>
 
-              {/* Log in */}
-              <Link
-                href="/login"
-                className="hidden sm:inline-flex items-center px-4 py-2 text-[14px] font-medium transition-colors duration-200 rounded-full text-[#555] hover:text-[#111113] hover:bg-black/[0.04]"
-              >
-                {t("login")}
-              </Link>
+              {isAuthenticated ? (
+                <Link
+                  href="/dashboard"
+                  className="hidden sm:inline-flex items-center px-5 py-2.5 text-[14px] font-semibold rounded-full active:scale-[0.97] transition-all duration-200 text-white bg-[#111113] hover:bg-[#333]"
+                >
+                  {t("dashboard")}
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="hidden sm:inline-flex items-center px-4 py-2 text-[14px] font-medium transition-colors duration-200 rounded-full text-[#555] hover:text-[#111113] hover:bg-black/[0.04]"
+                  >
+                    {t("login")}
+                  </Link>
 
-              {/* Sign up pill */}
-              <Link
-                href="/register"
-                className="hidden sm:inline-flex items-center px-5 py-2.5 text-[14px] font-semibold rounded-full active:scale-[0.97] transition-all duration-200 text-white bg-[#111113] hover:bg-[#333]"
-              >
-                {t("signup")}
-              </Link>
+                  <Link
+                    href="/register"
+                    className="hidden sm:inline-flex items-center px-5 py-2.5 text-[14px] font-semibold rounded-full active:scale-[0.97] transition-all duration-200 text-white bg-[#111113] hover:bg-[#333]"
+                  >
+                    {t("signup")}
+                  </Link>
+                </>
+              )}
 
               {/* Mobile hamburger */}
               <button
@@ -132,20 +141,32 @@ export function Navbar() {
                 <div className="flex items-center gap-2 px-1 pb-1">
                   <LanguageSwitcher variant="dark" />
                   <div className="flex-1" />
-                  <Link
-                    href="/login"
-                    onClick={handleNavLinkClick}
-                    className="px-4 py-2.5 text-[14px] font-medium rounded-full transition-colors duration-200 text-[#555] hover:text-[#111] hover:bg-black/[0.04]"
-                  >
-                    {t("login")}
-                  </Link>
-                  <Link
-                    href="/register"
-                    onClick={handleNavLinkClick}
-                    className="px-5 py-2.5 text-[14px] font-semibold rounded-full transition-all duration-200 active:scale-[0.97] text-white bg-[#111113] hover:bg-[#333]"
-                  >
-                    {t("signup")}
-                  </Link>
+                  {isAuthenticated ? (
+                    <Link
+                      href="/dashboard"
+                      onClick={handleNavLinkClick}
+                      className="px-5 py-2.5 text-[14px] font-semibold rounded-full transition-all duration-200 active:scale-[0.97] text-white bg-[#111113] hover:bg-[#333]"
+                    >
+                      {t("dashboard")}
+                    </Link>
+                  ) : (
+                    <>
+                      <Link
+                        href="/login"
+                        onClick={handleNavLinkClick}
+                        className="px-4 py-2.5 text-[14px] font-medium rounded-full transition-colors duration-200 text-[#555] hover:text-[#111] hover:bg-black/[0.04]"
+                      >
+                        {t("login")}
+                      </Link>
+                      <Link
+                        href="/register"
+                        onClick={handleNavLinkClick}
+                        className="px-5 py-2.5 text-[14px] font-semibold rounded-full transition-all duration-200 active:scale-[0.97] text-white bg-[#111113] hover:bg-[#333]"
+                      >
+                        {t("signup")}
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>

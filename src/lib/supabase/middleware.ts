@@ -42,9 +42,12 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from auth pages
+  // Redirect authenticated users away from auth pages and marketing homepage
   if (
-    (pathname === "/login" || pathname === "/register") &&
+    (pathname === "/login" ||
+      pathname === "/register" ||
+      pathname === "/" ||
+      pathname === "/pt-BR") &&
     user
   ) {
     const url = request.nextUrl.clone();

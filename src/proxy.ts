@@ -16,6 +16,13 @@ function setGeoCookie(response: NextResponse, request: NextRequest) {
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
+  // Refresh Supabase auth session + handle auth redirects for every app route.
+  // updateSession knows to redirect authenticated users away from "/" and "/pt-BR".
+  const authResponse = await updateSession(request);
+  if (authResponse.headers.get("location")) {
+    return setGeoCookie(authResponse, request);
+  }
+
   // Handle /pt-BR locale prefix: rewrite to root path and pass locale via header
   if (pathname === "/pt-BR" || pathname.startsWith("/pt-BR/")) {
     const remainingPath = pathname === "/pt-BR" ? "/" : pathname.slice(6);
@@ -29,9 +36,7 @@ export async function proxy(request: NextRequest) {
     return setGeoCookie(response, request);
   }
 
-  // For all other routes: refresh Supabase auth session + handle auth redirects
-  const response = await updateSession(request);
-  return setGeoCookie(response, request);
+  return setGeoCookie(authResponse, request);
 }
 
 export const config = {
