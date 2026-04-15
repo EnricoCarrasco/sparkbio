@@ -667,7 +667,13 @@
     "preview": {
       "livePreview": "Live Preview",
       "openFullPage": "Open full page",
-      "loading": "Loading preview..."
+      "loading": "Loading preview...",
+      "previewingCount": "Previewing {count, plural, one {# Pro feature} other {# Pro features}}",
+      "upgradeToMakeLive": "Upgrade to make it live",
+      "upgradeCta": "Upgrade",
+      "subscriptionEndedTitle": "Your Pro subscription ended",
+      "subscriptionEndedDesc": "Renew to restore your design",
+      "renewCta": "Renew"
     },
     "share": {
       "title": "Share",

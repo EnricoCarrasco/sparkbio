@@ -5,9 +5,9 @@ import { useTranslations } from "next-intl";
 import { Crown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useThemeStore } from "@/lib/stores/theme-store";
+import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { PREMADE_GRADIENTS } from "@/lib/constants";
 import { ColorInput } from "./color-input";
-import { ProFeatureGate } from "@/components/billing/pro-feature-gate";
 import { cn } from "@/lib/utils";
 import type { WallpaperStyle } from "@/types";
 
@@ -15,6 +15,8 @@ interface WallpaperStyleCardProps {
   label: string;
   preview: React.ReactNode;
   isActive: boolean;
+  isPro?: boolean;
+  showCrown?: boolean;
   onClick: () => void;
 }
 
@@ -22,6 +24,7 @@ function WallpaperStyleCard({
   label,
   preview,
   isActive,
+  showCrown,
   onClick,
 }: WallpaperStyleCardProps) {
   return (
@@ -35,6 +38,11 @@ function WallpaperStyleCard({
           : "border border-zinc-100 bg-white hover:border-zinc-200 hover:shadow-sm"
       )}
     >
+      {showCrown && (
+        <span className="absolute top-2 right-2 z-10 flex size-5 items-center justify-center rounded-full bg-white/95 shadow-sm">
+          <Crown className="size-3 text-amber-500" />
+        </span>
+      )}
       <div className="relative w-full min-h-[120px] aspect-[3/4] overflow-hidden">
         {preview}
       </div>
@@ -56,6 +64,7 @@ export function WallpaperPanel() {
   const t = useTranslations("dashboard.design");
   const theme = useThemeStore((s) => s.theme);
   const updateTheme = useThemeStore((s) => s.updateTheme);
+  const isPro = useSubscriptionStore((s) => s.isPro);
 
   if (!theme) return null;
 
@@ -135,25 +144,25 @@ export function WallpaperPanel() {
   ];
 
   return (
-    <ProFeatureGate featureLabel={t("wallpaperStyle")}>
-      <div className="space-y-6">
-        {/* Wallpaper Style */}
-        <section>
-          <h2 className="text-lg font-bold text-zinc-900 mb-4">
-            {t("wallpaperStyle")}
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {wallpaperCards.map((card) => (
-              <WallpaperStyleCard
-                key={card.value}
-                label={card.label}
-                preview={card.preview}
-                isActive={activeStyle === card.value}
-                onClick={() => handleStyleChange(card.value)}
-              />
-            ))}
-          </div>
-        </section>
+    <div className="space-y-6">
+      {/* Wallpaper Style */}
+      <section>
+        <h2 className="text-lg font-bold text-zinc-900 mb-4">
+          {t("wallpaperStyle")}
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {wallpaperCards.map((card) => (
+            <WallpaperStyleCard
+              key={card.value}
+              label={card.label}
+              preview={card.preview}
+              isActive={activeStyle === card.value}
+              showCrown={!isPro && card.value !== "fill"}
+              onClick={() => handleStyleChange(card.value)}
+            />
+          ))}
+        </div>
+      </section>
 
         {/* Fill: background color picker */}
         {activeStyle === "fill" && (
@@ -277,43 +286,43 @@ export function WallpaperPanel() {
           </section>
         )}
 
-        {/* Effects */}
-        <section className="bg-white p-6 rounded-2xl border border-zinc-100">
-          <h2 className="text-lg font-bold text-zinc-900 mb-4">
-            {t("animate")}
-          </h2>
-          <div className="space-y-3">
-            {/* Animate toggle */}
-            <div className="flex items-center justify-between rounded-xl bg-zinc-50 border border-zinc-100 p-4">
-              <span className="text-sm font-medium text-zinc-900">
-                {t("animate")}
-              </span>
-              <Switch
-                checked={theme.wallpaper_animate}
-                onCheckedChange={(v) =>
-                  updateTheme({ wallpaper_animate: v })
-                }
-              />
-            </div>
-
-            {/* Noise toggle */}
-            <div className="flex items-center justify-between rounded-xl bg-zinc-50 border border-zinc-100 p-4">
-              <div className="space-y-0.5">
-                <p className="text-sm font-medium text-zinc-900">
-                  {t("noise")}
-                </p>
-                <p className="text-xs text-zinc-500">{t("noiseDesc")}</p>
-              </div>
-              <Switch
-                checked={theme.wallpaper_noise}
-                onCheckedChange={(v) =>
-                  updateTheme({ wallpaper_noise: v })
-                }
-              />
-            </div>
+      {/* Effects */}
+      <section className="bg-white p-6 rounded-2xl border border-zinc-100">
+        <h2 className="text-lg font-bold text-zinc-900 mb-4 flex items-center gap-2">
+          {t("animate")}
+          {!isPro && <Crown className="size-4 text-amber-500" />}
+        </h2>
+        <div className="space-y-3">
+          {/* Animate toggle */}
+          <div className="flex items-center justify-between rounded-xl bg-zinc-50 border border-zinc-100 p-4">
+            <span className="text-sm font-medium text-zinc-900">
+              {t("animate")}
+            </span>
+            <Switch
+              checked={theme.wallpaper_animate}
+              onCheckedChange={(v) =>
+                updateTheme({ wallpaper_animate: v })
+              }
+            />
           </div>
-        </section>
-      </div>
-    </ProFeatureGate>
+
+          {/* Noise toggle */}
+          <div className="flex items-center justify-between rounded-xl bg-zinc-50 border border-zinc-100 p-4">
+            <div className="space-y-0.5">
+              <p className="text-sm font-medium text-zinc-900">
+                {t("noise")}
+              </p>
+              <p className="text-xs text-zinc-500">{t("noiseDesc")}</p>
+            </div>
+            <Switch
+              checked={theme.wallpaper_noise}
+              onCheckedChange={(v) =>
+                updateTheme({ wallpaper_noise: v })
+              }
+            />
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }

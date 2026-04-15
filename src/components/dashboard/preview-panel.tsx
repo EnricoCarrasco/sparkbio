@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Share2 } from "lucide-react";
 import { usePreviewIframe } from "@/lib/hooks/use-preview-iframe";
 import { ShareModal } from "@/components/dashboard/share-modal";
+import { PreviewBanner } from "@/components/dashboard/preview-banner";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://viopage.com";
@@ -36,6 +37,9 @@ export function PreviewPanel() {
           </a>
         )}
       </div>
+
+      {/* Pro-preview banner — free creators only, when Pro features are active */}
+      <PreviewBanner />
 
       {/* Share URL bar */}
       {username && (

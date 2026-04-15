@@ -5,6 +5,8 @@ import { ProfilePage } from "@/components/profile/profile-page";
 import type { Metadata } from "next";
 import type { PublicProfile } from "@/types";
 import { generatePersonJsonLd } from "@/lib/json-ld";
+import { isSubscriptionActive } from "@/lib/constants";
+import { stripProFields } from "@/lib/pro-fields";
 
 type Props = { params: Promise<{ username: string }> };
 
@@ -108,6 +110,14 @@ export default async function PublicProfilePage({ params }: Props) {
     image: profile.avatar_url ?? undefined,
   });
 
+  // Pro-field strip: hide aspirational Pro settings from public visitors when
+  // the creator isn't on an active Pro subscription. The owner sees the full
+  // design via the separate /{username}/preview route (auth-gated).
+  const isPro = isSubscriptionActive(data.subscription?.status);
+  const publicData: PublicProfile = isPro
+    ? data
+    : { ...data, theme: stripProFields(data.theme) };
+
   return (
     <>
       {/* Structured data for search engines */}
@@ -116,7 +126,7 @@ export default async function PublicProfilePage({ params }: Props) {
         // biome-ignore lint/security/noDangerouslySetInnerHtml: controlled server-generated JSON-LD
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ProfilePage data={data} />
+      <ProfilePage data={publicData} />
     </>
   );
 }

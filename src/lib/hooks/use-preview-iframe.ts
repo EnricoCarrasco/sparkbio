@@ -62,7 +62,10 @@ export function usePreviewIframe() {
   ]);
 
   const username = profile?.username;
-  const iframeSrc = username ? `/${username}?preview=1&t=${refreshKey}` : null;
+  // Use the owner-only /preview route so the creator sees Pro fields they've
+  // configured (including while on free tier). The public /{username} route
+  // server-strips Pro fields.
+  const iframeSrc = username ? `/${username}/preview?t=${refreshKey}` : null;
 
   return { iframeSrc, refreshKey, username };
 }

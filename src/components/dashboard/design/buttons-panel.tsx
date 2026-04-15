@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useTranslations } from "next-intl";
 import { Crown } from "lucide-react";
 import { useThemeStore } from "@/lib/stores/theme-store";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
-import { UpgradeDialog } from "@/components/billing/upgrade-dialog";
 import { ColorInput } from "./color-input";
 import { ToggleGroup } from "./toggle-group";
 import { cn } from "@/lib/utils";
@@ -17,35 +16,23 @@ export function ButtonsPanel() {
   const theme = useThemeStore((s) => s.theme);
   const updateTheme = useThemeStore((s) => s.updateTheme);
   const isPro = useSubscriptionStore((s) => s.isPro);
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   if (!theme) return null;
 
   const btnColor = theme.button_color;
   const btnTextColor = theme.button_text_color;
 
-  // Free users: only solid style, round/full corners, no shadow
+  // Free users can select any button style — their public page strips Pro
+  // fields server-side. Crown badges still mark Pro-only options as a cue.
   function handleStyleChange(v: ButtonStyleV2) {
-    if (!isPro && v !== "solid") {
-      setUpgradeOpen(true);
-      return;
-    }
     updateTheme({ button_style_v2: v });
   }
 
   function handleCornerChange(v: ButtonCorner) {
-    if (!isPro && v !== "round" && v !== "full") {
-      setUpgradeOpen(true);
-      return;
-    }
     updateTheme({ button_corner: v });
   }
 
   function handleShadowChange(v: ButtonShadow) {
-    if (!isPro && v !== "none") {
-      setUpgradeOpen(true);
-      return;
-    }
     updateTheme({ button_shadow: v });
   }
 
@@ -347,8 +334,6 @@ export function ButtonsPanel() {
           onChange={(v) => updateTheme({ button_font_size: v })}
         />
       </section>
-
-      <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
     </div>
   );
 }

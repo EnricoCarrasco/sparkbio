@@ -668,7 +668,13 @@
     "preview": {
       "livePreview": "Visualizar",
       "openFullPage": "Abrir página completa",
-      "loading": "Carregando..."
+      "loading": "Carregando...",
+      "previewingCount": "Visualizando {count, plural, one {# recurso Pro} other {# recursos Pro}}",
+      "upgradeToMakeLive": "Atualize para deixar no ar",
+      "upgradeCta": "Fazer upgrade",
+      "subscriptionEndedTitle": "Sua assinatura Pro encerrou",
+      "subscriptionEndedDesc": "Renove para restaurar seu design",
+      "renewCta": "Renovar"
     },
     "share": {
       "title": "Compartilhar",
