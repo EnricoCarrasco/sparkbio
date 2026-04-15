@@ -68,7 +68,7 @@ import type { SocialIcon, SocialPlatform, SocialDisplayMode, Link } from "@/type
 
 function ContentSkeleton() {
   return (
-    <div className="max-w-[680px] mx-auto px-4 py-6 space-y-5">
+    <div className="max-w-[860px] mx-auto px-6 py-6 space-y-5">
       <div className="flex items-center gap-6">
         <Skeleton className="h-5 w-12" />
         <Skeleton className="h-5 w-10" />
@@ -600,21 +600,23 @@ function SocialIconsList() {
 // ---------------------------------------------------------------------------
 
 export function ContentTab() {
+  const profile = useProfileStore((s) => s.profile);
   const links = useLinkStore((s) => s.links);
   const socialIcons = useSocialStore((s) => s.socialIcons);
-  const profileLoading = useProfileStore((s) => s.loading);
-  const linksLoading = useLinkStore((s) => s.loading);
-  const socialLoading = useSocialStore((s) => s.loading);
 
-  const isLoading = profileLoading || linksLoading || socialLoading;
-  const isEmpty = links.length === 0 && socialIcons.length === 0;
-
-  if (isLoading) {
+  // Wait for profile hydration — stores start empty, so checking length before
+  // DashboardShell's useEffect runs would false-positive the onboarding trigger.
+  if (!profile) {
     return <ContentSkeleton />;
   }
 
+  const shouldOnboard =
+    !profile.has_completed_onboarding &&
+    links.length === 0 &&
+    socialIcons.length === 0;
+
   return (
-    <OnboardingProvider initialStep={isEmpty ? "add-button" : null}>
+    <OnboardingProvider initialStep={shouldOnboard ? "add-button" : null}>
       <ContentTabInner />
     </OnboardingProvider>
   );
@@ -624,6 +626,17 @@ function ContentTabInner() {
   const t = useTranslations("dashboard.design");
   const tOnboarding = useTranslations("onboarding");
   const { step, setStep, dismiss } = useOnboarding();
+  const updateProfile = useProfileStore((s) => s.updateProfile);
+
+  // Persist onboarding completion to DB so it never shows again across devices
+  const markCompleted = React.useCallback(() => {
+    updateProfile({ has_completed_onboarding: true });
+  }, [updateProfile]);
+
+  const completeAndDismiss = React.useCallback(() => {
+    markCompleted();
+    dismiss();
+  }, [markCompleted, dismiss]);
 
   // Modal states
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -650,6 +663,8 @@ function ContentTabInner() {
       step === "smart-input-hint"
     ) {
       setShowCelebration(true);
+      // User added their first link — mark onboarding complete so it doesn't come back
+      markCompleted();
       const timer = setTimeout(() => {
         setShowCelebration(false);
         setStep("share-nudge");
@@ -657,10 +672,10 @@ function ContentTabInner() {
       return () => clearTimeout(timer);
     }
     prevCountRef.current = currentCount;
-  }, [socialIcons.length, links.length, step, setStep]);
+  }, [socialIcons.length, links.length, step, setStep, markCompleted]);
 
   return (
-    <div className="max-w-[680px] mx-auto px-4 py-6 space-y-5">
+    <div className="max-w-[860px] mx-auto px-6 py-6 space-y-5">
       {/* ── Top bar: Links / Earn tabs ── */}
       <div className="flex items-center">
         <div className="flex items-center gap-5">
@@ -703,7 +718,7 @@ function ContentTabInner() {
       <LinkList />
 
       {/* ── Share nudge banner ── */}
-      {step === "share-nudge" && <ShareNudgeBanner onDismiss={dismiss} />}
+      {step === "share-nudge" && <ShareNudgeBanner onDismiss={completeAndDismiss} />}
 
       {/* ── Modals ── */}
 
@@ -751,7 +766,7 @@ function ContentTabInner() {
         description={tOnboarding("addLinkDescription")}
         currentStep={1}
         totalSteps={4}
-        onDismiss={dismiss}
+        onDismiss={completeAndDismiss}
       />
 
       {/* ── Celebration overlay ── */}

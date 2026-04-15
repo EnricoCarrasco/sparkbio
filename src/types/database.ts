@@ -48,6 +48,7 @@ export interface Profile {
   payout_method: "paypal" | "pix" | null;
   payout_destination: string | null;
   has_chosen_username: boolean;
+  has_completed_onboarding: boolean;
   created_at: string;
   updated_at: string;
 }

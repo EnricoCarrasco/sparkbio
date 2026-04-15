@@ -54,8 +54,8 @@ export function PreviewPanel() {
       )}
 
       {/* Phone frame wrapper */}
-      <div className="flex-1 flex items-start justify-center py-6 px-3 overflow-y-auto">
-        <div className="relative w-[260px] shrink-0">
+      <div className="flex-1 flex items-start justify-center py-8 px-4 overflow-y-auto">
+        <div className="relative w-[300px] shrink-0">
           {/* Phone bezel — iPhone-style */}
           <div className="rounded-[3rem] border-[6px] border-[#1a1a1a] bg-[#1a1a1a] shadow-2xl overflow-hidden">
             {/* Dynamic Island / Notch */}
@@ -66,7 +66,7 @@ export function PreviewPanel() {
             {/* Screen — real iframe */}
             <div
               className="bg-white"
-              style={{ height: "520px", overflow: "hidden" }}
+              style={{ height: "600px", overflow: "hidden" }}
             >
               {iframeSrc ? (
                 <iframe
@@ -75,10 +75,10 @@ export function PreviewPanel() {
                   title="Profile preview"
                   className="w-full h-full border-0"
                   style={{
-                    transform: "scale(0.65)",
+                    transform: "scale(0.75)",
                     transformOrigin: "top left",
-                    width: "154%",
-                    height: "154%",
+                    width: "133.33%",
+                    height: "133.33%",
                   }}
                   sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
                 />
