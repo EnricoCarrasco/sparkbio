@@ -668,12 +668,17 @@
       "livePreview": "Live Preview",
       "openFullPage": "Open full page",
       "loading": "Loading preview...",
-      "previewingCount": "Previewing {count, plural, one {# Pro feature} other {# Pro features}}",
-      "upgradeToMakeLive": "Upgrade to make it live",
+      "previewingCount": "Only you can see {count, plural, one {# Pro feature} other {# Pro features}}",
+      "upgradeToMakeLive": "Upgrade to share with everyone",
       "upgradeCta": "Upgrade",
       "subscriptionEndedTitle": "Your Pro subscription ended",
       "subscriptionEndedDesc": "Renew to restore your design",
-      "renewCta": "Renew"
+      "renewCta": "Renew",
+      "modeToggleLabel": "View mode",
+      "modePreview": "Your view",
+      "modeLive": "Public view",
+      "modePreviewDesc": "only you see this",
+      "modeLiveDesc": "what visitors see"
     },
     "share": {
       "title": "Share",
