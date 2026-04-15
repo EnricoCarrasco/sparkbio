@@ -96,16 +96,25 @@ export const PLATFORM_BRAND_COLORS: Record<
 };
 
 export const THEME_FONTS = [
+  // Free tier
   { value: "Inter", label: "Inter" },
   { value: "Poppins", label: "Poppins" },
-  { value: "Montserrat", label: "Montserrat" },
-  { value: "Playfair Display", label: "Playfair Display" },
-  { value: "Space Grotesk", label: "Space Grotesk" },
   { value: "DM Sans", label: "DM Sans" },
-  { value: "Nunito", label: "Nunito" },
-  { value: "Outfit", label: "Outfit" },
-  { value: "Fraunces", label: "Fraunces" },
+  // Pro — modern sans
+  { value: "Space Grotesk", label: "Space Grotesk" },
   { value: "Manrope", label: "Manrope" },
+  { value: "Plus Jakarta Sans", label: "Plus Jakarta Sans" },
+  { value: "Bricolage Grotesque", label: "Bricolage Grotesque" },
+  // Pro — editorial serifs
+  { value: "Playfair Display", label: "Playfair Display" },
+  { value: "Fraunces", label: "Fraunces" },
+  { value: "Instrument Serif", label: "Instrument Serif" },
+  { value: "Cormorant Garamond", label: "Cormorant Garamond" },
+  { value: "Newsreader", label: "Newsreader" },
+  // Pro — expressive / personality
+  { value: "Caveat", label: "Caveat" },
+  { value: "Space Mono", label: "Space Mono" },
+  { value: "IBM Plex Mono", label: "IBM Plex Mono" },
 ] as const;
 
 // ── Basic themes (Free tier) ────────────────────────────────────────────────

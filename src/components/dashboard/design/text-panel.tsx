@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Crown } from "lucide-react";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -22,6 +21,12 @@ import type { TitleSize } from "@/types";
 /** Fonts available on the free tier */
 const FREE_FONTS = ["Inter", "Poppins", "DM Sans"];
 
+/** True when the given font value is no longer in THEME_FONTS (dropped in an update). */
+function isLegacyFont(value: string | null | undefined): boolean {
+  if (!value) return false;
+  return !THEME_FONTS.some((f) => f.value === value);
+}
+
 export function TextPanel() {
   const t = useTranslations("dashboard.design");
   const tBilling = useTranslations("billing");
@@ -32,9 +37,24 @@ export function TextPanel() {
 
   if (!theme) return null;
 
-  const availableFonts = isPro
-    ? THEME_FONTS
-    : THEME_FONTS.map((f) => ({ ...f, locked: !FREE_FONTS.includes(f.value) }));
+  // Build the page-font option list, appending the current value as a legacy
+  // entry when it was removed from THEME_FONTS in a later update.
+  const pageLegacy = isLegacyFont(theme.font_family);
+  const pageFontOptions: { value: string; label: string; legacy?: boolean }[] = [
+    ...THEME_FONTS.map((f) => ({ value: f.value, label: f.label })),
+    ...(pageLegacy
+      ? [{ value: theme.font_family, label: `${theme.font_family} (legacy)`, legacy: true }]
+      : []),
+  ];
+
+  // Same for the title font (Pro-only section).
+  const titleLegacyValue = theme.title_font && isLegacyFont(theme.title_font) ? theme.title_font : null;
+  const titleFontOptions: { value: string; label: string; legacy?: boolean }[] = [
+    ...THEME_FONTS.map((f) => ({ value: f.value, label: f.label })),
+    ...(titleLegacyValue
+      ? [{ value: titleLegacyValue, label: `${titleLegacyValue} (legacy)`, legacy: true }]
+      : []),
+  ];
 
   return (
     <div className="space-y-6">
@@ -49,7 +69,9 @@ export function TextPanel() {
             value={theme.font_family}
             onValueChange={(v) => {
               if (!v) return;
-              if (!isPro && !FREE_FONTS.includes(v)) {
+              // Legacy fonts are their current selection — always allowed.
+              const legacy = isLegacyFont(v);
+              if (!isPro && !legacy && !FREE_FONTS.includes(v)) {
                 setUpgradeOpen(true);
                 return;
               }
@@ -60,8 +82,9 @@ export function TextPanel() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {THEME_FONTS.map((font) => {
-                const locked = !isPro && !FREE_FONTS.includes(font.value);
+              {pageFontOptions.map((font) => {
+                const locked =
+                  !isPro && !font.legacy && !FREE_FONTS.includes(font.value);
                 return (
                   <SelectItem key={font.value} value={font.value}>
                     <span
@@ -119,7 +142,7 @@ export function TextPanel() {
                 <SelectItem value="__inherit__">
                   {t("inheritFont")}
                 </SelectItem>
-                {THEME_FONTS.map((font) => (
+                {titleFontOptions.map((font) => (
                   <SelectItem key={font.value} value={font.value}>
                     <span style={{ fontFamily: font.value }}>
                       {font.label}
