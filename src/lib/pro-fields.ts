@@ -154,6 +154,50 @@ export function hasPremiumPresetApplied(theme: Theme): boolean {
   return matchesPremiumPreset(theme);
 }
 
+/** Capture the free-tier-relevant fields of a theme as a restore snapshot.
+ *  Used when a free creator FIRST adds a Pro field so we can offer to bring
+ *  them back to exactly this state later. Only includes fields that a free
+ *  creator can legitimately own — Pro fields are intentionally excluded. */
+export function snapshotFreeFields(theme: Theme): Partial<Theme> {
+  return {
+    bg_color: theme.bg_color,
+    text_color: theme.text_color,
+    button_color: theme.button_color,
+    button_text_color: theme.button_text_color,
+    button_style: theme.button_style,
+    font_family: FREE_FONTS.includes(theme.font_family)
+      ? theme.font_family
+      : "Inter",
+    profile_layout: theme.profile_layout,
+    title_style: theme.title_style,
+    title_size: theme.title_size,
+    title_font_alt: theme.title_font_alt,
+    title_color: theme.title_color,
+    avatar_shape: theme.avatar_shape,
+    hide_bio: theme.hide_bio,
+  };
+}
+
+/** The reset payload for every Pro field → free-tier default. */
+export const PRO_FIELDS_RESET: Partial<Theme> = {
+  wallpaper_style: "fill",
+  bg_gradient_from: null,
+  bg_gradient_to: null,
+  bg_gradient_direction: null,
+  wallpaper_gradient_style: "custom",
+  wallpaper_gradient_preset: null,
+  wallpaper_animate: false,
+  wallpaper_noise: false,
+  button_style_v2: "solid",
+  button_corner: "round",
+  button_shadow: "none",
+  button_font_size: "medium",
+  link_gap: "normal",
+  title_font: null,
+  avatar_border: "solid",
+  hide_footer: false,
+};
+
 /** True when a subscription status indicates a past active state that has ended. */
 export function hasLapsedSubscription(status?: string | null): boolean {
   if (!status) return false;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Eye, X, Share2 } from "lucide-react";
 import {
@@ -10,16 +10,62 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ShareModal } from "@/components/dashboard/share-modal";
-import { usePreviewIframe } from "@/lib/hooks/use-preview-iframe";
+import { PreviewBanner } from "@/components/dashboard/preview-banner";
+import {
+  usePreviewIframe,
+  type PreviewMode,
+} from "@/lib/hooks/use-preview-iframe";
+import { useThemeStore } from "@/lib/stores/theme-store";
+import { useSubscriptionStore } from "@/lib/stores/subscription-store";
+import { countPreviewedProCategories } from "@/lib/pro-fields";
+import { cn } from "@/lib/utils";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://viopage.com";
 
 export function MobilePreviewFAB() {
   const t = useTranslations("dashboard.preview");
-  const { iframeSrc, refreshKey, username } = usePreviewIframe();
+  const theme = useThemeStore((s) => s.theme);
+  const isPro = useSubscriptionStore((s) => s.isPro);
+  const [mode, setMode] = useState<PreviewMode>("preview");
+  const { iframeSrc, refreshKey, username } = usePreviewIframe(mode);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+
+  const proCount = theme ? countPreviewedProCategories(theme).count : 0;
+  const showToggle = !isPro && proCount > 0;
+
+  // Snap back to Pro view when any Pro setting changes while viewing Public,
+  // so the creator actually sees the change they just made.
+  const proFingerprint = useMemo(() => {
+    if (!theme) return "";
+    return [
+      theme.wallpaper_style,
+      theme.bg_gradient_from,
+      theme.bg_gradient_to,
+      theme.bg_gradient_direction,
+      theme.wallpaper_animate,
+      theme.wallpaper_noise,
+      theme.button_style_v2,
+      theme.button_corner,
+      theme.button_shadow,
+      theme.button_font_size,
+      theme.link_gap,
+      theme.font_family,
+      theme.title_font,
+      theme.avatar_border,
+      theme.hide_footer,
+    ].join("|");
+  }, [theme]);
+
+  useEffect(() => {
+    if (mode === "live" && !isPro) setMode("preview");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [proFingerprint]);
+
+  useEffect(() => {
+    if (!showToggle && mode === "live") setMode("preview");
+  }, [showToggle, mode]);
 
   const displayUrl = username
     ? `${SITE_URL}/${username}`.replace(/^https?:\/\//, "")
@@ -67,9 +113,52 @@ export function MobilePreviewFAB() {
             <div className="size-8" />
           </div>
 
+          {/* Pro-preview banner — free creators previewing Pro features */}
+          <PreviewBanner />
+
+          {/* Pro / Public toggle — free creators with active Pro previews */}
+          {showToggle && (
+            <div className="px-4 pt-3 shrink-0 flex justify-center">
+              <div
+                role="tablist"
+                aria-label={t("modeToggleLabel")}
+                className="inline-flex items-center rounded-full bg-zinc-100 p-0.5 text-[11px] font-semibold"
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === "preview"}
+                  onClick={() => setMode("preview")}
+                  className={cn(
+                    "rounded-full px-3 py-1 transition-all",
+                    mode === "preview"
+                      ? "bg-white text-zinc-900 shadow-sm"
+                      : "text-zinc-500"
+                  )}
+                >
+                  {t("modePreview")}
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === "live"}
+                  onClick={() => setMode("live")}
+                  className={cn(
+                    "rounded-full px-3 py-1 transition-all",
+                    mode === "live"
+                      ? "bg-white text-zinc-900 shadow-sm"
+                      : "text-zinc-500"
+                  )}
+                >
+                  {t("modeLive")}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Tappable URL bar — opens Share modal */}
           {username && (
-            <div className="px-4 pb-3 shrink-0">
+            <div className="px-4 pt-3 pb-1 shrink-0 space-y-1">
               <button
                 type="button"
                 onClick={() => setShareOpen(true)}
@@ -80,6 +169,16 @@ export function MobilePreviewFAB() {
                 </span>
                 <Share2 className="size-4 text-[#999] shrink-0" />
               </button>
+              {showToggle && (
+                <p
+                  className={cn(
+                    "text-[11px] font-medium text-center",
+                    mode === "preview" ? "text-amber-700" : "text-emerald-700"
+                  )}
+                >
+                  {mode === "preview" ? t("modePreviewDesc") : t("modeLiveDesc")}
+                </p>
+              )}
             </div>
           )}
 
@@ -87,7 +186,7 @@ export function MobilePreviewFAB() {
           <div className="flex-1 min-h-0 overflow-hidden bg-white mx-3 mb-3 rounded-xl border border-border">
             {iframeSrc ? (
               <iframe
-                key={refreshKey}
+                key={`${mode}-${refreshKey}`}
                 src={iframeSrc}
                 title="Profile preview"
                 className="w-full h-full border-0"

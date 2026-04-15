@@ -679,7 +679,8 @@
       "modePreview": "Pro",
       "modeLive": "Público",
       "modePreviewDesc": "só você vê",
-      "modeLiveDesc": "o que visitantes veem"
+      "modeLiveDesc": "o que visitantes veem",
+      "restorePrePro": "Restaurar minha versão pública"
     },
     "share": {
       "title": "Compartilhar",

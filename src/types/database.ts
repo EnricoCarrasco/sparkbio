@@ -100,6 +100,9 @@ export interface Theme {
   hide_bio: boolean;
   button_font_size: ButtonFontSize;
   hero_image_url: string | null;
+  /** Snapshot of free-tier theme fields captured the first time a free creator
+   *  sets a Pro field. Powers the "restore to my public setup" button. */
+  pre_pro_snapshot: Partial<Theme> | null;
 }
 
 export interface SocialIcon {

@@ -678,7 +678,8 @@
       "modePreview": "Pro",
       "modeLive": "Public",
       "modePreviewDesc": "only you see this",
-      "modeLiveDesc": "what visitors see"
+      "modeLiveDesc": "what visitors see",
+      "restorePrePro": "Restore my public setup"
     },
     "share": {
       "title": "Share",
