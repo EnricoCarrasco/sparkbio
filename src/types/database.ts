@@ -157,6 +157,7 @@ export interface Subscription {
 export interface PublicSubscription {
   status: SubscriptionStatus;
   current_period_end: string | null;
+  trial_ends_at: string | null;
 }
 
 export interface PublicProfile {

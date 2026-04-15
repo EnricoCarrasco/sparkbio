@@ -37,7 +37,7 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
 
     set({
       subscription: data,
-      isPro: isSubscriptionActive(data?.status),
+      isPro: isSubscriptionActive(data),
       loading: false,
     });
   },
@@ -45,7 +45,6 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
   setSubscription: (subscription) =>
     set({
       subscription,
-      isPro:
-        isSubscriptionActive(subscription?.status),
+      isPro: isSubscriptionActive(subscription),
     }),
 }));
