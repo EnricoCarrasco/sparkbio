@@ -11,11 +11,9 @@ export function GoogleOAuthButton({ label }: GoogleOAuthButtonProps) {
   const handleClick = async () => {
     const supabase = createClient();
 
-    // Pass referral code through OAuth redirect if present
-    const callbackUrl = new URL(
-      "/auth/callback",
-      process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
-    );
+    // Use the current origin so Vercel preview deployments authenticate
+    // back to THEIR preview URL instead of the production NEXT_PUBLIC_SITE_URL.
+    const callbackUrl = new URL("/auth/callback", window.location.origin);
     const refCookie = document.cookie
       .split("; ")
       .find((c) => c.startsWith("viopage_ref="))

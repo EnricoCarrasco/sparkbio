@@ -6,11 +6,16 @@ import { useLinkStore } from "@/lib/stores/link-store";
 import { useThemeStore } from "@/lib/stores/theme-store";
 import { useSocialStore } from "@/lib/stores/social-store";
 
+export type PreviewMode = "preview" | "live";
+
 /**
  * Shared hook for live preview iframe — subscribes to all relevant stores
  * and returns a debounced iframe src that refreshes when data changes.
+ *
+ * mode === "preview" → owner-only /{username}/preview route (Pro fields visible)
+ * mode === "live"    → public /{username} route (Pro fields server-stripped)
  */
-export function usePreviewIframe() {
+export function usePreviewIframe(mode: PreviewMode = "preview") {
   const profile = useProfileStore((s) => s.profile);
   const links = useLinkStore((s) => s.links);
   const theme = useThemeStore((s) => s.theme);
@@ -62,7 +67,8 @@ export function usePreviewIframe() {
   ]);
 
   const username = profile?.username;
-  const iframeSrc = username ? `/${username}?preview=1&t=${refreshKey}` : null;
+  const path = mode === "live" ? username : `${username}/preview`;
+  const iframeSrc = username ? `/${path}?t=${refreshKey}` : null;
 
   return { iframeSrc, refreshKey, username };
 }

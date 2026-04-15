@@ -559,8 +559,51 @@ export const REFERRAL_MIN_PAYOUT_CENTS = 2000; // $20.00
 
 export const ACTIVE_SUBSCRIPTION_STATUSES = ["on_trial", "active"] as const;
 
-export function isSubscriptionActive(status?: string | null): boolean {
-  return ACTIVE_SUBSCRIPTION_STATUSES.includes(
-    status as (typeof ACTIVE_SUBSCRIPTION_STATUSES)[number],
-  );
+/** Statuses where the creator has signaled "stop billing me" but is still
+ *  inside the paid or trial window. We keep them on Pro until that window
+ *  ends — matches LemonSqueezy's native behavior and standard SaaS UX. */
+const GRACE_STATUSES = new Set(["cancelled", "past_due"]);
+
+type SubscriptionShape = {
+  status?: string | null;
+  current_period_end?: string | null;
+  trial_ends_at?: string | null;
+} | null | undefined;
+
+/** True when the creator currently has Pro access. Accepts either a raw
+ *  status string (legacy callers) or a subscription object — the latter
+ *  enables grace-period handling for cancelled / past_due subscriptions
+ *  whose paid or trial period hasn't ended yet. */
+export function isSubscriptionActive(
+  subOrStatus?: string | SubscriptionShape,
+): boolean {
+  if (!subOrStatus) return false;
+
+  const sub: SubscriptionShape =
+    typeof subOrStatus === "string" ? { status: subOrStatus } : subOrStatus;
+
+  const status = sub?.status ?? null;
+  if (!status) return false;
+
+  if (
+    ACTIVE_SUBSCRIPTION_STATUSES.includes(
+      status as (typeof ACTIVE_SUBSCRIPTION_STATUSES)[number],
+    )
+  ) {
+    return true;
+  }
+
+  // Grace period: cancelled or past_due + still inside the paid/trial window
+  if (GRACE_STATUSES.has(status)) {
+    const candidates = [sub?.trial_ends_at, sub?.current_period_end].filter(
+      Boolean,
+    ) as string[];
+    const now = Date.now();
+    return candidates.some((iso) => {
+      const t = new Date(iso).getTime();
+      return Number.isFinite(t) && t > now;
+    });
+  }
+
+  return false;
 }

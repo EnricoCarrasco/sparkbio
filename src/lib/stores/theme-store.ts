@@ -5,6 +5,12 @@ import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { createDebouncedSave } from "@/lib/utils/debounced-save";
 import { HERO_MAX_SIZE, HERO_ACCEPTED_TYPES } from "@/lib/constants";
 import { triggerRevalidation } from "@/lib/utils/revalidate";
+import {
+  countPreviewedProCategories,
+  snapshotFreeFields,
+  stripProFields,
+  PRO_FIELDS_RESET,
+} from "@/lib/pro-fields";
 
 interface ThemeState {
   theme: Theme | null;
@@ -12,6 +18,7 @@ interface ThemeState {
   setTheme: (theme: Theme | null) => void;
   fetchTheme: () => Promise<void>;
   updateTheme: (updates: Partial<Theme>) => Promise<void>;
+  restorePreProSnapshot: () => Promise<void>;
   uploadHeroImage: (file: File) => Promise<string | null>;
   removeHeroImage: () => Promise<void>;
 }
@@ -56,6 +63,21 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
       if (!isPro) return;
     }
 
+    // Snapshot capture: the first time a free creator introduces a Pro field
+    // (transitioning from all-free to any-Pro), save the pre-change state so
+    // they can "restore to my public setup" later.
+    if (!updates.pre_pro_snapshot && theme.pre_pro_snapshot == null) {
+      const { isPro } = useSubscriptionStore.getState();
+      if (!isPro) {
+        const wasAllFree = countPreviewedProCategories(theme).count === 0;
+        const willHavePro =
+          countPreviewedProCategories({ ...theme, ...updates }).count > 0;
+        if (wasAllFree && willHavePro) {
+          updates = { ...updates, pre_pro_snapshot: snapshotFreeFields(theme) };
+        }
+      }
+    }
+
     // Optimistic update (instant UI)
     set({ theme: { ...theme, ...updates } });
 
@@ -90,6 +112,46 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
         triggerRevalidation();
       }
     });
+  },
+
+  /** Bring the editor back in sync with what the public page shows.
+   *
+   *  Two cases:
+   *  - A snapshot exists (captured when the creator first tried a Pro
+   *    feature): restore those exact free-tier values plus reset all Pro
+   *    fields to defaults. This preserves their custom colors from that
+   *    moment.
+   *  - No snapshot (e.g. they already had Pro fields set before the
+   *    snapshot feature shipped): fall back to the same strip the public
+   *    page uses — so the editor matches the live page exactly.
+   *
+   *  Either way the snapshot is cleared so a new experimentation cycle
+   *  can capture a fresh one. */
+  restorePreProSnapshot: async () => {
+    const { theme } = get();
+    if (!theme) return;
+
+    if (theme.pre_pro_snapshot) {
+      await get().updateTheme({
+        ...theme.pre_pro_snapshot,
+        ...PRO_FIELDS_RESET,
+        pre_pro_snapshot: null,
+      });
+      return;
+    }
+
+    // Fallback: apply the same strip the public page uses. Compute a diff
+    // so we only send changed fields to the server.
+    const stripped = stripProFields(theme);
+    const diff: Record<string, unknown> = {};
+    for (const key of Object.keys(stripped)) {
+      const k = key as keyof Theme;
+      if (stripped[k] !== theme[k]) {
+        diff[key] = stripped[k];
+      }
+    }
+    if (Object.keys(diff).length === 0) return;
+    await get().updateTheme(diff as Partial<Theme>);
   },
 
   uploadHeroImage: async (file: File) => {

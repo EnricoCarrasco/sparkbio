@@ -32,7 +32,7 @@ export default async function DashboardLayout({
       initialTheme={themeRes.data}
       initialSocialIcons={socialRes.data || []}
       initialSubscription={subRes.data}
-      initialIsPro={isSubscriptionActive(subRes.data?.status)}
+      initialIsPro={isSubscriptionActive(subRes.data)}
     >
       {children}
     </DashboardShell>

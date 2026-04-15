@@ -668,7 +668,19 @@
     "preview": {
       "livePreview": "Visualizar",
       "openFullPage": "Abrir página completa",
-      "loading": "Carregando..."
+      "loading": "Carregando...",
+      "previewingCount": "Só você vê {count, plural, one {# recurso Pro} other {# recursos Pro}}",
+      "upgradeToMakeLive": "Atualize para compartilhar com todos",
+      "upgradeCta": "Fazer upgrade",
+      "subscriptionEndedTitle": "Sua assinatura Pro encerrou",
+      "subscriptionEndedDesc": "Renove para restaurar seu design",
+      "renewCta": "Renovar",
+      "modeToggleLabel": "Modo de visualização",
+      "modePreview": "Pro",
+      "modeLive": "Público",
+      "modePreviewDesc": "só você vê",
+      "modeLiveDesc": "o que visitantes veem",
+      "restorePrePro": "Restaurar minha versão pública"
     },
     "share": {
       "title": "Compartilhar",

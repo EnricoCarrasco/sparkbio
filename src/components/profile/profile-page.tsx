@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo } from "react";
 import type { PublicProfile } from "@/types";
-import { isSubscriptionActive } from "@/lib/constants";
 import { ProfileHeader } from "./profile-header";
 import { ProfileLink } from "./profile-link";
 import { SocialIconsBar } from "./social-icons-bar";
@@ -55,7 +54,7 @@ function buildGoogleFontsUrl(theme: PublicProfile["theme"]): string | null {
 }
 
 export function ProfilePage({ data }: ProfilePageProps) {
-  const { profile, links, theme, social_icons, subscription } = data;
+  const { profile, links, theme, social_icons } = data;
   const t = useTranslations("publicProfile");
 
   const backgroundStyle = useMemo(() => buildBackgroundStyle(theme), [theme]);
@@ -109,8 +108,10 @@ export function ProfilePage({ data }: ProfilePageProps) {
   const gridIcons = activeSocialIcons.filter((s) => s.display_mode === "grid");
   const buttonIcons = activeSocialIcons.filter((s) => s.display_mode === "button");
 
-  const isProActive = isSubscriptionActive(subscription?.status);
-  const showFooter = !(theme.hide_footer && isProActive);
+  // hide_footer is stripped server-side for non-Pro visitors (see
+  // lib/pro-fields.ts). The owner preview route passes it through. Either
+  // way, reading theme.hide_footer directly here is correct.
+  const showFooter = !theme.hide_footer;
 
   return (
     <div

@@ -173,7 +173,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         update_payment_url: attributes.urls?.update_payment_method ?? null,
         customer_portal_url: attributes.urls?.customer_portal ?? null,
       },
-      { onConflict: "lemonsqueezy_subscription_id" }
+      // Conflict on user_id because the subscriptions table enforces one
+      // subscription per user. If a user cancels and resubscribes, the new
+      // lemonsqueezy_subscription_id replaces the old one on the same row.
+      { onConflict: "user_id" }
     );
 
   if (upsertError) {

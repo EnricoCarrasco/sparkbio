@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useTranslations } from "next-intl";
 import { Crown } from "lucide-react";
 import {
@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import { useThemeStore } from "@/lib/stores/theme-store";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
-import { UpgradeDialog } from "@/components/billing/upgrade-dialog";
 import { THEME_FONTS } from "@/lib/constants";
 import { ColorInput } from "./color-input";
 import { ToggleGroup } from "./toggle-group";
@@ -33,7 +32,6 @@ export function TextPanel() {
   const theme = useThemeStore((s) => s.theme);
   const updateTheme = useThemeStore((s) => s.updateTheme);
   const isPro = useSubscriptionStore((s) => s.isPro);
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   if (!theme) return null;
 
@@ -69,12 +67,8 @@ export function TextPanel() {
             value={theme.font_family}
             onValueChange={(v) => {
               if (!v) return;
-              // Legacy fonts are their current selection — always allowed.
-              const legacy = isLegacyFont(v);
-              if (!isPro && !legacy && !FREE_FONTS.includes(v)) {
-                setUpgradeOpen(true);
-                return;
-              }
+              // Free users can pick any font — the public page strips
+              // Pro fonts server-side. Crown icons remain as a visual cue.
               updateTheme({ font_family: v });
             }}
           >
@@ -126,54 +120,49 @@ export function TextPanel() {
           {!isPro && <Crown className="size-4 text-amber-500" />}
         </h2>
 
-        {isPro ? (
-          <div className="space-y-4">
-            <Select
-              value={theme.title_font ?? "__inherit__"}
-              onValueChange={(v) => {
-                if (v)
-                  updateTheme({ title_font: v === "__inherit__" ? null : v });
+        <div className="space-y-4">
+          <Select
+            value={theme.title_font ?? "__inherit__"}
+            onValueChange={(v) => {
+              if (v)
+                updateTheme({ title_font: v === "__inherit__" ? null : v });
+            }}
+          >
+            <SelectTrigger id="title-font" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__inherit__">
+                {t("inheritFont")}
+              </SelectItem>
+              {titleFontOptions.map((font) => (
+                <SelectItem key={font.value} value={font.value}>
+                  <span
+                    className="flex items-center gap-2"
+                    style={{ fontFamily: font.value }}
+                  >
+                    {font.label}
+                    {!isPro && !font.legacy && (
+                      <Crown className="size-3 text-amber-500" />
+                    )}
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Title font preview */}
+          <div className="bg-zinc-50 rounded-xl p-5 border border-zinc-100">
+            <p
+              className="text-lg text-zinc-700 leading-relaxed"
+              style={{
+                fontFamily: theme.title_font ?? theme.font_family,
               }}
             >
-              <SelectTrigger id="title-font" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__inherit__">
-                  {t("inheritFont")}
-                </SelectItem>
-                {titleFontOptions.map((font) => (
-                  <SelectItem key={font.value} value={font.value}>
-                    <span style={{ fontFamily: font.value }}>
-                      {font.label}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Title font preview */}
-            <div className="bg-zinc-50 rounded-xl p-5 border border-zinc-100">
-              <p
-                className="text-lg text-zinc-700 leading-relaxed"
-                style={{
-                  fontFamily: theme.title_font ?? theme.font_family,
-                }}
-              >
-                The quick brown fox jumps over the lazy dog
-              </p>
-            </div>
+              The quick brown fox jumps over the lazy dog
+            </p>
           </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setUpgradeOpen(true)}
-            className="w-full flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-500 hover:bg-zinc-100 transition-colors"
-          >
-            <span>{t("inheritFont")}</span>
-            <Crown className="size-3.5 text-amber-500" />
-          </button>
-        )}
+        </div>
       </section>
 
       {/* ── Colors ── */}
@@ -213,8 +202,6 @@ export function TextPanel() {
           onChange={(v) => updateTheme({ title_size: v })}
         />
       </section>
-
-      <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
     </div>
   );
 }
