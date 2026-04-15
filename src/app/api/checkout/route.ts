@@ -61,6 +61,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
+  // --- Trial-abuse guard: one trial per user ---
+  // If the creator has EVER had a subscription (any status — on_trial,
+  // active, cancelled, past_due, paused, expired), they don't get another
+  // trial on this checkout. They can still subscribe; LemonSqueezy will
+  // bill them on day 1 instead of after 7 days. This blocks the
+  // "cancel-and-resubscribe to refresh the trial" loop.
+  const { data: priorSubscription } = await supabase
+    .from("subscriptions")
+    .select("id")
+    .eq("user_id", user.id)
+    .limit(1)
+    .maybeSingle();
+  const skipTrial = priorSubscription !== null;
+
   // --- Initialise LemonSqueezy SDK ---
   initLemonSqueezy();
 
@@ -76,6 +90,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       // Use the current request's origin so checkouts initiated from preview
       // deployments return to the SAME preview URL instead of production.
       redirectUrl: `${new URL(request.url).origin}/dashboard?upgraded=1`,
+    },
+    checkoutOptions: {
+      skipTrial,
     },
   });
 
