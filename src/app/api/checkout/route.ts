@@ -73,7 +73,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       },
     },
     productOptions: {
-      redirectUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard?upgraded=1`,
+      // Use the current request's origin so checkouts initiated from preview
+      // deployments return to the SAME preview URL instead of production.
+      redirectUrl: `${new URL(request.url).origin}/dashboard?upgraded=1`,
     },
   });
 
