@@ -1,4 +1,5 @@
 import type { Theme } from "@/types";
+import { THEME_PRESETS_BASIC, THEME_PRESETS_PREMIUM } from "@/lib/constants";
 
 /** Fonts available on the free tier. Anything outside this list is Pro. */
 export const FREE_FONTS = ["Inter", "Poppins", "DM Sans"];
@@ -11,16 +12,35 @@ const FREE_BUTTON_FONT_SIZES = new Set(["small", "medium"]);
 const FREE_LINK_GAPS = new Set(["compact", "normal"]);
 const FREE_AVATAR_BORDERS = new Set(["none", "subtle", "solid"]);
 
+/** True when the theme's base palette exactly matches a premium preset.
+ *  Used to detect "free user applied a Pro theme" so the public page can
+ *  revert the entire palette — not just the Pro-only fields. */
+function matchesPremiumPreset(theme: Theme): boolean {
+  return THEME_PRESETS_PREMIUM.some(
+    (p) =>
+      p.bg_color === theme.bg_color &&
+      p.text_color === theme.text_color &&
+      p.button_color === theme.button_color &&
+      p.button_text_color === theme.button_text_color
+  );
+}
+
 /**
  * Returns a copy of the theme with every Pro-only field replaced by its
  * free-tier fallback. Used server-side on the public profile page to hide
  * aspirational Pro settings from visitors until the creator upgrades.
  *
- * Base color fields (bg_color, text_color, etc.) are never stripped —
- * creators can already pick any color on the free tier.
+ * Base color fields (bg_color, text_color, etc.) are normally kept —
+ * free creators can already pick any color. The ONE exception is when
+ * the theme exactly matches a premium preset, in which case we revert
+ * the whole palette to Viopage Default so premium theme colors don't
+ * leak through the strip.
  */
 export function stripProFields(theme: Theme): Theme {
-  return {
+  const fallbackBase = matchesPremiumPreset(theme) ? THEME_PRESETS_BASIC[0] : null;
+
+  // Pro-field strip applies to every non-Pro render
+  const stripped: Theme = {
     ...theme,
     // Wallpaper (entire block is Pro)
     wallpaper_style: "fill",
@@ -57,6 +77,23 @@ export function stripProFields(theme: Theme): Theme {
     // Footer
     hide_footer: false,
   };
+
+  // If a full premium preset was applied, also reset the palette (otherwise
+  // the premium theme's colors would leak through unchanged).
+  if (fallbackBase) {
+    return {
+      ...stripped,
+      bg_color: fallbackBase.bg_color,
+      text_color: fallbackBase.text_color,
+      button_color: fallbackBase.button_color,
+      button_text_color: fallbackBase.button_text_color,
+      button_style: fallbackBase.button_style,
+      avatar_shape: fallbackBase.avatar_shape,
+      font_family: fallbackBase.font_family,
+    };
+  }
+
+  return stripped;
 }
 
 /** Categories of Pro features. Used for the "Previewing N Pro features" banner. */
@@ -110,6 +147,11 @@ export function countPreviewedProCategories(theme: Theme): {
   }
 
   return { count: categories.length, categories };
+}
+
+/** True when a premium theme preset is currently applied. */
+export function hasPremiumPresetApplied(theme: Theme): boolean {
+  return matchesPremiumPreset(theme);
 }
 
 /** True when a subscription status indicates a past active state that has ended. */
