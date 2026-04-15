@@ -185,34 +185,6 @@ export function StatsBar() {
         </motion.div>
 
       </div>
-
-      {/* ── Marquee keyframe animation ── */}
-      {/*
-        We animate the track by -50% because the two copies together are
-        exactly 200% wide; -50% of that equals one full copy, making the
-        loop seamless with zero JavaScript.
-      */}
-      <style jsx>{`
-        @keyframes statsMarquee {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-
-        .stats-marquee {
-          animation: statsMarquee 25s linear infinite;
-          width: max-content;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .stats-marquee {
-            animation: none;
-          }
-        }
-      `}</style>
     </section>
   );
 }

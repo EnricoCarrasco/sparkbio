@@ -47,6 +47,7 @@ export function Navbar({ isAuthenticated = false }: { isAuthenticated?: boolean 
                 width={200}
                 height={44}
                 className="h-11 w-auto object-contain"
+                style={{ width: "auto" }}
                 priority
               />
             </Link>

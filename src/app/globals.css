@@ -148,3 +148,23 @@
     padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
   }
 }
+
+@keyframes statsMarquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.stats-marquee {
+  animation: statsMarquee 25s linear infinite;
+  width: max-content;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stats-marquee {
+    animation: none;
+  }
+}

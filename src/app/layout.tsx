@@ -53,7 +53,7 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={`${inter.variable} ${poppins.variable} ${instrumentSerif.variable} h-full antialiased`}>
+    <html lang={locale} suppressHydrationWarning className={`${inter.variable} ${poppins.variable} ${instrumentSerif.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">
         <NextIntlClientProvider messages={messages}>
           {children}

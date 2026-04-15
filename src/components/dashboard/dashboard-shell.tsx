@@ -155,7 +155,7 @@ export function DashboardShell({
           </main>
 
           {/* Live preview panel - desktop only (hidden on card tab which has its own preview) */}
-          <aside className={`hidden lg:flex lg:flex-col lg:w-80 lg:shrink-0 border-l border-border bg-white overflow-y-auto ${activeTab === "card" ? "lg:hidden" : ""}`}>
+          <aside className={`hidden lg:flex lg:flex-col lg:w-[360px] lg:shrink-0 border-l border-border bg-white overflow-y-auto ${activeTab === "card" ? "lg:hidden" : ""}`}>
             <PreviewPanel />
           </aside>
         </div>

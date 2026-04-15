@@ -51,6 +51,7 @@ export function Footer() {
                 width={160}
                 height={40}
                 className="h-10 w-auto object-contain"
+                style={{ width: "auto" }}
               />
             </Link>
             <p className="text-[14px] text-[#999] leading-relaxed max-w-[200px]">
@@ -89,7 +90,7 @@ export function Footer() {
             href="/register"
             className="text-[13px] font-semibold text-[#FF6B35] hover:text-[#e85a24] transition-colors duration-150"
           >
-            {t("ctaFooter")} &rarr;
+            {`${t("ctaFooter")} →`}
           </Link>
         </div>
       </div>
