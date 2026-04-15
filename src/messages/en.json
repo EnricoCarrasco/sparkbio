@@ -675,8 +675,8 @@
       "subscriptionEndedDesc": "Renew to restore your design",
       "renewCta": "Renew",
       "modeToggleLabel": "View mode",
-      "modePreview": "Your view",
-      "modeLive": "Public view",
+      "modePreview": "Pro",
+      "modeLive": "Public",
       "modePreviewDesc": "only you see this",
       "modeLiveDesc": "what visitors see"
     },

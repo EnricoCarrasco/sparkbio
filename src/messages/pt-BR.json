@@ -676,8 +676,8 @@
       "subscriptionEndedDesc": "Renove para restaurar seu design",
       "renewCta": "Renovar",
       "modeToggleLabel": "Modo de visualização",
-      "modePreview": "Sua visão",
-      "modeLive": "Visão pública",
+      "modePreview": "Pro",
+      "modeLive": "Público",
       "modePreviewDesc": "só você vê",
       "modeLiveDesc": "o que visitantes veem"
     },
