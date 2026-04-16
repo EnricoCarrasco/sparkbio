@@ -24,7 +24,7 @@ import { useDashboardStore } from "@/lib/stores/dashboard-store";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChooseUsernameDialog } from "@/components/auth/choose-username-dialog";
-import { trackRegistration } from "@/lib/gtm";
+import { trackRegistration } from "@/lib/meta-pixel";
 import type { Profile, Link, Theme, SocialIcon, Subscription } from "@/types";
 
 const BusinessCardTab = lazy(() => import("@/components/dashboard/business-card/business-card-tab").then((m) => ({ default: m.BusinessCardTab })));

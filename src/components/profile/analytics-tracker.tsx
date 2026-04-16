@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { trackViewContent } from "@/lib/gtm";
+import { trackViewContent } from "@/lib/meta-pixel";
 
 interface AnalyticsTrackerProps {
   profileId: string;

@@ -2,15 +2,15 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { sendGTMEvent } from "@next/third-parties/google";
+import { trackPageView } from "@/lib/meta-pixel";
 
-export function GTMPageView() {
+export function MetaPixelPageView() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isFirst = useRef(true);
 
   useEffect(() => {
-    // Skip the initial render — GTM's All Pages trigger handles it
+    // Skip the initial render — the base code already fires PageView on init
     if (isFirst.current) {
       isFirst.current = false;
       return;
@@ -19,10 +19,7 @@ export function GTMPageView() {
     // Skip preview iframe
     if (searchParams.has("preview")) return;
 
-    sendGTMEvent({
-      event: "page_view",
-      page_path: pathname,
-    });
+    trackPageView();
   }, [pathname, searchParams]);
 
   return null;
