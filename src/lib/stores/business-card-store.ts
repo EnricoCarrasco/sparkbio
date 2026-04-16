@@ -9,6 +9,7 @@ interface BusinessCardSettings {
   email: string;
   website: string;
   phone: string;
+  whatsapp: string;
   logoUrl: string | null;
   showQrCode: boolean;
   primaryColor: string;
@@ -69,6 +70,7 @@ const defaultSettings: BusinessCardSettings = {
   email: "",
   website: "",
   phone: "",
+  whatsapp: "",
   logoUrl: null,
   showQrCode: true,
   primaryColor: "#FF6B35",
@@ -100,6 +102,7 @@ function triggerSave(getState: () => BusinessCardState, profileId: string) {
       email: state.email,
       website: state.website,
       phone: state.phone,
+      whatsapp: state.whatsapp,
       logoUrl: state.logoUrl,
       showQrCode: state.showQrCode,
       primaryColor: state.primaryColor,
@@ -216,6 +219,10 @@ export const useBusinessCardStore = create<BusinessCardState>((set, get) => ({
         const phoneMatch = whatsappIcon.url.match(/[\d+]+/);
         if (phoneMatch) updates.phone = phoneMatch[0];
       }
+      if (!state.whatsapp && whatsappIcon) {
+        const waMatch = whatsappIcon.url.match(/[\d+]+/);
+        if (waMatch) updates.whatsapp = waMatch[0];
+      }
 
       const websiteIcon = socialIcons.find((s) => s.platform === "website");
       if (!state.website && websiteIcon) updates.website = websiteIcon.url;
@@ -238,6 +245,7 @@ export const useBusinessCardStore = create<BusinessCardState>((set, get) => ({
     if (whatsappIcon) {
       const phoneMatch = whatsappIcon.url.match(/[\d+]+/);
       if (phoneMatch) updates.phone = phoneMatch[0];
+      updates.whatsapp = phoneMatch ? phoneMatch[0] : "";
     }
 
     const websiteIcon = socialIcons.find((s) => s.platform === "website");

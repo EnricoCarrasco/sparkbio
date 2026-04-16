@@ -199,6 +199,20 @@ export function CardEditor() {
             />
           </div>
         </div>
+        <div className="grid grid-cols-3 gap-3 mt-3">
+          <div>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">
+              WhatsApp
+            </label>
+            <input
+              type="tel"
+              value={store.whatsapp}
+              onChange={(e) => store.setField("whatsapp", e.target.value)}
+              placeholder={t("placeholderWhatsApp")}
+              className="w-full h-10 px-3 rounded-lg border border-border bg-muted/30 text-sm focus:outline-none focus:border-[#FF6B35] transition-colors"
+            />
+          </div>
+        </div>
       </div>
 
       {/* QR Code Toggle */}

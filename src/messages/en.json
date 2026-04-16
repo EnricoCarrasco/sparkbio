@@ -789,6 +789,7 @@
       "placeholderWebsite": "yoursite.com",
       "phone": "Phone",
       "placeholderPhone": "+1 234 567",
+      "placeholderWhatsApp": "+1 234 567",
       "qrCode": "QR Code",
       "dynamicQrCode": "Dynamic QR Code",
       "qrCodeDescription": "Links to your Viopage profile",

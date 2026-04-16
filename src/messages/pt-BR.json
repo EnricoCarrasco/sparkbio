@@ -790,6 +790,7 @@
       "placeholderWebsite": "seusite.com",
       "phone": "Telefone",
       "placeholderPhone": "+55 11 99999-9999",
+      "placeholderWhatsApp": "+55 11 99999-9999",
       "qrCode": "QR Code",
       "dynamicQrCode": "QR Code Dinamico",
       "qrCodeDescription": "Leva ao seu perfil Viopage",

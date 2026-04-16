@@ -23,6 +23,7 @@ const DEMO_DATA = {
   email: "hello@sofiamartinez.com",
   website: "sofiamartinez.com",
   phone: "+1 (555) 234-8901",
+  whatsapp: "+1 (555) 234-8901",
   logoUrl: "/images/demo-card-avatar.jpeg",
   showQrCode: true,
   primaryColor: "#FF6B35",
@@ -233,6 +234,24 @@ export function CardPreview({ cardRef, demoMode = false }: CardPreviewProps) {
                     <Phone style={{ width: store.contactFontSize + 2, height: store.contactFontSize + 2, flexShrink: 0, color: store.accentColor }} />
                     <span style={{ fontSize: store.contactFontSize, fontWeight: 500, color: mutedText, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {store.phone}
+                    </span>
+                  </div>
+                )}
+                {store.whatsapp && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <img
+                      src="/icons/social/whatsapp.svg"
+                      alt="WhatsApp"
+                      style={{
+                        width: store.contactFontSize + 2,
+                        height: store.contactFontSize + 2,
+                        flexShrink: 0,
+                        filter: isDark ? "brightness(0) invert(1)" : "none",
+                        opacity: isDark ? 0.8 : 0.7,
+                      }}
+                    />
+                    <span style={{ fontSize: store.contactFontSize, fontWeight: 500, color: mutedText, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {store.whatsapp}
                     </span>
                   </div>
                 )}
