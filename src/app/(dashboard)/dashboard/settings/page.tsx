@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,11 +12,9 @@ import {
   Copy,
   Check,
   LogOut,
-  Trash2,
   KeyRound,
   AtSign,
   Link2,
-  AlertTriangle,
   CreditCard,
 } from "lucide-react";
 
@@ -38,16 +36,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog";
 import { UpgradeButton } from "@/components/billing/upgrade-button";
 import { UpgradeDialog } from "@/components/billing/upgrade-dialog";
 
@@ -544,104 +532,6 @@ function SignOutSection() {
 }
 
 // ---------------------------------------------------------------------------
-// Delete account section
-// ---------------------------------------------------------------------------
-function DeleteAccountSection() {
-  const t = useTranslations("dashboard.settings");
-  const profile = useProfileStore((s) => s.profile);
-  const router = useRouter();
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
-
-  const handleDeleteAccount = useCallback(async () => {
-    if (!profile?.id) return;
-
-    setIsDeleting(true);
-    try {
-      const supabase = createClient();
-
-      // Delete the profile row. Cascade constraints in the DB will clean up
-      // linked rows (links, themes, social_icons, analytics_events).
-      const { error: deleteError } = await supabase
-        .from("profiles")
-        .delete()
-        .eq("id", profile.id);
-
-      if (deleteError) {
-        toast.error("Failed to delete account. Please try again.");
-        setIsDeleting(false);
-        return;
-      }
-
-      // Sign out regardless of any sign-out error
-      await supabase.auth.signOut();
-
-      setDialogOpen(false);
-      router.push("/");
-    } catch {
-      toast.error("An unexpected error occurred. Please try again.");
-      setIsDeleting(false);
-    }
-  }, [profile, router]);
-
-  return (
-    <Card className="border-destructive/30">
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <AlertTriangle className="size-4 text-destructive" />
-          <CardTitle className="text-destructive">{t("deleteAccount")}</CardTitle>
-        </div>
-        <CardDescription>{t("deleteAccountDesc")}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger
-            render={
-              <Button
-                variant="destructive"
-                className="gap-1.5"
-              />
-            }
-          >
-            <Trash2 className="size-4" />
-            {t("deleteAccount")}
-          </DialogTrigger>
-
-          <DialogContent showCloseButton={!isDeleting}>
-            <DialogHeader>
-              <div className="flex items-center gap-2 mb-1">
-                <AlertTriangle className="size-5 text-destructive shrink-0" />
-                <DialogTitle>{t("deleteAccount")}</DialogTitle>
-              </div>
-              <DialogDescription>
-                {t("deleteConfirm")}
-              </DialogDescription>
-            </DialogHeader>
-
-            <DialogFooter className="bg-transparent border-0 -mx-0 -mb-0 rounded-none p-0 pt-2">
-              <DialogClose
-                render={<Button variant="outline" disabled={isDeleting} />}
-              >
-                Cancel
-              </DialogClose>
-              <Button
-                variant="destructive"
-                onClick={handleDeleteAccount}
-                disabled={isDeleting}
-                className="gap-1.5"
-              >
-                <Trash2 className="size-4" />
-                {isDeleting ? "Deleting…" : "Yes, delete my account"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </CardContent>
-    </Card>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Settings page
 // ---------------------------------------------------------------------------
 export default function SettingsPage() {
@@ -677,9 +567,6 @@ export default function SettingsPage() {
 
       {/* Section: Sign out */}
       <SignOutSection />
-
-      {/* Section: Delete account — last and visually distinct */}
-      <DeleteAccountSection />
     </div>
   );
 }
