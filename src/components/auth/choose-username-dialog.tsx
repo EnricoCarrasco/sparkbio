@@ -51,10 +51,12 @@ export function ChooseUsernameDialog({ open }: { open: boolean }) {
     setStatus("checking");
 
     const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
     const { data: existing } = await supabase
       .from("profiles")
       .select("id")
       .eq("username", normalized)
+      .neq("id", user?.id ?? "")
       .maybeSingle();
 
     // Discard stale response if the user has typed more since this query fired
@@ -104,10 +106,12 @@ export function ChooseUsernameDialog({ open }: { open: boolean }) {
     try {
       // Final availability re-check
       const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
       const { data: existing } = await supabase
         .from("profiles")
         .select("id")
         .eq("username", normalized)
+        .neq("id", user?.id ?? "")
         .maybeSingle();
 
       if (existing) {
