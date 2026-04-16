@@ -165,7 +165,7 @@ export function ProfilePage({ data }: ProfilePageProps) {
       )}
 
       {/* Non-rendering analytics tracker */}
-      <AnalyticsTracker profileId={profile.id} />
+      <AnalyticsTracker profileId={profile.id} username={profile.username} />
 
       {/* Content column — content centers vertically when sparse, footer stays at bottom */}
       <main className="w-full max-w-[480px] mx-auto flex flex-col items-center px-4 relative z-10 flex-1">

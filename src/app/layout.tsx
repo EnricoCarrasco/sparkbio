@@ -4,6 +4,8 @@ import { Inter, Poppins, Instrument_Serif } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Toaster } from "@/components/ui/sonner";
+import { GoogleTagManager } from "@next/third-parties/google";
+import { GTMPageView } from "@/components/gtm-page-view";
 import "./globals.css";
 
 const inter = Inter({
@@ -55,6 +57,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning className={`${inter.variable} ${poppins.variable} ${instrumentSerif.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">
+        <GTMPageView />
         <NextIntlClientProvider messages={messages}>
           {children}
           <Toaster />
@@ -64,6 +67,9 @@ export default async function RootLayout({
           strategy="afterInteractive"
         />
       </body>
+      {process.env.NEXT_PUBLIC_GTM_ID && (
+        <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />
+      )}
     </html>
   );
 }

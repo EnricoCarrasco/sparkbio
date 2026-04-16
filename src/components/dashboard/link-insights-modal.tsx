@@ -14,12 +14,12 @@ import {
 } from "recharts";
 import { Smartphone, Tablet, Monitor } from "lucide-react";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { processLinkAnalytics } from "@/lib/analytics/process";
@@ -168,20 +168,16 @@ export function LinkInsightsModal({
         : t("allTime");
 
   return (
-    <Sheet open={open} onOpenChange={handleOpenChange}>
-      <SheetContent
-        side="bottom"
-        showCloseButton
-        className="mx-auto max-h-[85vh] w-full rounded-t-2xl sm:max-w-[520px]"
-      >
-        <SheetHeader className="pb-0">
-          <SheetTitle className="text-sm font-semibold truncate pr-8">
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="max-h-[85vh] w-full max-w-[520px] flex flex-col">
+        <DialogHeader className="pb-0">
+          <DialogTitle className="text-sm font-semibold truncate pr-8">
             {link.title}
-          </SheetTitle>
-          <SheetDescription className="text-xs truncate">
+          </DialogTitle>
+          <DialogDescription className="text-xs truncate">
             {link.url}
-          </SheetDescription>
-        </SheetHeader>
+          </DialogDescription>
+        </DialogHeader>
 
         <div className="overflow-y-auto flex-1 px-4 pb-4 space-y-6">
           {/* ── Insights title + date range pills ── */}
@@ -346,8 +342,8 @@ export function LinkInsightsModal({
             )
           )}
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }
 

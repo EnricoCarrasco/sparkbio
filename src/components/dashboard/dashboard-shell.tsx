@@ -24,6 +24,7 @@ import { useDashboardStore } from "@/lib/stores/dashboard-store";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChooseUsernameDialog } from "@/components/auth/choose-username-dialog";
+import { trackRegistration } from "@/lib/gtm";
 import type { Profile, Link, Theme, SocialIcon, Subscription } from "@/types";
 
 const BusinessCardTab = lazy(() => import("@/components/dashboard/business-card/business-card-tab").then((m) => ({ default: m.BusinessCardTab })));
@@ -99,6 +100,16 @@ export function DashboardShell({
       window.history.replaceState({}, "", "/dashboard");
     }
   }, [searchParams, fetchSubscription]);
+
+  // Fire CompleteRegistration for brand-new sign-ups
+  useEffect(() => {
+    if (!profile || profileLoading) return;
+    const createdAt = new Date(profile.created_at).getTime();
+    const now = Date.now();
+    if (now - createdAt < 60_000) {
+      trackRegistration();
+    }
+  }, [profile, profileLoading]);
 
   const router = useRouter();
 
