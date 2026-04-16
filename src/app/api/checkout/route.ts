@@ -96,7 +96,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       redirectUrl: `${new URL(request.url).origin}/dashboard?upgraded=1`,
     },
     checkoutOptions: {
-      // embed: true, // temporarily disabled to test Apple Pay on hosted checkout
       skipTrial,
     },
   });

@@ -191,8 +191,8 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
         return;
       }
 
-      // TEMP: Force full redirect to test Apple Pay on hosted checkout
-      // (Apple Pay doesn't work in overlay iframes)
+      // Full redirect to LemonSqueezy hosted checkout — Apple Pay and
+      // Google Pay only work on the hosted page, not in overlay iframes.
       window.location.href = url;
     } catch {
       toast.error(t("checkoutError"));
