@@ -191,14 +191,9 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
         return;
       }
 
-      // Open LemonSqueezy overlay instead of redirecting
-      if (lemonReady && window.LemonSqueezy) {
-        onOpenChange(false); // Close upgrade dialog so overlay is on top
-        window.LemonSqueezy.Url.Open(url);
-      } else {
-        // Fallback: redirect if script failed to load
-        window.location.href = url;
-      }
+      // TEMP: Force full redirect to test Apple Pay on hosted checkout
+      // (Apple Pay doesn't work in overlay iframes)
+      window.location.href = url;
     } catch {
       toast.error(t("checkoutError"));
     } finally {
