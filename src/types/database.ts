@@ -49,6 +49,7 @@ export interface Profile {
   payout_destination: string | null;
   has_chosen_username: boolean;
   has_completed_onboarding: boolean;
+  is_complimentary_pro: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -150,6 +151,7 @@ export interface Subscription {
   cancel_at: string | null;
   update_payment_url: string | null;
   customer_portal_url: string | null;
+  ls_updated_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -166,6 +168,7 @@ export interface PublicProfile {
   theme: Theme;
   social_icons: SocialIcon[];
   subscription: PublicSubscription | null;
+  is_complimentary_pro: boolean;
 }
 
 // ── Referral system types ───────────────────────────────────────────────────

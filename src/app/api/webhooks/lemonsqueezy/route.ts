@@ -23,6 +23,7 @@ interface LemonSqueezyAttributes {
   trial_ends_at: string | null;
   ends_at: string | null;
   status: string;
+  updated_at?: string | null;
   urls?: {
     update_payment_method?: string;
     customer_portal?: string;
@@ -157,6 +158,36 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const supabase = createAdminClient();
 
+  // --- Ordering guard: reject stale out-of-order events ---
+  // LemonSqueezy can deliver events out of order (network retries, multi-sub
+  // cancel races, plan flapping). If our stored ls_updated_at is already newer
+  // than or equal to the incoming event's updated_at, ignore the event —
+  // overwriting with stale data would revert good state (e.g., a brand-new
+  // subscription getting clobbered by the tail end of an old sub's cancellation).
+  const incomingLsUpdatedAt = attributes.updated_at ?? null;
+
+  const { data: current } = await supabase
+    .from("subscriptions")
+    .select("lemonsqueezy_subscription_id, ls_updated_at")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (current?.ls_updated_at && incomingLsUpdatedAt) {
+    const incoming = new Date(incomingLsUpdatedAt).getTime();
+    const stored = new Date(current.ls_updated_at).getTime();
+    if (Number.isFinite(incoming) && Number.isFinite(stored) && incoming <= stored) {
+      console.warn("[webhook] ignoring stale event", {
+        userId,
+        event: eventName,
+        incomingSubId: String(subscriptionId),
+        currentSubId: current.lemonsqueezy_subscription_id,
+        incomingAt: incomingLsUpdatedAt,
+        storedAt: current.ls_updated_at,
+      });
+      return NextResponse.json({ ok: true, skipped: "stale" });
+    }
+  }
+
   // --- Upsert subscription record ---
   const { error: upsertError } = await supabase
     .from("subscriptions")
@@ -172,6 +203,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         cancel_at: attributes.ends_at ?? null,
         update_payment_url: attributes.urls?.update_payment_method ?? null,
         customer_portal_url: attributes.urls?.customer_portal ?? null,
+        ls_updated_at: incomingLsUpdatedAt,
       },
       // Conflict on user_id because the subscriptions table enforces one
       // subscription per user. If a user cancels and resubscribes, the new

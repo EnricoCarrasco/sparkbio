@@ -113,7 +113,9 @@ export default async function PublicProfilePage({ params }: Props) {
   // Pro-field strip: hide aspirational Pro settings from public visitors when
   // the creator isn't on an active Pro subscription. The owner sees the full
   // design via the separate /{username}/preview route (auth-gated).
-  const isPro = isSubscriptionActive(data.subscription);
+  const isPro = isSubscriptionActive(data.subscription, {
+    is_complimentary_pro: data.is_complimentary_pro,
+  });
   const publicData: PublicProfile = isPro
     ? data
     : { ...data, theme: stripProFields(data.theme) };

@@ -621,13 +621,24 @@ type SubscriptionShape = {
   trial_ends_at?: string | null;
 } | null | undefined;
 
+type ProfileShape = {
+  is_complimentary_pro?: boolean | null;
+} | null | undefined;
+
 /** True when the creator currently has Pro access. Accepts either a raw
  *  status string (legacy callers) or a subscription object — the latter
  *  enables grace-period handling for cancelled / past_due subscriptions
- *  whose paid or trial period hasn't ended yet. */
+ *  whose paid or trial period hasn't ended yet.
+ *
+ *  The optional `profile` argument lets callers honor the
+ *  `is_complimentary_pro` admin override (owner/team/support grants). When
+ *  the flag is set we short-circuit to true regardless of subscription state.
+ */
 export function isSubscriptionActive(
   subOrStatus?: string | SubscriptionShape,
+  profile?: ProfileShape,
 ): boolean {
+  if (profile?.is_complimentary_pro) return true;
   if (!subOrStatus) return false;
 
   const sub: SubscriptionShape =

@@ -29,15 +29,22 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
       return;
     }
 
-    const { data } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .eq("user_id", user.id)
-      .maybeSingle();
+    const [subRes, profileRes] = await Promise.all([
+      supabase
+        .from("subscriptions")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("profiles")
+        .select("is_complimentary_pro")
+        .eq("id", user.id)
+        .maybeSingle(),
+    ]);
 
     set({
-      subscription: data,
-      isPro: isSubscriptionActive(data),
+      subscription: subRes.data,
+      isPro: isSubscriptionActive(subRes.data, profileRes.data),
       loading: false,
     });
   },
