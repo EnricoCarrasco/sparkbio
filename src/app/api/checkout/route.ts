@@ -82,6 +82,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const { data, error } = await createCheckout(STORE_ID, variantId, {
     checkoutData: {
       email: user.email,
+      billingAddress: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      country: (country || undefined) as any,
+      },
       custom: {
         user_id: user.id,
       },
@@ -92,6 +96,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       redirectUrl: `${new URL(request.url).origin}/dashboard?upgraded=1`,
     },
     checkoutOptions: {
+      embed: true,
       skipTrial,
     },
   });
