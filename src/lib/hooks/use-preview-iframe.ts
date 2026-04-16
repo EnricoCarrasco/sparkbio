@@ -68,7 +68,7 @@ export function usePreviewIframe(mode: PreviewMode = "preview") {
 
   const username = profile?.username;
   const path = mode === "live" ? username : `${username}/preview`;
-  const iframeSrc = username ? `/${path}?t=${refreshKey}` : null;
+  const iframeSrc = username ? `/${path}?preview=1&t=${refreshKey}` : null;
 
   return { iframeSrc, refreshKey, username };
 }
