@@ -204,6 +204,8 @@ export function ProfilePage({ data }: ProfilePageProps) {
                     profileId={profile.id}
                     theme={theme}
                     index={index}
+                    username={profile.username}
+                    referralCode={profile.referral_code}
                   />
                 ))}
               {/* Regular links */}
@@ -214,6 +216,8 @@ export function ProfilePage({ data }: ProfilePageProps) {
                   profileId={profile.id}
                   theme={theme}
                   index={buttonIcons.length + index}
+                  username={profile.username}
+                  referralCode={profile.referral_code}
                 />
               ))}
             </div>

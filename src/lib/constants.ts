@@ -95,6 +95,57 @@ export const PLATFORM_BRAND_COLORS: Record<
   pix: { bg: "#4BB8A9", text: "#fff" },
 };
 
+/** Share targets for individual links on the public profile */
+export const LINK_SHARE_TARGETS = [
+  {
+    key: "copy",
+    label: "Copy link",
+    icon: null,
+    bg: "#6B7280",
+    makeUrl: null,
+  },
+  {
+    key: "x",
+    label: "X",
+    icon: "/icons/social/x.svg",
+    bg: "#000000",
+    makeUrl: (url: string) =>
+      `https://x.com/intent/tweet?url=${encodeURIComponent(url)}`,
+  },
+  {
+    key: "facebook",
+    label: "Facebook",
+    icon: "/icons/social/facebook.svg",
+    bg: "#1877F2",
+    makeUrl: (url: string) =>
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+  },
+  {
+    key: "whatsapp",
+    label: "WhatsApp",
+    icon: "/icons/social/whatsapp.svg",
+    bg: "#25D366",
+    makeUrl: (url: string) =>
+      `https://wa.me/?text=${encodeURIComponent(url)}`,
+  },
+  {
+    key: "linkedin",
+    label: "LinkedIn",
+    icon: "/icons/social/linkedin.svg",
+    bg: "#0A66C2",
+    makeUrl: (url: string) =>
+      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+  },
+  {
+    key: "telegram",
+    label: "Telegram",
+    icon: "/icons/social/telegram.svg",
+    bg: "#26A5E4",
+    makeUrl: (url: string) =>
+      `https://t.me/share/url?url=${encodeURIComponent(url)}`,
+  },
+] as const;
+
 export const THEME_FONTS = [
   // Free tier
   { value: "Inter", label: "Inter" },

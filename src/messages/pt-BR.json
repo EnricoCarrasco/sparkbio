@@ -1095,7 +1095,15 @@
     }
   },
   "publicProfile": {
-    "joinCta": "Junte-se a {username} no Viopage"
+    "joinCta": "Junte-se a {username} no Viopage",
+    "shareLink": "Compartilhar link",
+    "copyLink": "Copiar link",
+    "linkCopied": "Link copiado!",
+    "joinViopageCta": "Junte-se a {username} no Viopage",
+    "joinViopageSubtitle": "O link na bio gratuito usado por criadores no mundo todo.",
+    "signUpFree": "Cadastre-se grátis",
+    "learnMore": "Saiba mais",
+    "reportLink": "Denunciar este link"
   },
   "onboarding": {
     "addLinkTitle": "Adicione seu primeiro link",

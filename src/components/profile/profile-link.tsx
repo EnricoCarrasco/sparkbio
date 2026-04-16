@@ -1,13 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { MoreHorizontal } from "lucide-react";
 import type { Link, Theme } from "@/types";
+import { ShareLinkSheet } from "./share-link-sheet";
 
 interface ProfileLinkProps {
   link: Link;
   profileId: string;
   theme: Theme;
   index: number;
+  username: string;
+  referralCode: string | null;
 }
 
 function getCornerRadius(corner: string): string {
@@ -85,9 +90,14 @@ function getLinkStyles(theme: Theme): React.CSSProperties {
   }
 }
 
-export function ProfileLink({ link, profileId, theme, index }: ProfileLinkProps) {
+export function ProfileLink({ link, profileId, theme, index, username, referralCode }: ProfileLinkProps) {
+  const [shareOpen, setShareOpen] = useState(false);
   const styles = getLinkStyles(theme);
   const isInIframe = typeof window !== "undefined" && window.self !== window.top;
+
+  const ellipsisColor = theme.button_style_v2 === "solid"
+    ? theme.button_text_color
+    : theme.button_color;
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
     // In dashboard preview iframe, open in parent window instead of inside the iframe
@@ -121,13 +131,13 @@ export function ProfileLink({ link, profileId, theme, index }: ProfileLinkProps)
         ease: "easeOut",
         delay: 0.2 + index * 0.06,
       }}
-      className="w-full"
+      className="w-full relative"
     >
       <motion.a
         href={link.url}
         target="_blank"
         rel="noopener noreferrer"
-        style={styles}
+        style={{ ...styles, paddingRight: "48px" }}
         onClick={handleClick}
         whileHover={{ scale: 1.015, y: -1 }}
         whileTap={{ scale: 0.98 }}
@@ -135,6 +145,31 @@ export function ProfileLink({ link, profileId, theme, index }: ProfileLinkProps)
       >
         {link.title}
       </motion.a>
+
+      {/* Share ellipsis button */}
+      <button
+        type="button"
+        aria-label="Share link"
+        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full transition-opacity hover:opacity-100"
+        style={{ color: ellipsisColor, opacity: 0.5 }}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setShareOpen(true);
+        }}
+      >
+        <MoreHorizontal className="w-5 h-5" />
+      </button>
+
+      <ShareLinkSheet
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        linkTitle={link.title}
+        linkUrl={link.url}
+        thumbnailUrl={link.thumbnail_url}
+        username={username}
+        referralCode={referralCode}
+      />
     </motion.div>
   );
 }

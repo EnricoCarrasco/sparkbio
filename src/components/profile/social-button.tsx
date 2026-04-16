@@ -3,8 +3,10 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { MoreHorizontal } from "lucide-react";
 import { SOCIAL_PLATFORMS, PLATFORM_BRAND_COLORS } from "@/lib/constants";
 import { getBrandIconPath } from "@/lib/brand-icons";
+import { ShareLinkSheet } from "./share-link-sheet";
 import type { SocialIcon, Theme } from "@/types";
 
 function getCornerRadius(corner: string): string {
@@ -31,10 +33,13 @@ interface SocialButtonProps {
   profileId: string;
   theme: Theme;
   index: number;
+  username: string;
+  referralCode: string | null;
 }
 
-export function SocialButton({ icon, profileId, theme, index }: SocialButtonProps) {
+export function SocialButton({ icon, profileId, theme, index, username, referralCode }: SocialButtonProps) {
   const [copied, setCopied] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const isPix = icon.platform === "pix";
   const isInIframe = typeof window !== "undefined" && window.self !== window.top;
   const { button_color, button_text_color, button_style_v2, button_corner, button_shadow } = theme;
@@ -154,13 +159,13 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
         ease: "easeOut",
         delay: 0.2 + index * 0.06,
       }}
-      className="w-full"
+      className="w-full relative"
     >
       {isPix ? (
         <motion.button
           type="button"
           aria-label={title}
-          style={outerStyle}
+          style={{ ...outerStyle, paddingRight: "48px" }}
           onClick={handlePixCopy}
           whileHover={{ scale: 1.015, y: -1 }}
           whileTap={{ scale: 0.98 }}
@@ -174,7 +179,7 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
           target="_blank"
           rel="noopener noreferrer"
           aria-label={title}
-          style={outerStyle}
+          style={{ ...outerStyle, paddingRight: "48px" }}
           onClick={isInIframe ? (e: React.MouseEvent) => { e.preventDefault(); window.open(icon.url, "_blank", "noopener,noreferrer"); } : fireAnalytics}
           whileHover={{ scale: 1.015, y: -1 }}
           whileTap={{ scale: 0.98 }}
@@ -183,6 +188,34 @@ export function SocialButton({ icon, profileId, theme, index }: SocialButtonProp
           {innerContent}
         </motion.a>
       )}
+
+      {/* Share ellipsis button */}
+      <button
+        type="button"
+        aria-label="Share link"
+        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full transition-opacity hover:opacity-100"
+        style={{
+          color: button_style_v2 === "solid" ? button_text_color : button_color,
+          opacity: 0.5,
+        }}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setShareOpen(true);
+        }}
+      >
+        <MoreHorizontal className="w-5 h-5" />
+      </button>
+
+      <ShareLinkSheet
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        linkTitle={title}
+        linkUrl={icon.url}
+        thumbnailUrl={null}
+        username={username}
+        referralCode={referralCode}
+      />
     </motion.div>
   );
 }

@@ -1097,7 +1097,15 @@
     }
   },
   "publicProfile": {
-    "joinCta": "Join {username} on Viopage"
+    "joinCta": "Join {username} on Viopage",
+    "shareLink": "Share link",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied!",
+    "joinViopageCta": "Join {username} on Viopage",
+    "joinViopageSubtitle": "The free link-in-bio trusted by creators worldwide.",
+    "signUpFree": "Sign up free",
+    "learnMore": "Learn more",
+    "reportLink": "Report this link"
   },
   "onboarding": {
     "addLinkTitle": "Add your first link",
