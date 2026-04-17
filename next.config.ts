@@ -18,12 +18,12 @@ const nextConfig: NextConfig = {
     const isDev = process.env.NODE_ENV === "development";
     const csp = [
       "default-src 'self'",
-      `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ""} https://*.lemonsqueezy.com https://www.googletagmanager.com https://connect.facebook.net`,
+      `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ""} https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com https://connect.facebook.net`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' data: blob: https://lbouculyhpqcnmvyrofo.supabase.co https://replicate.delivery https://*.replicate.delivery https://lh3.googleusercontent.com https://www.facebook.com https://www.googletagmanager.com",
+      "img-src 'self' data: blob: https://lbouculyhpqcnmvyrofo.supabase.co https://replicate.delivery https://*.replicate.delivery https://lh3.googleusercontent.com https://www.facebook.com https://www.googletagmanager.com https://*.stripe.com",
       "font-src 'self' https://fonts.gstatic.com",
-      "connect-src 'self' https://lbouculyhpqcnmvyrofo.supabase.co https://*.supabase.co wss://*.supabase.co https://*.lemonsqueezy.com https://replicate.delivery https://*.replicate.delivery https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.facebook.com https://*.facebook.net",
-      "frame-src 'self' https://*.lemonsqueezy.com",
+      "connect-src 'self' https://lbouculyhpqcnmvyrofo.supabase.co https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://checkout.stripe.com https://*.stripe.com https://replicate.delivery https://*.replicate.delivery https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.facebook.com https://*.facebook.net",
+      "frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com",
       "frame-ancestors 'self'",
       "object-src 'none'",
       "base-uri 'self'",

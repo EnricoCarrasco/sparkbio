@@ -142,16 +142,14 @@ export type SubscriptionStatus =
 export interface Subscription {
   id: string;
   user_id: string;
-  lemonsqueezy_subscription_id: string;
-  lemonsqueezy_customer_id: string;
-  lemonsqueezy_variant_id: string;
+  stripe_subscription_id: string;
+  stripe_customer_id: string;
+  stripe_price_id: string | null;
+  stripe_updated_at: string | null;
   status: SubscriptionStatus;
   current_period_end: string | null;
   trial_ends_at: string | null;
   cancel_at: string | null;
-  update_payment_url: string | null;
-  customer_portal_url: string | null;
-  ls_updated_at: string | null;
   created_at: string;
   updated_at: string;
 }

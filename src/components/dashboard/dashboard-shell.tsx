@@ -91,7 +91,7 @@ export function DashboardShell({
   const profileLoading = useProfileStore((s) => s.loading);
   const fetchSubscription = useSubscriptionStore((s) => s.fetchSubscription);
 
-  // Handle redirect back from LemonSqueezy checkout
+  // Handle redirect back from Stripe embedded checkout
   const searchParams = useSearchParams();
   useEffect(() => {
     if (searchParams.get("upgraded") === "1") {

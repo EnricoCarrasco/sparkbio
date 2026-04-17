@@ -687,7 +687,7 @@ export const ACTIVE_SUBSCRIPTION_STATUSES = ["on_trial", "active"] as const;
 
 /** Statuses where the creator has signaled "stop billing me" but is still
  *  inside the paid or trial window. We keep them on Pro until that window
- *  ends — matches LemonSqueezy's native behavior and standard SaaS UX. */
+ *  ends — matches Stripe's cancel_at_period_end behavior and standard SaaS UX. */
 const GRACE_STATUSES = new Set(["cancelled", "past_due"]);
 
 type SubscriptionShape = {

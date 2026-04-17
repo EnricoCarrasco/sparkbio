@@ -348,6 +348,29 @@ function BillingSection() {
   const subscription = useSubscriptionStore((s) => s.subscription);
   const isPro = useSubscriptionStore((s) => s.isPro);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [openingPortal, setOpeningPortal] = useState(false);
+
+  async function handleOpenPortal() {
+    setOpeningPortal(true);
+    try {
+      const res = await fetch("/api/portal", { method: "POST" });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        toast.error(body?.message ?? "Could not open billing portal");
+        return;
+      }
+      const { url } = await res.json();
+      if (url) {
+        window.location.href = url;
+      } else {
+        toast.error("Could not open billing portal");
+      }
+    } catch {
+      toast.error("Could not open billing portal");
+    } finally {
+      setOpeningPortal(false);
+    }
+  }
 
   // Derive billing interval from variant ID if needed in the future.
   // For now we show "Pro" without distinguishing monthly/yearly unless
@@ -455,15 +478,14 @@ function BillingSection() {
             <UpgradeButton />
           )}
 
-          {isPro && !isCancelled && subscription?.customer_portal_url && (
+          {isPro && !isCancelled && (
             <Button
               variant="outline"
               size="sm"
-              onClick={() =>
-                window.open(subscription.customer_portal_url!, "_blank", "noopener,noreferrer")
-              }
+              onClick={handleOpenPortal}
+              disabled={openingPortal}
             >
-              {t("manageSubscription")}
+              {openingPortal ? "…" : t("manageSubscription")}
             </Button>
           )}
 

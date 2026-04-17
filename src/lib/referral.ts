@@ -6,14 +6,17 @@ import {
 } from "@/lib/constants";
 
 /**
- * Called from the LemonSqueezy webhook on a successful subscription payment.
+ * Called from the Stripe webhook on a successful subscription payment.
  * Idempotent: safe to call multiple times for the same subscriptionId.
  * Never throws — errors are logged and swallowed so the webhook can still return 200.
+ *
+ * `priceId` is the Stripe price ID — we match against env vars to determine
+ * monthly vs yearly commission.
  */
 export async function processReferralConversion(
   userId: string,
   subscriptionId: string,
-  variantId: string,
+  priceId: string,
 ): Promise<void> {
   try {
     const supabase = createAdminClient();
@@ -54,24 +57,34 @@ export async function processReferralConversion(
       return;
     }
 
-    // 3. Determine commission amount based on which plan variant triggered the conversion.
-    const monthlyVariantId = process.env.LEMONSQUEEZY_MONTHLY_VARIANT_ID ?? "";
-    const yearlyVariantId = process.env.LEMONSQUEEZY_YEARLY_VARIANT_ID ?? "";
+    // 3. Determine commission amount based on which Stripe price triggered the conversion.
+    const monthlyIds = new Set(
+      [
+        process.env.STRIPE_PRICE_MONTHLY_EUR,
+        process.env.STRIPE_PRICE_MONTHLY_BRL,
+      ].filter(Boolean) as string[],
+    );
+    const yearlyIds = new Set(
+      [
+        process.env.STRIPE_PRICE_YEARLY_EUR,
+        process.env.STRIPE_PRICE_YEARLY_BRL,
+      ].filter(Boolean) as string[],
+    );
 
     let amountCents: number;
-    if (variantId === yearlyVariantId) {
+    if (yearlyIds.has(priceId)) {
       amountCents = Math.round(
         (PLANS.pro.yearlyTotal * 100 * REFERRAL_COMMISSION_PERCENT) / 100,
       );
-    } else if (variantId === monthlyVariantId) {
+    } else if (monthlyIds.has(priceId)) {
       amountCents = Math.round(
         (PLANS.pro.monthlyPrice * 100 * REFERRAL_COMMISSION_PERCENT) / 100,
       );
     } else {
-      // Unknown variant — fall back to monthly commission as a safe default.
+      // Unknown price — fall back to monthly commission as a safe default.
       console.warn(
-        "[referral] Unknown variantId:",
-        variantId,
+        "[referral] Unknown price ID:",
+        priceId,
         "— falling back to monthly commission.",
       );
       amountCents = Math.round(
@@ -136,7 +149,7 @@ export async function processReferralConversion(
 }
 
 /**
- * Called from the LemonSqueezy webhook on a subscription cancellation or refund.
+ * Called from the Stripe webhook on a subscription cancellation or refund.
  * Voids any pending (not yet paid out) earnings tied to the cancelled subscription.
  * Never throws — errors are logged and swallowed so the webhook can still return 200.
  */

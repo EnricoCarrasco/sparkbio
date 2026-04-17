@@ -890,6 +890,7 @@
     "trialGateTitle": "Comece seu teste grátis de 7 dias",
     "trialGateDesc": "Insira seus dados de pagamento para desbloquear todos os recursos do Viopage. Você não será cobrado durante o período de teste.",
     "manageSubscription": "Gerenciar assinatura",
+    "backToPlans": "Voltar aos planos",
     "feature_hideFooter": "Ocultar marca Viopage",
     "feature_premiumThemes": "14 temas premium de designer",
     "feature_advancedButtons": "Estilos de botao glass, outline e sombra",
@@ -959,7 +960,10 @@
     "support": "Dúvidas?",
     "supportLink": "Fale com o suporte",
     "error": "Algo deu errado. Tente novamente.",
-    "errorCheckout": "Não foi possível criar o checkout. Tente novamente."
+    "errorCheckout": "Não foi possível criar o checkout. Tente novamente.",
+    "backToPlans": "Voltar à seleção de plano",
+    "checkoutHeading": "Finalizar sua assinatura",
+    "checkoutSubtitle": "7 dias grátis \u00b7 Cancele quando quiser"
   },
   "terms": {
     "title": "Termos de Uso",
@@ -975,11 +979,11 @@
     },
     "subscription": {
       "heading": "3. Assinatura e Cobrança",
-      "content": "O Viopage oferece um plano de assinatura Pro pago. Novos usuários recebem um período de teste gratuito de 7 dias. Após o término do período de teste, o método de pagamento escolhido será cobrado automaticamente, a menos que você cancele antes do término do teste. Todo o processamento de pagamentos é realizado pela LemonSqueezy, nosso Merchant of Record (Comerciante Registrado), responsável pela cobrança, arrecadação de impostos, estornos e processamento de reembolsos. Ao assinar, você também concorda com os termos de serviço da LemonSqueezy."
+      "content": "O Viopage oferece um plano de assinatura Pro pago. Novos usuários recebem um período de teste gratuito de 7 dias. Após o término do período de teste, o método de pagamento escolhido será cobrado automaticamente, a menos que você cancele antes do término do teste. Todo o processamento de pagamentos é realizado pela Stripe, nosso Merchant of Record (Comerciante Registrado), responsável pela cobrança, arrecadação de impostos, estornos e processamento de reembolsos. Ao assinar, você também concorda com os termos de serviço da Stripe."
     },
     "cancellation": {
       "heading": "4. Cancelamento e Reembolsos",
-      "content": "Você pode cancelar sua assinatura a qualquer momento através do portal de clientes da LemonSqueezy. Após o cancelamento, você manterá acesso aos recursos Pro até o final do período de cobrança atual. Não são emitidos reembolsos parciais pelo tempo não utilizado dentro de um ciclo de cobrança. Todas as disputas de cobrança e solicitações de reembolso devem ser direcionadas à LemonSqueezy como Merchant of Record."
+      "content": "Você pode cancelar sua assinatura a qualquer momento através do portal de clientes da Stripe. Após o cancelamento, você manterá acesso aos recursos Pro até o final do período de cobrança atual. Não são emitidos reembolsos parciais pelo tempo não utilizado dentro de um ciclo de cobrança. Todas as disputas de cobrança e solicitações de reembolso devem ser direcionadas à Stripe como Merchant of Record."
     },
     "acceptableUse": {
       "heading": "5. Uso Aceitável",
@@ -1044,7 +1048,7 @@
     },
     "thirdPartyServices": {
       "heading": "5. Serviços de Terceiros",
-      "content": "Utilizamos os seguintes serviços de terceiros para operar o Viopage: (a) Supabase — hospedagem de banco de dados, autenticação de usuários e armazenamento de arquivos (supabase.com); (b) LemonSqueezy — processamento de pagamentos, gestão de assinaturas, gestão tributária e faturamento como nosso Merchant of Record (lemonsqueezy.com). No futuro, poderemos integrar: Google Analytics e Google Ads para análise e publicidade; Meta (Facebook) Pixel para publicidade e retargeting. Cada serviço de terceiro possui sua própria política de privacidade que rege o uso dos seus dados."
+      "content": "Utilizamos os seguintes serviços de terceiros para operar o Viopage: (a) Supabase — hospedagem de banco de dados, autenticação de usuários e armazenamento de arquivos (supabase.com); (b) Stripe — processamento de pagamentos, gestão de assinaturas, gestão tributária e faturamento como nosso Merchant of Record (stripe.com). No futuro, poderemos integrar: Google Analytics e Google Ads para análise e publicidade; Meta (Facebook) Pixel para publicidade e retargeting. Cada serviço de terceiro possui sua própria política de privacidade que rege o uso dos seus dados."
     },
     "dataSharing": {
       "heading": "6. Compartilhamento de Dados",

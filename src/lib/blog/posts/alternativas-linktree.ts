@@ -223,7 +223,7 @@ export const alternativasLinktree: BlogPost = {
         "Pro Mensal: €9/mês",
         "Pro Anual: €7/mês (€84 cobrado anualmente — economia de €24/ano)",
         "Todos os recursos inclusos: temas, analytics, domínio, QR code, sem branding",
-        "Pagamentos processados por LemonSqueezy — lida com impostos e chargebacks globalmente",
+        "Pagamentos processados com segurança via Stripe — integração global confiável",
         "Cancele quando quiser diretamente nas configurações da conta",
       ],
     },

@@ -1,16 +1,18 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Crown, Check, Loader2, X, Sparkles } from "lucide-react";
+import { Crown, Check, Loader2, X, Sparkles, ArrowLeft } from "lucide-react";
+import { loadStripe, type Stripe as StripeJs } from "@stripe/stripe-js";
+import {
+  EmbeddedCheckoutProvider,
+  EmbeddedCheckout,
+} from "@stripe/react-stripe-js";
 import { useGeoPricing } from "@/hooks/use-geo-pricing";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -20,18 +22,6 @@ type BillingInterval = "monthly" | "yearly";
 interface UpgradeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}
-
-declare global {
-  interface Window {
-    createLemonSqueezy?: () => void;
-    LemonSqueezy?: {
-      Url: {
-        Open: (url: string) => void;
-      };
-      Setup: (options: { eventHandler: (event: { event: string }) => void }) => void;
-    };
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -78,32 +68,19 @@ function FloatingParticle({ delay, x, size }: { delay: number; x: number; size: 
 }
 
 // ---------------------------------------------------------------------------
-// Load LemonSqueezy script dynamically
+// Stripe.js loader (module-singleton)
 // ---------------------------------------------------------------------------
-let lemonScriptLoaded = false;
-
-function loadLemonSqueezyScript(): Promise<void> {
-  if (lemonScriptLoaded && window.LemonSqueezy) return Promise.resolve();
-
-  return new Promise((resolve) => {
-    // Check if script already exists in DOM
-    if (document.querySelector('script[src*="lemon.js"]')) {
-      window.createLemonSqueezy?.();
-      lemonScriptLoaded = true;
-      resolve();
-      return;
+let stripePromise: Promise<StripeJs | null> | null = null;
+function getStripe() {
+  if (!stripePromise) {
+    const pk = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+    if (!pk) {
+      console.error("[upgrade-dialog] NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not set");
+      return null;
     }
-
-    const script = document.createElement("script");
-    script.src = "https://app.lemonsqueezy.com/js/lemon.js";
-    script.async = true;
-    script.onload = () => {
-      window.createLemonSqueezy?.();
-      lemonScriptLoaded = true;
-      resolve();
-    };
-    document.head.appendChild(script);
-  });
+    stripePromise = loadStripe(pk);
+  }
+  return stripePromise;
 }
 
 // ---------------------------------------------------------------------------
@@ -114,62 +91,12 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
   const geo = useGeoPricing();
   const [interval, setInterval] = useState<BillingInterval>("yearly");
   const [isLoading, setIsLoading] = useState(false);
-  const [lemonReady, setLemonReady] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
   const fetchSubscription = useSubscriptionStore((s) => s.fetchSubscription);
 
-  // Load LemonSqueezy script when dialog opens
-  useEffect(() => {
-    if (!open) return;
-    loadLemonSqueezyScript().then(() => {
-      // Set up event handler for checkout events
-      window.LemonSqueezy?.Setup({
-        eventHandler: (event: { event: string }) => {
-          if (
-            event.event === "Checkout.Success" ||
-            event.event === "Checkout.Close" ||
-            event.event === "close"
-          ) {
-            startPolling();
-          }
-        },
-      });
-      setLemonReady(true);
-    });
-  }, [open]);
+  const stripe = useMemo(() => getStripe(), []);
 
-  // Poll for subscription after checkout overlay closes
-  const startPolling = useCallback(() => {
-    let attempts = 0;
-    const maxAttempts = 20; // 20 * 2s = 40s max wait
-
-    async function check() {
-      attempts++;
-      try {
-        const res = await fetch("/api/checkout/status");
-        if (res.ok) {
-          const data = await res.json();
-          if (data.hasSubscription) {
-            // Subscription confirmed -- refresh store and close dialog
-            await fetchSubscription();
-            onOpenChange(false);
-            toast.success(t("welcomePro"));
-            return;
-          }
-        }
-      } catch { /* ignore */ }
-
-      if (attempts >= maxAttempts) {
-        // Timeout -- still close and refresh (webhook might be delayed)
-        await fetchSubscription();
-        onOpenChange(false);
-        return;
-      }
-      setTimeout(check, 2000);
-    }
-
-    setTimeout(check, 2000);
-  }, [fetchSubscription, onOpenChange, t]);
-
+  // Start checkout: fetch clientSecret, switch to embedded mode
   const handleUpgrade = async () => {
     setIsLoading(true);
     try {
@@ -181,19 +108,16 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        toast.error(body?.error ?? t("checkoutError"));
+        toast.error(body?.message ?? body?.error ?? t("checkoutError"));
         return;
       }
 
-      const { url } = await res.json();
-      if (!url) {
+      const { clientSecret: secret } = await res.json();
+      if (!secret) {
         toast.error(t("checkoutError"));
         return;
       }
-
-      // Full redirect to LemonSqueezy hosted checkout — Apple Pay and
-      // Google Pay only work on the hosted page, not in overlay iframes.
-      window.location.href = url;
+      setClientSecret(secret);
     } catch {
       toast.error(t("checkoutError"));
     } finally {
@@ -201,14 +125,38 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
     }
   };
 
+  // Fired by Stripe when the embedded checkout completes (success OR expiry)
+  const handleCheckoutComplete = useCallback(async () => {
+    // Refresh the subscription store (the webhook may have fired by now;
+    // if not, our fetch will pick it up a few seconds later via polling).
+    await fetchSubscription();
+    toast.success(t("welcomePro"));
+    onOpenChange(false);
+    setClientSecret(null); // Reset for next open
+  }, [fetchSubscription, onOpenChange, t]);
+
+  const handleClose = () => {
+    setClientSecret(null);
+    onOpenChange(false);
+  };
+
+  const handleBackToPlans = () => {
+    setClientSecret(null);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="sm:max-w-[420px] p-0 overflow-hidden border-0">
-        <AnimatePresence>
-          {open && (
+      <DialogContent
+        showCloseButton={false}
+        className={`${clientSecret ? "sm:max-w-[500px]" : "sm:max-w-[420px]"} p-0 overflow-hidden border-0 max-h-[90vh]`}
+      >
+        <AnimatePresence mode="wait">
+          {open && !clientSecret && (
             <motion.div
+              key="plan-view"
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             >
               {/* Animated gradient accent bar */}
@@ -235,7 +183,7 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
                 {/* Close button */}
                 <motion.button
                   type="button"
-                  onClick={() => onOpenChange(false)}
+                  onClick={handleClose}
                   className="absolute top-4 right-4 text-zinc-300 hover:text-zinc-500 transition-colors z-10"
                   initial={{ opacity: 0, rotate: -90 }}
                   animate={{ opacity: 1, rotate: 0 }}
@@ -246,14 +194,12 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
 
                 {/* Header */}
                 <div className="text-center mb-6 relative">
-                  {/* Glowing icon */}
                   <motion.div
                     className="inline-flex items-center justify-center size-14 rounded-2xl mb-3 relative"
                     initial={{ scale: 0, rotate: -180 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ delay: 0.1, duration: 0.5, type: "spring", stiffness: 200 }}
                   >
-                    {/* Glow ring */}
                     <motion.div
                       className="absolute inset-0 rounded-2xl"
                       style={{ background: "linear-gradient(135deg, #FF6B3540, #8B5CF640)" }}
@@ -318,7 +264,6 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
                   >
                     {t("yearly")} {geo.yearlyPerMonth}/{geo.isBR ? "mês" : "mo"}
                   </button>
-                  {/* Animated save badge */}
                   <motion.div
                     className="absolute -top-3 -right-2 bg-[#8B5CF6] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm tracking-wide"
                     initial={{ scale: 0, rotate: -20 }}
@@ -334,7 +279,7 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
                   </motion.div>
                 </motion.div>
 
-                {/* Feature List — staggered entrance */}
+                {/* Feature List */}
                 <ul className="space-y-3.5 mb-8">
                   {PRO_FEATURES.map((key, i) => (
                     <motion.li
@@ -359,7 +304,7 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
                   ))}
                 </ul>
 
-                {/* CTA Button — with shimmer */}
+                {/* CTA Button */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -371,7 +316,6 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
                     disabled={isLoading}
                     className="group w-full relative flex items-center justify-center gap-2 bg-[#FF6B35] hover:bg-[#e85a24] text-white font-bold py-4 px-6 rounded-full shadow-lg shadow-orange-100 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed mb-4 overflow-hidden"
                   >
-                    {/* Shimmer sweep */}
                     <motion.div
                       className="absolute inset-0 pointer-events-none"
                       style={{
@@ -403,6 +347,52 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
                 >
                   {t("trialDisclaimer")}
                 </motion.p>
+              </div>
+            </motion.div>
+          )}
+
+          {open && clientSecret && (
+            <motion.div
+              key="checkout-view"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white"
+            >
+              {/* Back + close header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-100">
+                <button
+                  type="button"
+                  onClick={handleBackToPlans}
+                  className="flex items-center gap-1.5 text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors"
+                >
+                  <ArrowLeft className="size-4" />
+                  {t("backToPlans")}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className="text-zinc-300 hover:text-zinc-500 transition-colors"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+
+              {/* Embedded Stripe Checkout */}
+              <div className="max-h-[75vh] overflow-y-auto">
+                {stripe ? (
+                  <EmbeddedCheckoutProvider
+                    stripe={stripe}
+                    options={{ clientSecret, onComplete: handleCheckoutComplete }}
+                  >
+                    <EmbeddedCheckout />
+                  </EmbeddedCheckoutProvider>
+                ) : (
+                  <div className="p-8 text-center text-sm text-zinc-500">
+                    Stripe is not configured. Check NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.
+                  </div>
+                )}
               </div>
             </motion.div>
           )}

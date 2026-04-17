@@ -203,7 +203,7 @@ export const viopageVsLinktree: BlogPost = {
     },
     {
       type: "paragraph",
-      text: "This pricing model is intentionally creator-friendly. You are not paying for a tier just to unlock analytics, remove branding, or add a custom domain. All of those features are included at the single Pro price point. Payments are handled by LemonSqueezy, a Merchant of Record that takes care of chargebacks, VAT, and sales tax compliance globally — which matters if you are a creator selling internationally.",
+      text: "This pricing model is intentionally creator-friendly. You are not paying for a tier just to unlock analytics, remove branding, or add a custom domain. All of those features are included at the single Pro price point. Payments are handled securely by Stripe, one of the most trusted payment processors globally — which matters if you are a creator selling internationally.",
     },
     {
       type: "subheading",

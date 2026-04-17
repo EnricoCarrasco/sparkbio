@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { initLemonSqueezy, VARIANT_IDS, STORE_ID } from "@/lib/lemonsqueezy";
-import { createCheckout } from "@lemonsqueezy/lemonsqueezy.js";
+import { stripe, PRICE_IDS, type BillingInterval, type Region } from "@/lib/stripe";
 
-// Only the two billing intervals the frontend can request
-type BillingInterval = "monthly" | "yearly";
+// ---------------------------------------------------------------------------
+// Route: POST /api/checkout
+// Creates a Stripe Checkout Session in EMBEDDED ui_mode.
+// Returns { clientSecret, sessionId } for the frontend to mount with
+// <EmbeddedCheckoutProvider clientSecret={...}>.
+// ---------------------------------------------------------------------------
 
 function isValidInterval(value: unknown): value is BillingInterval {
   return value === "monthly" || value === "yearly";
@@ -41,75 +44,105 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  // --- Determine country for geo-pricing ---
-  // Prefer Vercel's IP-based header (reliable, can't be spoofed by client)
-  // Fallback to client-provided country param
+  // --- Geo-pricing routing ---
+  // Prefer Vercel's IP-based header (can't be spoofed), fall back to body param
   const headerCountry = request.headers.get("x-vercel-ip-country");
   const bodyCountry =
     body !== null && typeof body === "object" && "country" in body
       ? (body as Record<string, unknown>).country
       : undefined;
   const country = headerCountry || (typeof bodyCountry === "string" ? bodyCountry : "");
-  const region: "BR" | "default" = country === "BR" ? "BR" : "default";
+  const region: Region = country === "BR" ? "BR" : "default";
 
-  // --- Resolve variant ID ---
-  const variantId = VARIANT_IDS[interval][region];
-  if (!variantId) {
+  const priceId = PRICE_IDS[interval][region];
+  if (!priceId) {
     return NextResponse.json(
-      { error: "variant_not_configured" },
-      { status: 400 }
+      { error: "price_not_configured", region, interval },
+      { status: 500 }
     );
   }
 
   // --- Trial-abuse guard: one trial per user ---
-  // If the creator has EVER had a subscription (any status — on_trial,
-  // active, cancelled, past_due, paused, expired), they don't get another
-  // trial on this checkout. They can still subscribe; LemonSqueezy will
-  // bill them on day 1 instead of after 7 days. This blocks the
-  // "cancel-and-resubscribe to refresh the trial" loop.
+  // If the user has EVER had a subscription (any status), skip the trial.
+  // This blocks the "cancel-and-resubscribe to refresh the trial" loop.
   const { data: priorSubscription } = await supabase
     .from("subscriptions")
-    .select("id")
+    .select("id, stripe_customer_id")
     .eq("user_id", user.id)
-    .limit(1)
     .maybeSingle();
   const skipTrial = priorSubscription !== null;
 
-  // --- Initialise LemonSqueezy SDK ---
-  initLemonSqueezy();
+  // --- Find or create Stripe customer ---
+  // Reuse stripe_customer_id if we've ever created one for this user.
+  // Otherwise, look up by email (idempotent) or create a fresh one.
+  let customerId: string | null = priorSubscription?.stripe_customer_id ?? null;
 
-  // --- Create checkout session ---
-  const { data, error } = await createCheckout(STORE_ID, variantId, {
-    checkoutData: {
-      email: user.email,
-      billingAddress: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      country: (country || undefined) as any,
+  if (!customerId && user.email) {
+    // Check if Stripe already has a customer with this email (e.g. leftover from
+    // a previous checkout that didn't complete).
+    const existing = await stripe.customers.list({ email: user.email, limit: 1 });
+    customerId = existing.data[0]?.id ?? null;
+
+    if (customerId) {
+      // Make sure the user_id metadata is set on the existing customer
+      await stripe.customers.update(customerId, {
+        metadata: { user_id: user.id },
+      });
+    }
+  }
+
+  if (!customerId) {
+    const customer = await stripe.customers.create({
+      email: user.email ?? undefined,
+      metadata: { user_id: user.id },
+    });
+    customerId = customer.id;
+  }
+
+  // --- Create the embedded checkout session ---
+  const origin = new URL(request.url).origin;
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      // Stripe API 2026-03-25.dahlia renamed 'embedded' → 'embedded_page'
+      ui_mode: "embedded_page",
+      mode: "subscription",
+      customer: customerId,
+      line_items: [{ price: priceId, quantity: 1 }],
+      subscription_data: {
+        trial_period_days: skipTrial ? undefined : 7,
+        metadata: {
+          user_id: user.id,
+          region,
+          interval,
+        },
       },
-      custom: {
+      client_reference_id: user.id,
+      metadata: {
         user_id: user.id,
+        region,
+        interval,
       },
-    },
-    productOptions: {
-      // Use the current request's origin so checkouts initiated from preview
-      // deployments return to the SAME preview URL instead of production.
-      redirectUrl: `${new URL(request.url).origin}/dashboard?upgraded=1`,
-    },
-    checkoutOptions: {
-      skipTrial,
-    },
-  });
+      // After embedded checkout completes, Stripe redirects the iframe to this URL.
+      // We use the ?session_id={CHECKOUT_SESSION_ID} template so the dashboard
+      // shell can pick up the session ID if we ever need it.
+      return_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}&upgraded=1`,
+      allow_promotion_codes: true,
+      automatic_tax: { enabled: false },
+    });
 
-  if (error) {
-    console.error("[checkout] createCheckout error:", error);
-    return NextResponse.json({ error: "checkout_failed" }, { status: 500 });
+    if (!session.client_secret) {
+      console.error("[checkout] session created but no client_secret returned");
+      return NextResponse.json({ error: "no_client_secret" }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      clientSecret: session.client_secret,
+      sessionId: session.id,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[checkout] createCheckoutSession error:", msg);
+    return NextResponse.json({ error: "checkout_failed", message: msg }, { status: 500 });
   }
-
-  const url = data?.data?.attributes?.url;
-  if (!url) {
-    console.error("[checkout] no checkout URL returned from LemonSqueezy");
-    return NextResponse.json({ error: "no_checkout_url" }, { status: 500 });
-  }
-
-  return NextResponse.json({ url });
 }

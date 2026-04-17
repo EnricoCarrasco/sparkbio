@@ -892,6 +892,7 @@
     "trialGateTitle": "Start your 7-day free trial",
     "trialGateDesc": "Enter your payment details to unlock all Viopage features. You won't be charged during the trial period.",
     "manageSubscription": "Manage subscription",
+    "backToPlans": "Back to plans",
     "feature_hideFooter": "Hide Viopage branding",
     "feature_premiumThemes": "14 premium designer themes",
     "feature_advancedButtons": "Glass, outline & shadow button styles",
@@ -961,7 +962,10 @@
     "support": "Questions?",
     "supportLink": "Contact support",
     "error": "Something went wrong. Please try again.",
-    "errorCheckout": "Could not create checkout. Please try again."
+    "errorCheckout": "Could not create checkout. Please try again.",
+    "backToPlans": "Back to plan selection",
+    "checkoutHeading": "Complete your subscription",
+    "checkoutSubtitle": "7-day free trial \u00b7 Cancel anytime"
   },
   "terms": {
     "title": "Terms of Service",
@@ -977,11 +981,11 @@
     },
     "subscription": {
       "heading": "3. Subscription & Billing",
-      "content": "Viopage offers a paid Pro subscription plan. New users receive a 7-day free trial. After the trial period ends, your chosen payment method will be automatically charged unless you cancel before the trial expires. All payment processing is handled by LemonSqueezy, our Merchant of Record, which is responsible for billing, tax collection, chargebacks, and refund processing. By subscribing, you also agree to LemonSqueezy's terms of service."
+      "content": "Viopage offers a paid Pro subscription plan. New users receive a 7-day free trial. After the trial period ends, your chosen payment method will be automatically charged unless you cancel before the trial expires. All payment processing is handled by Stripe, our Merchant of Record, which is responsible for billing, tax collection, chargebacks, and refund processing. By subscribing, you also agree to Stripe's terms of service."
     },
     "cancellation": {
       "heading": "4. Cancellation & Refunds",
-      "content": "You may cancel your subscription at any time through LemonSqueezy's customer portal. Upon cancellation, you will retain access to Pro features until the end of your current billing period. No partial refunds are issued for unused time within a billing cycle. All billing disputes and refund requests must be directed to LemonSqueezy as the Merchant of Record."
+      "content": "You may cancel your subscription at any time through Stripe's customer portal. Upon cancellation, you will retain access to Pro features until the end of your current billing period. No partial refunds are issued for unused time within a billing cycle. All billing disputes and refund requests must be directed to Stripe as the Merchant of Record."
     },
     "acceptableUse": {
       "heading": "5. Acceptable Use",
@@ -1046,7 +1050,7 @@
     },
     "thirdPartyServices": {
       "heading": "5. Third-Party Services",
-      "content": "We use the following third-party services to operate Viopage: (a) Supabase — database hosting, user authentication, and file storage (supabase.com); (b) LemonSqueezy — payment processing, subscription management, tax handling, and invoicing as our Merchant of Record (lemonsqueezy.com). In the future, we may integrate: Google Analytics and Google Ads for analytics and advertising; Meta (Facebook) Pixel for advertising and retargeting. Each third-party service has its own privacy policy governing their use of your data."
+      "content": "We use the following third-party services to operate Viopage: (a) Supabase — database hosting, user authentication, and file storage (supabase.com); (b) Stripe — payment processing, subscription management, tax handling, and invoicing as our Merchant of Record (stripe.com). In the future, we may integrate: Google Analytics and Google Ads for analytics and advertising; Meta (Facebook) Pixel for advertising and retargeting. Each third-party service has its own privacy policy governing their use of your data."
     },
     "dataSharing": {
       "heading": "6. Data Sharing",

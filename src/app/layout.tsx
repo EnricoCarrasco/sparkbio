@@ -64,10 +64,6 @@ export default async function RootLayout({
           {children}
           <Toaster />
         </NextIntlClientProvider>
-        <Script
-          src="https://app.lemonsqueezy.com/js/lemon.js"
-          strategy="afterInteractive"
-        />
         {META_PIXEL_ID && (
           <Script id="meta-pixel" strategy="afterInteractive">
             {`!function(f,b,e,v,n,t,s)
