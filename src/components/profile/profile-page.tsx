@@ -112,8 +112,9 @@ export function ProfilePage({ data, preview = false }: ProfilePageProps) {
 
   // hide_footer is stripped server-side for non-Pro visitors (see
   // lib/pro-fields.ts). The owner preview route passes it through. Either
-  // way, reading theme.hide_footer directly here is correct.
-  const showFooter = !theme.hide_footer;
+  // way, reading theme.hide_footer directly here is correct. Internal
+  // /preview/* marketing routes always hide the footer regardless.
+  const showFooter = !theme.hide_footer && !preview;
 
   return (
     <div
