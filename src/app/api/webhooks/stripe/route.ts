@@ -85,6 +85,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         });
         break;
       }
+      case "charge.refunded": {
+        // Full refund on a subscription invoice → cancel the sub so the user
+        // loses Pro access. Partial refunds leave access intact (user got
+        // some money back but is still paying for the period).
+        const charge = event.data.object as Stripe.Charge;
+        await handleChargeRefunded(charge);
+        break;
+      }
       default:
         // Unhandled event — log and acknowledge so Stripe doesn't retry.
         console.log("[webhook] unhandled event:", event.type);
@@ -222,4 +230,80 @@ async function handleSubscription(
       console.error("[webhook] background task error:", err);
     }
   });
+}
+
+// ---------------------------------------------------------------------------
+// Refund handler
+// ---------------------------------------------------------------------------
+
+async function handleChargeRefunded(charge: Stripe.Charge): Promise<void> {
+  // Only act on FULL refunds. Partial refunds = user got some money back but
+  // is still paying; they keep access.
+  const fullyRefunded =
+    charge.refunded ||
+    (typeof charge.amount_refunded === "number" &&
+      typeof charge.amount === "number" &&
+      charge.amount_refunded >= charge.amount);
+
+  if (!fullyRefunded) {
+    console.log("[webhook] charge.refunded — partial refund, leaving sub intact", {
+      chargeId: charge.id,
+      amount: charge.amount,
+      refunded: charge.amount_refunded,
+    });
+    return;
+  }
+
+  // The Stripe API 2026-03-25.dahlia removed `Charge.invoice`. Instead of
+  // walking charge → invoice → subscription, look up the user's active sub
+  // directly via stripe_customer_id (we enforce one-sub-per-user).
+  const customerId = typeof charge.customer === "string" ? charge.customer : charge.customer?.id;
+  if (!customerId) {
+    console.log("[webhook] charge.refunded — no customer on charge", {
+      chargeId: charge.id,
+    });
+    return;
+  }
+
+  const supabase = createAdminClient();
+  const { data: subRow } = await supabase
+    .from("subscriptions")
+    .select("stripe_subscription_id, status")
+    .eq("stripe_customer_id", customerId)
+    .maybeSingle();
+
+  if (!subRow?.stripe_subscription_id) {
+    console.log("[webhook] charge.refunded — no tracked subscription for customer", {
+      chargeId: charge.id,
+      customerId,
+    });
+    return;
+  }
+
+  // Idempotency: already cancelled → nothing to do
+  if (subRow.status === "cancelled" || subRow.status === "expired") {
+    console.log("[webhook] charge.refunded — sub already cancelled/expired, skipping", {
+      subscriptionId: subRow.stripe_subscription_id,
+    });
+    return;
+  }
+
+  // Cancel in Stripe. This fires customer.subscription.deleted, which our
+  // existing handler processes: flips DB status + resets hide_footer + voids
+  // pending referral earnings.
+  try {
+    await stripe.subscriptions.cancel(subRow.stripe_subscription_id);
+    console.log("[webhook] charge.refunded — cancelled subscription", {
+      chargeId: charge.id,
+      subscriptionId: subRow.stripe_subscription_id,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(
+      "[webhook] charge.refunded — failed to cancel sub:",
+      subRow.stripe_subscription_id,
+      msg
+    );
+    throw err;
+  }
 }
