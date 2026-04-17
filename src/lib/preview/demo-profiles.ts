@@ -1,6 +1,6 @@
 /**
  * Demo profiles for the internal `/preview/[theme]` marketing routes.
- * Pulls the 3 hero premium presets (Modernist / Executive / Electric)
+ * Pulls the 3 hero premium presets (Photographers / Designers / Musicians)
  * directly from `THEME_PRESETS_PREMIUM` so visuals stay in sync with the
  * dashboard catalog.
  *
@@ -112,79 +112,79 @@ function demoSocial(
 
 // ── Demo profiles ───────────────────────────────────────────────────────────
 
-export type DemoThemeSlug = "modernist" | "executive" | "electric";
+export type DemoThemeSlug = "photographers" | "designers" | "musicians";
 
-const MODERNIST_USER_ID = "demo-juno-marsh";
-const EXECUTIVE_USER_ID = "demo-studio-kael";
-const ELECTRIC_USER_ID = "demo-nova";
+const PHOTOGRAPHER_USER_ID = "demo-juno-marsh";
+const DESIGNER_USER_ID = "demo-studio-kael";
+const MUSICIAN_USER_ID = "demo-nova";
 
 export const DEMO_PROFILES: Record<DemoThemeSlug, PublicProfile> = {
-  modernist: {
+  photographers: {
     profile: demoProfile({
-      id: MODERNIST_USER_ID,
+      id: PHOTOGRAPHER_USER_ID,
       username: "junomarsh",
       display_name: "Juno Marsh",
       bio: "Photographer · Amsterdam",
       avatar_url: "/avatars/juno-marsh.jpeg",
     }),
-    theme: buildDemoTheme(getPreset("Modernist"), "demo-theme-modernist", MODERNIST_USER_ID),
+    theme: buildDemoTheme(getPreset("Photographers"), "demo-theme-photographers", PHOTOGRAPHER_USER_ID),
     links: [
-      demoLink(MODERNIST_USER_ID, 0, "Latest Work", "https://example.com/latest"),
-      demoLink(MODERNIST_USER_ID, 1, "Portfolio 2026", "https://example.com/portfolio"),
-      demoLink(MODERNIST_USER_ID, 2, "Book a Session", "https://example.com/book"),
-      demoLink(MODERNIST_USER_ID, 3, "Instagram", "https://instagram.com/junomarsh"),
-      demoLink(MODERNIST_USER_ID, 4, "Print Shop", "https://example.com/prints"),
+      demoLink(PHOTOGRAPHER_USER_ID, 0, "Latest Work", "https://example.com/latest"),
+      demoLink(PHOTOGRAPHER_USER_ID, 1, "Portfolio 2026", "https://example.com/portfolio"),
+      demoLink(PHOTOGRAPHER_USER_ID, 2, "Book a Session", "https://example.com/book"),
+      demoLink(PHOTOGRAPHER_USER_ID, 3, "Instagram", "https://instagram.com/junomarsh"),
+      demoLink(PHOTOGRAPHER_USER_ID, 4, "Print Shop", "https://example.com/prints"),
     ],
     social_icons: [
-      demoSocial(MODERNIST_USER_ID, 0, "instagram", "https://instagram.com/junomarsh"),
-      demoSocial(MODERNIST_USER_ID, 1, "website", "https://example.com"),
+      demoSocial(PHOTOGRAPHER_USER_ID, 0, "instagram", "https://instagram.com/junomarsh"),
+      demoSocial(PHOTOGRAPHER_USER_ID, 1, "website", "https://example.com"),
     ],
     subscription: null,
     is_complimentary_pro: true,
   },
-  executive: {
+  designers: {
     profile: demoProfile({
-      id: EXECUTIVE_USER_ID,
+      id: DESIGNER_USER_ID,
       username: "studiokael",
       display_name: "Studio Kael",
       bio: "Brand & product design",
       avatar_url: "/avatars/studio-kael.jpeg",
     }),
-    theme: buildDemoTheme(getPreset("Executive"), "demo-theme-executive", EXECUTIVE_USER_ID),
+    theme: buildDemoTheme(getPreset("Designers"), "demo-theme-designers", DESIGNER_USER_ID),
     links: [
-      demoLink(EXECUTIVE_USER_ID, 0, "Selected Work", "https://example.com/work"),
-      demoLink(EXECUTIVE_USER_ID, 1, "Case Studies", "https://example.com/cases"),
-      demoLink(EXECUTIVE_USER_ID, 2, "About", "https://example.com/about"),
-      demoLink(EXECUTIVE_USER_ID, 3, "Read.cv", "https://read.cv/studiokael"),
-      demoLink(EXECUTIVE_USER_ID, 4, "Email me", "mailto:hello@studiokael.com"),
+      demoLink(DESIGNER_USER_ID, 0, "Selected Work", "https://example.com/work"),
+      demoLink(DESIGNER_USER_ID, 1, "Case Studies", "https://example.com/cases"),
+      demoLink(DESIGNER_USER_ID, 2, "About", "https://example.com/about"),
+      demoLink(DESIGNER_USER_ID, 3, "Read.cv", "https://read.cv/studiokael"),
+      demoLink(DESIGNER_USER_ID, 4, "Email me", "mailto:hello@studiokael.com"),
     ],
     social_icons: [
-      demoSocial(EXECUTIVE_USER_ID, 0, "x", "https://x.com/studiokael"),
-      demoSocial(EXECUTIVE_USER_ID, 1, "linkedin", "https://linkedin.com/in/studiokael"),
+      demoSocial(DESIGNER_USER_ID, 0, "x", "https://x.com/studiokael"),
+      demoSocial(DESIGNER_USER_ID, 1, "linkedin", "https://linkedin.com/in/studiokael"),
     ],
     subscription: null,
     is_complimentary_pro: true,
   },
-  electric: {
+  musicians: {
     profile: demoProfile({
-      id: ELECTRIC_USER_ID,
+      id: MUSICIAN_USER_ID,
       username: "nova",
       display_name: "NOVA",
       bio: "New single out now",
       avatar_url: "/avatars/nova.jpeg",
     }),
-    theme: buildDemoTheme(getPreset("Electric"), "demo-theme-electric", ELECTRIC_USER_ID),
+    theme: buildDemoTheme(getPreset("Musicians"), "demo-theme-musicians", MUSICIAN_USER_ID),
     links: [
-      demoLink(ELECTRIC_USER_ID, 0, "New Single — Undertow", "https://example.com/undertow"),
-      demoLink(ELECTRIC_USER_ID, 1, "Tour Dates 2026", "https://example.com/tour"),
-      demoLink(ELECTRIC_USER_ID, 2, "Spotify", "https://open.spotify.com/artist/nova"),
-      demoLink(ELECTRIC_USER_ID, 3, "Apple Music", "https://music.apple.com/artist/nova"),
-      demoLink(ELECTRIC_USER_ID, 4, "Merch", "https://example.com/merch"),
+      demoLink(MUSICIAN_USER_ID, 0, "New Single — Undertow", "https://example.com/undertow"),
+      demoLink(MUSICIAN_USER_ID, 1, "Tour Dates 2026", "https://example.com/tour"),
+      demoLink(MUSICIAN_USER_ID, 2, "Spotify", "https://open.spotify.com/artist/nova"),
+      demoLink(MUSICIAN_USER_ID, 3, "Apple Music", "https://music.apple.com/artist/nova"),
+      demoLink(MUSICIAN_USER_ID, 4, "Merch", "https://example.com/merch"),
     ],
     social_icons: [
-      demoSocial(ELECTRIC_USER_ID, 0, "instagram", "https://instagram.com/nova"),
-      demoSocial(ELECTRIC_USER_ID, 1, "tiktok", "https://tiktok.com/@nova"),
-      demoSocial(ELECTRIC_USER_ID, 2, "spotify", "https://open.spotify.com/artist/nova"),
+      demoSocial(MUSICIAN_USER_ID, 0, "instagram", "https://instagram.com/nova"),
+      demoSocial(MUSICIAN_USER_ID, 1, "tiktok", "https://tiktok.com/@nova"),
+      demoSocial(MUSICIAN_USER_ID, 2, "spotify", "https://open.spotify.com/artist/nova"),
     ],
     subscription: null,
     is_complimentary_pro: true,

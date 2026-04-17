@@ -307,7 +307,7 @@ export const THEME_PRESETS_BASIC = [
 
 export const THEME_PRESETS_PREMIUM = [
   {
-    name: "Modernist",
+    name: "Photographers",
     bg_color: "#F7F5F1",
     text_color: "#1A1A1A",
     button_color: "#1A1A1A",
@@ -330,7 +330,7 @@ export const THEME_PRESETS_PREMIUM = [
     wallpaper_animate: false,
   },
   {
-    name: "Executive",
+    name: "Designers",
     bg_color: "#0A0A0B",
     text_color: "#EDECE7",
     button_color: "#C9A96E",
@@ -356,7 +356,7 @@ export const THEME_PRESETS_PREMIUM = [
     wallpaper_noise: true,
   },
   {
-    name: "Electric",
+    name: "Musicians",
     bg_color: "#0E0812",
     text_color: "#EFE5D4",
     button_color: "#F8A661",

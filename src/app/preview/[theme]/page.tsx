@@ -5,7 +5,7 @@ import { DEMO_PROFILES, type DemoThemeSlug } from "@/lib/preview/demo-profiles";
 
 type Props = { params: Promise<{ theme: string }> };
 
-const VALID: readonly DemoThemeSlug[] = ["modernist", "executive", "electric"];
+const VALID: readonly DemoThemeSlug[] = ["photographers", "designers", "musicians"];
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
