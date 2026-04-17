@@ -162,6 +162,11 @@ export function ThemePanel() {
   const activePresetName = getActivePresetName(theme);
 
   function handlePresetApply(preset: (typeof THEME_PRESETS)[number]) {
+    // Some premium presets opt into wallpaper/gradient/title customizations.
+    // Apply them when present; otherwise reset to safe defaults so switching
+    // away from a "loud" preset cleans up the carry-over visual state.
+    const p = preset as (typeof THEME_PRESETS)[number] & Partial<Theme>;
+
     updateTheme({
       bg_color: preset.bg_color,
       text_color: preset.text_color,
@@ -178,11 +183,15 @@ export function ThemePanel() {
       title_font: preset.title_font,
       hide_bio: preset.hide_bio,
       button_font_size: preset.button_font_size ?? "medium",
-      // Reset customizations that shouldn't persist across presets
-      title_color: null,
-      bg_gradient_from: null,
-      bg_gradient_to: null,
-      bg_gradient_direction: null,
+      // Optional design-rich fields — reset by default, override if preset declares
+      title_color: p.title_color ?? null,
+      title_size: p.title_size ?? "small",
+      wallpaper_style: p.wallpaper_style ?? "fill",
+      wallpaper_animate: p.wallpaper_animate ?? false,
+      wallpaper_noise: p.wallpaper_noise ?? false,
+      bg_gradient_from: p.bg_gradient_from ?? null,
+      bg_gradient_to: p.bg_gradient_to ?? null,
+      bg_gradient_direction: p.bg_gradient_direction ?? null,
     });
   }
 

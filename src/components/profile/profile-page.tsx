@@ -13,6 +13,8 @@ import { useTranslations } from "next-intl";
 
 interface ProfilePageProps {
   data: PublicProfile;
+  /** Skip analytics tracking — used by internal /preview/* marketing routes. */
+  preview?: boolean;
 }
 
 function buildBackgroundStyle(theme: PublicProfile["theme"]): React.CSSProperties {
@@ -53,7 +55,7 @@ function buildGoogleFontsUrl(theme: PublicProfile["theme"]): string | null {
   return `https://fonts.googleapis.com/css2?${params}&display=swap`;
 }
 
-export function ProfilePage({ data }: ProfilePageProps) {
+export function ProfilePage({ data, preview = false }: ProfilePageProps) {
   const { profile, links, theme, social_icons } = data;
   const t = useTranslations("publicProfile");
 
@@ -165,7 +167,7 @@ export function ProfilePage({ data }: ProfilePageProps) {
       )}
 
       {/* Non-rendering analytics tracker */}
-      <AnalyticsTracker profileId={profile.id} username={profile.username} />
+      {!preview && <AnalyticsTracker profileId={profile.id} username={profile.username} />}
 
       {/* Content column — content centers vertically when sparse, footer stays at bottom */}
       <main className="w-full max-w-[480px] mx-auto flex flex-col items-center px-4 relative z-10 flex-1">
