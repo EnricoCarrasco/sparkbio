@@ -148,7 +148,7 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className={`${clientSecret ? "sm:max-w-[500px]" : "sm:max-w-[420px]"} p-0 overflow-hidden border-0 max-h-[90vh]`}
+        className={`${clientSecret ? "sm:max-w-[500px]" : "sm:max-w-[420px]"} p-0 overflow-hidden border-0 max-h-[92dvh] flex flex-col`}
       >
         <AnimatePresence mode="wait">
           {open && !clientSecret && (
@@ -158,10 +158,11 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col min-h-0 flex-1"
             >
               {/* Animated gradient accent bar */}
               <motion.div
-                className="h-1.5 w-full"
+                className="h-1.5 w-full shrink-0"
                 style={{
                   background: "linear-gradient(90deg, #f59e0b, #FF6B35, #8B5CF6, #FF6B35, #f59e0b)",
                   backgroundSize: "200% 100%",
@@ -170,7 +171,7 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
                 transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
               />
 
-              <div className="p-8 relative overflow-hidden">
+              <div className="p-5 sm:p-8 relative overflow-y-auto overflow-x-hidden flex-1 min-h-0">
                 {/* Floating particles */}
                 <div className="absolute inset-0 pointer-events-none overflow-hidden">
                   <FloatingParticle delay={0} x={10} size={4} />
@@ -358,10 +359,10 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -30 }}
               transition={{ duration: 0.3 }}
-              className="bg-white"
+              className="bg-white flex flex-col min-h-0 flex-1"
             >
               {/* Back + close header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-100">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-100 shrink-0">
                 <button
                   type="button"
                   onClick={handleBackToPlans}
@@ -380,7 +381,7 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
               </div>
 
               {/* Embedded Stripe Checkout */}
-              <div className="max-h-[75vh] overflow-y-auto">
+              <div className="flex-1 min-h-0 overflow-y-auto">
                 {stripe ? (
                   <EmbeddedCheckoutProvider
                     stripe={stripe}
