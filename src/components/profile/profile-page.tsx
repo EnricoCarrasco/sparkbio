@@ -172,8 +172,8 @@ export function ProfilePage({ data, preview = false }: ProfilePageProps) {
 
       {/* Content column — content centers vertically when sparse, footer stays at bottom */}
       <main className="w-full max-w-[480px] mx-auto flex flex-col items-center px-4 relative z-10 flex-1">
-        {/* Add to Home Screen button (mobile only) */}
-        <AddToHomeButton bgColor={theme.bg_color} />
+        {/* Add to Home Screen button (mobile only) — hidden on /preview/* */}
+        {!preview && <AddToHomeButton bgColor={theme.bg_color} />}
 
         {/* Content wrapper — centers vertically when space is available */}
         <div className="flex-1 w-full flex flex-col items-center justify-center gap-6 py-12 md:py-16">
