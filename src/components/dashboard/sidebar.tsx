@@ -42,16 +42,10 @@ export function Sidebar({ onNavigate }: SidebarProps) {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "").split(",").map(e => e.trim().toLowerCase()).filter(Boolean);
-    if (adminEmails.length === 0) {
-      // Fallback: check via admin API
-      fetch("/api/admin/stats").then(r => setIsAdmin(r.ok)).catch(() => {});
-    } else {
-      const supabase = createClient();
-      supabase.auth.getUser().then(({ data: { user } }) => {
-        if (user?.email) setIsAdmin(adminEmails.includes(user.email.toLowerCase()));
-      });
-    }
+    // Admin detection is server-authoritative: /api/admin/stats checks the
+    // caller's email against ADMIN_EMAILS (server-only). We don't expose the
+    // list client-side — it shouldn't be in a public bundle.
+    fetch("/api/admin/stats").then((r) => setIsAdmin(r.ok)).catch(() => {});
   }, []);
 
   async function handleSignOut() {
