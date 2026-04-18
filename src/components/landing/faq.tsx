@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { safeJsonLdString } from "@/lib/json-ld";
 
 const faqKeys = ["q1", "q2", "q3", "q4", "q5"] as const;
 
@@ -84,7 +85,7 @@ export function FAQ() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: safeJsonLdString({
             "@context": "https://schema.org",
             "@type": "FAQPage",
             mainEntity: faqs.map(({ question, answer }) => ({

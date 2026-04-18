@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import * as Sentry from "@sentry/nextjs";
 
 interface ErrorPageProps {
   error: Error & { digest?: string };
@@ -14,8 +15,11 @@ export default function GlobalError({ error, reset }: ErrorPageProps) {
   const t = useTranslations("errors.generic");
 
   useEffect(() => {
-    // Log the error to an error reporting service in production.
-    console.error(error);
+    // Forward the error to Sentry with a tag we can filter on.
+    Sentry.captureException(error, {
+      tags: { surface: "global-error-boundary" },
+      extra: { digest: error.digest },
+    });
   }, [error]);
 
   return (

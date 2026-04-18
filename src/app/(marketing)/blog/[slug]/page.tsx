@@ -6,6 +6,7 @@ import { allPosts, getPostBySlug, getRelatedPosts } from "@/lib/blog/posts";
 import type { BlogPost, ContentSection } from "@/lib/blog/types";
 import { BlogFAQ } from "@/components/blog/blog-faq";
 import { BlogCardImage } from "@/components/blog/blog-card-image";
+import { safeJsonLdString } from "@/lib/json-ld";
 
 const POST_TEXT = {
   en: {
@@ -296,7 +297,7 @@ export default async function BlogPostPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: safeJsonLdString({
             "@context": "https://schema.org",
             "@type": "Article",
             headline: post.title,

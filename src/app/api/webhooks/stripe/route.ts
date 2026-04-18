@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { after } from "next/server";
 import Stripe from "stripe";
+import * as Sentry from "@sentry/nextjs";
 import { stripe, mapStripeStatus, getCurrentPeriodEnd } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { processReferralConversion, cancelPendingReferralEarnings } from "@/lib/referral";
@@ -52,6 +53,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("[webhook] invalid signature:", msg);
+    Sentry.captureException(err, {
+      tags: { surface: "stripe-webhook", reason: "invalid_signature" },
+    });
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
@@ -93,6 +97,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         await handleChargeRefunded(charge);
         break;
       }
+      case "charge.dispute.created":
+      case "charge.dispute.funds_withdrawn": {
+        // User opened a chargeback. Cancel the sub immediately so they can't
+        // keep Pro access for the weeks-long dispute window and until
+        // resolution. If we win the dispute they can resubscribe (no trial).
+        const dispute = event.data.object as Stripe.Dispute;
+        await handleChargeDispute(dispute);
+        break;
+      }
       default:
         // Unhandled event — log and acknowledge so Stripe doesn't retry.
         console.log("[webhook] unhandled event:", event.type);
@@ -100,6 +113,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("[webhook] handler error:", event.type, msg);
+    Sentry.captureException(err, {
+      tags: { surface: "stripe-webhook", event_type: event.type },
+      extra: { eventId: event.id },
+    });
     return NextResponse.json({ error: "handler_error" }, { status: 500 });
   }
 
@@ -201,6 +218,10 @@ async function handleSubscription(
 
   if (upsertError) {
     console.error("[webhook] subscription upsert error:", upsertError.message);
+    Sentry.captureException(new Error(upsertError.message), {
+      tags: { surface: "stripe-webhook", op: "subscription-upsert" },
+      extra: { userId, stripeSubId: sub.id, mapped },
+    });
     throw new Error(upsertError.message);
   }
 
@@ -303,6 +324,84 @@ async function handleChargeRefunded(charge: Stripe.Charge): Promise<void> {
       "[webhook] charge.refunded — failed to cancel sub:",
       subRow.stripe_subscription_id,
       msg
+    );
+    throw err;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Dispute / chargeback handler
+// ---------------------------------------------------------------------------
+
+async function handleChargeDispute(dispute: Stripe.Dispute): Promise<void> {
+  const customerId =
+    typeof dispute.charge === "string"
+      ? null // customer not populated on the dispute — resolve via charge
+      : ((dispute.charge as Stripe.Charge | null)?.customer as
+          | string
+          | { id: string }
+          | null
+          | undefined) ?? null;
+
+  let resolvedCustomerId: string | null =
+    typeof customerId === "string"
+      ? customerId
+      : customerId?.id ?? null;
+
+  // Fall back to retrieving the charge when only the ID is expanded.
+  if (!resolvedCustomerId && typeof dispute.charge === "string") {
+    try {
+      const charge = await stripe.charges.retrieve(dispute.charge);
+      resolvedCustomerId =
+        typeof charge.customer === "string"
+          ? charge.customer
+          : charge.customer?.id ?? null;
+    } catch (err) {
+      console.error("[webhook] dispute — failed to retrieve charge:", err);
+    }
+  }
+
+  if (!resolvedCustomerId) {
+    console.log("[webhook] dispute — no customer on charge", {
+      disputeId: dispute.id,
+    });
+    return;
+  }
+
+  const supabase = createAdminClient();
+  const { data: subRow } = await supabase
+    .from("subscriptions")
+    .select("stripe_subscription_id, status")
+    .eq("stripe_customer_id", resolvedCustomerId)
+    .maybeSingle();
+
+  if (!subRow?.stripe_subscription_id) {
+    console.log("[webhook] dispute — no tracked subscription for customer", {
+      disputeId: dispute.id,
+      customerId: resolvedCustomerId,
+    });
+    return;
+  }
+
+  if (subRow.status === "cancelled" || subRow.status === "expired") {
+    console.log("[webhook] dispute — sub already cancelled/expired, skipping", {
+      subscriptionId: subRow.stripe_subscription_id,
+    });
+    return;
+  }
+
+  try {
+    await stripe.subscriptions.cancel(subRow.stripe_subscription_id);
+    console.log("[webhook] dispute — cancelled subscription", {
+      disputeId: dispute.id,
+      subscriptionId: subRow.stripe_subscription_id,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(
+      "[webhook] dispute — failed to cancel sub:",
+      subRow.stripe_subscription_id,
+      msg,
     );
     throw err;
   }

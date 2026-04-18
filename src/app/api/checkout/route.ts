@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
 import { stripe, PRICE_IDS, type BillingInterval, type Region } from "@/lib/stripe";
 
@@ -45,14 +46,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   // --- Geo-pricing routing ---
-  // Prefer Vercel's IP-based header (can't be spoofed), fall back to body param
+  // Trust ONLY Vercel's IP-based header — never client input. On any request
+  // where the header is missing (local dev, non-Vercel edge), default to the
+  // EUR region so the caller can't cheat their way into BRL pricing by POSTing
+  // `{ country: "BR" }`.
   const headerCountry = request.headers.get("x-vercel-ip-country");
-  const bodyCountry =
-    body !== null && typeof body === "object" && "country" in body
-      ? (body as Record<string, unknown>).country
-      : undefined;
-  const country = headerCountry || (typeof bodyCountry === "string" ? bodyCountry : "");
-  const region: Region = country === "BR" ? "BR" : "default";
+  const region: Region = headerCountry === "BR" ? "BR" : "default";
 
   const priceId = PRICE_IDS[interval][region];
   if (!priceId) {
@@ -143,6 +142,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("[checkout] createCheckoutSession error:", msg);
+    Sentry.captureException(err, {
+      tags: { surface: "checkout", region, interval },
+      user: { id: user.id, email: user.email ?? undefined },
+    });
     return NextResponse.json({ error: "checkout_failed", message: msg }, { status: 500 });
   }
 }

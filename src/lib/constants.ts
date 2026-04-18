@@ -687,8 +687,12 @@ export const ACTIVE_SUBSCRIPTION_STATUSES = ["on_trial", "active"] as const;
 
 /** Statuses where the creator has signaled "stop billing me" but is still
  *  inside the paid or trial window. We keep them on Pro until that window
- *  ends — matches Stripe's cancel_at_period_end behavior and standard SaaS UX. */
-const GRACE_STATUSES = new Set(["cancelled", "past_due"]);
+ *  ends — matches Stripe's cancel_at_period_end behavior and standard SaaS UX.
+ *
+ *  `paused` is included: Stripe lets admins pause billing without cancelling;
+ *  the sub row remains and `current_period_end` is still the source of truth
+ *  for when access lapses. */
+const GRACE_STATUSES = new Set(["cancelled", "past_due", "paused"]);
 
 type SubscriptionShape = {
   status?: string | null;

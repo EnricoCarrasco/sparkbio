@@ -2,6 +2,7 @@ import { create } from "zustand";
 import type { Link } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { triggerRevalidation } from "@/lib/utils/revalidate";
+import { isSafeUrl } from "@/lib/validators/url";
 
 interface LinkState {
   links: Link[];
@@ -40,6 +41,7 @@ export const useLinkStore = create<LinkState>((set, get) => ({
   },
 
   addLink: async ({ title, url }) => {
+    if (!isSafeUrl(url)) return;
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -60,6 +62,7 @@ export const useLinkStore = create<LinkState>((set, get) => ({
   },
 
   updateLink: async (id, updates) => {
+    if (typeof updates.url === "string" && !isSafeUrl(updates.url)) return;
     const { links } = get();
     const prevLinks = [...links];
 
