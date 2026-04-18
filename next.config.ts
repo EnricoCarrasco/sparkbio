@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
@@ -56,4 +57,23 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withSentryConfig(withNextIntl(nextConfig), {
+  // Source-map upload auth — set in Vercel prod env only. When missing (preview,
+  // local), withSentryConfig skips uploads silently.
+  org: process.env.SENTRY_ORG ?? "viopage",
+  project: process.env.SENTRY_PROJECT ?? "viopage-web",
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
+  // Keep build logs quiet.
+  silent: !process.env.CI,
+
+  // Route Sentry's ingest traffic through our own origin at /monitoring so
+  // ad-blockers / privacy extensions don't silently drop error events.
+  tunnelRoute: "/monitoring",
+
+  // Upload source maps only when an auth token is present (prod deploys).
+  widenClientFileUpload: true,
+  sourcemaps: {
+    disable: !process.env.SENTRY_AUTH_TOKEN,
+  },
+});

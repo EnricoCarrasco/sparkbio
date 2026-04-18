@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { after } from "next/server";
 import Stripe from "stripe";
+import * as Sentry from "@sentry/nextjs";
 import { stripe, mapStripeStatus, getCurrentPeriodEnd } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { processReferralConversion, cancelPendingReferralEarnings } from "@/lib/referral";
@@ -52,6 +53,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("[webhook] invalid signature:", msg);
+    Sentry.captureException(err, {
+      tags: { surface: "stripe-webhook", reason: "invalid_signature" },
+    });
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
@@ -109,6 +113,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("[webhook] handler error:", event.type, msg);
+    Sentry.captureException(err, {
+      tags: { surface: "stripe-webhook", event_type: event.type },
+      extra: { eventId: event.id },
+    });
     return NextResponse.json({ error: "handler_error" }, { status: 500 });
   }
 
@@ -210,6 +218,10 @@ async function handleSubscription(
 
   if (upsertError) {
     console.error("[webhook] subscription upsert error:", upsertError.message);
+    Sentry.captureException(new Error(upsertError.message), {
+      tags: { surface: "stripe-webhook", op: "subscription-upsert" },
+      extra: { userId, stripeSubId: sub.id, mapped },
+    });
     throw new Error(upsertError.message);
   }
 

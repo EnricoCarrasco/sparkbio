@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
 import { stripe, PRICE_IDS, type BillingInterval, type Region } from "@/lib/stripe";
 
@@ -141,6 +142,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("[checkout] createCheckoutSession error:", msg);
+    Sentry.captureException(err, {
+      tags: { surface: "checkout", region, interval },
+      user: { id: user.id, email: user.email ?? undefined },
+    });
     return NextResponse.json({ error: "checkout_failed", message: msg }, { status: 500 });
   }
 }

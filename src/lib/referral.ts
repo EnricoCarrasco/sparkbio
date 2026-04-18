@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   REFERRAL_COMMISSION_PERCENT,
@@ -174,6 +175,10 @@ export async function processReferralConversion(
     );
   } catch (err) {
     console.error("[referral] Unexpected error in processReferralConversion:", err);
+    Sentry.captureException(err, {
+      tags: { surface: "referral", op: "process-conversion" },
+      extra: { userId, subscriptionId, priceId },
+    });
   }
 }
 
@@ -210,5 +215,9 @@ export async function cancelPendingReferralEarnings(
     );
   } catch (err) {
     console.error("[referral] Unexpected error in cancelPendingReferralEarnings:", err);
+    Sentry.captureException(err, {
+      tags: { surface: "referral", op: "cancel-earnings" },
+      extra: { subscriptionId },
+    });
   }
 }

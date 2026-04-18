@@ -1,4 +1,5 @@
 import { cache } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { ProfilePage } from "@/components/profile/profile-page";
@@ -15,6 +16,16 @@ const fetchPublicProfile = cache(async function fetchPublicProfile(username: str
   const { data, error } = await supabase.rpc("get_public_profile", {
     p_username: username,
   });
+
+  if (error) {
+    // A real RPC failure (not just "no such user") is a production problem —
+    // ship it to Sentry so we notice. The page itself still renders 404 so the
+    // visitor isn't stuck on an error screen.
+    Sentry.captureException(error, {
+      tags: { surface: "public-profile", op: "get_public_profile" },
+      extra: { username },
+    });
+  }
 
   if (error || !data || !data.profile) {
     return null;
