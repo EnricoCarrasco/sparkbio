@@ -15,8 +15,38 @@ import { isLightColor } from "@/lib/color-utils";
 const CARD_WIDTH = 600;
 const CARD_HEIGHT = CARD_WIDTH / 1.6; // 375px — standard business card ratio
 
+type Store = {
+  brandName: string;
+  fullName: string;
+  jobTitle: string;
+  email: string;
+  website: string;
+  phone: string;
+  whatsapp: string;
+  logoUrl: string | null;
+  showQrCode: boolean;
+  primaryColor: string;
+  textColor: string;
+  accentColor: string;
+  bgColor: string;
+  bgGradient: string | null;
+  secondaryTextColor: string;
+  cardLayout: "split" | "centered" | "left-aligned";
+  qrFgColor: string;
+  qrBgColor: string;
+  logoSize: number;
+  logoShape: "rounded" | "circle" | "square";
+  nameFontSize: number;
+  titleFontSize: number;
+  contactFontSize: number;
+  brandNameFontSize: number;
+  qrCodeSize: number;
+  aiBackgroundUrl: string | null;
+  aiLogoUrl: string | null;
+};
+
 // Demo data shown to free users so the card looks stunning
-const DEMO_DATA = {
+const DEMO_DATA: Store = {
   brandName: "Sofia Martinez",
   fullName: "Sofia Martinez",
   jobTitle: "Digital Creator & Designer",
@@ -27,18 +57,23 @@ const DEMO_DATA = {
   logoUrl: "/images/demo-card-avatar.jpeg",
   showQrCode: true,
   primaryColor: "#FF6B35",
-  textColor: "#FFFFFF",
+  textColor: "#F5F5DC",
   accentColor: "#D4AF37",
   bgColor: "#0a0a0a",
+  bgGradient: "radial-gradient(ellipse at 30% 50%, #1a1a2e 0%, #0a0a0a 70%)",
+  secondaryTextColor: "#D4AF37",
+  cardLayout: "split",
+  qrFgColor: "#D4AF37",
+  qrBgColor: "#0a0a0a",
   logoSize: 80,
-  logoShape: "rounded" as const,
+  logoShape: "rounded",
   nameFontSize: 30,
   titleFontSize: 14,
   contactFontSize: 12,
   brandNameFontSize: 18,
   qrCodeSize: 140,
-  aiBackgroundUrl: null as string | null,
-  aiLogoUrl: null as string | null,
+  aiBackgroundUrl: null,
+  aiLogoUrl: null,
 };
 
 const DEMO_SOCIALS = [
@@ -53,6 +88,320 @@ interface CardPreviewProps {
   demoMode?: boolean;
 }
 
+type Social = { id: string; platform: string; is_active: boolean };
+
+function LogoBlock({ store, isDark }: { store: Store; isDark: boolean }) {
+  const logoSrc = store.aiLogoUrl || store.logoUrl;
+  const borderRadius =
+    store.logoShape === "circle" ? "50%" : store.logoShape === "square" ? 0 : 16;
+
+  if (logoSrc) {
+    return (
+      <img
+        src={logoSrc}
+        alt="Logo"
+        style={{
+          width: store.logoSize,
+          height: store.logoSize,
+          borderRadius,
+        }}
+        className="object-cover"
+        crossOrigin="anonymous"
+        onError={(e) => {
+          (e.target as HTMLImageElement).style.display = "none";
+        }}
+      />
+    );
+  }
+
+  return (
+    <div
+      className="flex items-center justify-center text-white font-black"
+      style={{
+        width: store.logoSize,
+        height: store.logoSize,
+        borderRadius,
+        fontSize: store.logoSize * 0.35,
+        background: `linear-gradient(135deg, ${store.primaryColor}, ${store.primaryColor}cc)`,
+        boxShadow: `0 4px 24px ${store.primaryColor}40${isDark ? "" : ""}`,
+      }}
+    >
+      {(store.brandName || "V").charAt(0).toUpperCase()}
+    </div>
+  );
+}
+
+function NameBlock({
+  store,
+  mutedText,
+  t,
+  align = "left",
+}: {
+  store: Store;
+  mutedText: string;
+  t: (key: string) => string;
+  align?: "left" | "center";
+}) {
+  const textAlign = align;
+  return (
+    <div style={{ textAlign }}>
+      <h2
+        className="font-black leading-tight tracking-tight"
+        style={{
+          color: store.textColor,
+          fontSize: store.nameFontSize,
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical" as const,
+          overflow: "hidden",
+          wordBreak: "break-word",
+          hyphens: "auto",
+        }}
+      >
+        {store.fullName || t("yourName")}
+      </h2>
+      <p
+        className="font-semibold"
+        style={{
+          color: store.accentColor,
+          fontSize: store.titleFontSize,
+          marginTop: 4,
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical" as const,
+          overflow: "hidden",
+          wordBreak: "break-word",
+        }}
+      >
+        {store.jobTitle || t("yourTitle")}
+      </p>
+
+      <ContactList store={store} mutedText={mutedText} align={align} />
+    </div>
+  );
+}
+
+function ContactList({
+  store,
+  mutedText,
+  align = "left",
+}: {
+  store: Store;
+  mutedText: string;
+  align?: "left" | "center";
+}) {
+  const isDark = !isLightColor(store.bgColor);
+  const row: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    justifyContent: align === "center" ? "center" : "flex-start",
+    minWidth: 0,
+  };
+  const text: React.CSSProperties = {
+    fontSize: store.contactFontSize,
+    fontWeight: 500,
+    color: mutedText,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    minWidth: 0,
+  };
+  const iconSize = store.contactFontSize + 2;
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+        marginTop: 16,
+        marginBottom: 12,
+      }}
+    >
+      {store.phone && (
+        <div style={row}>
+          <Phone style={{ width: iconSize, height: iconSize, flexShrink: 0, color: store.accentColor }} />
+          <span style={text}>{store.phone}</span>
+        </div>
+      )}
+      {store.whatsapp && (
+        <div style={row}>
+          <img
+            src="/icons/social/whatsapp.svg"
+            alt="WhatsApp"
+            style={{
+              width: iconSize,
+              height: iconSize,
+              flexShrink: 0,
+              filter: isDark ? "brightness(0) invert(1)" : "none",
+              opacity: isDark ? 0.8 : 0.7,
+            }}
+          />
+          <span style={text}>{store.whatsapp}</span>
+        </div>
+      )}
+      {store.email && (
+        <div style={row}>
+          <Mail style={{ width: iconSize, height: iconSize, flexShrink: 0, color: store.accentColor }} />
+          <span style={text}>{store.email}</span>
+        </div>
+      )}
+      {store.website && (
+        <div style={row}>
+          <Globe style={{ width: iconSize, height: iconSize, flexShrink: 0, color: store.accentColor }} />
+          <span style={text}>{store.website}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SocialIcons({
+  store,
+  socials,
+  isDark,
+  align = "left",
+}: {
+  store: Store;
+  socials: Social[];
+  isDark: boolean;
+  align?: "left" | "center";
+}) {
+  const active = socials.filter((s) => s.is_active).slice(0, 6);
+  if (active.length === 0) return null;
+
+  const dense = active.length >= 5;
+  const box = dense ? 28 : 32;
+  const icon = dense ? 14 : 16;
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: dense ? 8 : 10,
+        marginTop: 16,
+        flexWrap: "wrap",
+        rowGap: 6,
+        justifyContent: align === "center" ? "center" : "flex-start",
+      }}
+    >
+      {active.map((social) => (
+        <div
+          key={social.id}
+          style={{
+            width: box,
+            height: box,
+            borderRadius: 8,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: `${store.accentColor}15`,
+            border: `1px solid ${store.accentColor}25`,
+            flexShrink: 0,
+          }}
+        >
+          <img
+            src={getBrandIconPath(social.platform as Parameters<typeof getBrandIconPath>[0])}
+            alt={social.platform}
+            style={{
+              width: icon,
+              height: icon,
+              filter: isDark ? "brightness(0) invert(1)" : "none",
+              opacity: isDark ? 0.8 : 0.7,
+            }}
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = "none";
+            }}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function QrBlock({
+  store,
+  qrValue,
+  maxSize,
+  mutedText,
+  isDark,
+  t,
+}: {
+  store: Store;
+  qrValue: string;
+  maxSize: number;
+  mutedText: string;
+  isDark: boolean;
+  t: (key: string) => string;
+}) {
+  if (!store.showQrCode) return null;
+  const effectiveSize = Math.min(store.qrCodeSize, maxSize);
+  return (
+    <div className="flex flex-col items-center">
+      <div
+        style={{
+          padding: 4,
+          borderRadius: 16,
+          background: `linear-gradient(135deg, ${store.accentColor}60, ${store.accentColor}20, ${store.accentColor}60)`,
+          boxShadow: isDark
+            ? `0 0 30px ${store.accentColor}15, inset 0 0 20px ${store.accentColor}08`
+            : "none",
+        }}
+      >
+        <div
+          style={{
+            padding: 2,
+            borderRadius: 12,
+            background: `linear-gradient(135deg, ${store.accentColor}80, ${store.accentColor}30)`,
+          }}
+        >
+          <div style={{ backgroundColor: store.qrBgColor, borderRadius: 8, padding: 8 }}>
+            <QRCodeCanvas
+              value={qrValue}
+              size={effectiveSize}
+              bgColor={store.qrBgColor}
+              fgColor={store.qrFgColor}
+              level="H"
+              marginSize={1}
+            />
+          </div>
+        </div>
+      </div>
+      <p className="font-medium text-center" style={{ color: mutedText, fontSize: 10, marginTop: 8 }}>
+        {t("scanToVisit")}
+      </p>
+    </div>
+  );
+}
+
+function BrandName({
+  store,
+  align = "center",
+}: {
+  store: Store;
+  align?: "left" | "center" | "right";
+}) {
+  return (
+    <p
+      className="font-bold leading-snug"
+      style={{
+        color: store.accentColor,
+        fontSize: store.brandNameFontSize,
+        textAlign: align,
+        overflow: "hidden",
+        display: "-webkit-box",
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: "vertical" as const,
+        wordBreak: "break-word",
+        hyphens: "auto",
+      }}
+    >
+      {store.brandName || "Your Brand"}
+    </p>
+  );
+}
 
 export function CardPreview({ cardRef, demoMode = false }: CardPreviewProps) {
   const t = useTranslations("dashboard.businessCard");
@@ -65,24 +414,51 @@ export function CardPreview({ cardRef, demoMode = false }: CardPreviewProps) {
 
   // Use demo data for free users so the card looks amazing
   const displayName = useProfileStore((s) => s.profile?.display_name);
-  const store = demoMode
+  const store: Store = demoMode
     ? { ...DEMO_DATA, fullName: displayName || DEMO_DATA.fullName, brandName: displayName || DEMO_DATA.brandName }
-    : realStore;
-  const socialIcons = demoMode ? DEMO_SOCIALS : realSocialIcons;
+    : {
+        brandName: realStore.brandName,
+        fullName: realStore.fullName,
+        jobTitle: realStore.jobTitle,
+        email: realStore.email,
+        website: realStore.website,
+        phone: realStore.phone,
+        whatsapp: realStore.whatsapp,
+        logoUrl: realStore.logoUrl,
+        showQrCode: realStore.showQrCode,
+        primaryColor: realStore.primaryColor,
+        textColor: realStore.textColor,
+        accentColor: realStore.accentColor,
+        bgColor: realStore.bgColor,
+        bgGradient: realStore.bgGradient,
+        secondaryTextColor: realStore.secondaryTextColor,
+        cardLayout: realStore.cardLayout,
+        qrFgColor: realStore.qrFgColor,
+        qrBgColor: realStore.qrBgColor,
+        logoSize: realStore.logoSize,
+        logoShape: realStore.logoShape,
+        nameFontSize: realStore.nameFontSize,
+        titleFontSize: realStore.titleFontSize,
+        contactFontSize: realStore.contactFontSize,
+        brandNameFontSize: realStore.brandNameFontSize,
+        qrCodeSize: realStore.qrCodeSize,
+        aiBackgroundUrl: realStore.aiBackgroundUrl,
+        aiLogoUrl: realStore.aiLogoUrl,
+      };
+  const socialIcons: Social[] = demoMode ? DEMO_SOCIALS : realSocialIcons;
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://viopage.com";
   const qrValue = demoMode ? `${siteUrl}/sofia` : (username ? `${siteUrl}/${username}` : siteUrl);
 
-  const logoSrc = store.aiLogoUrl || store.logoUrl;
   const isDark = !isLightColor(store.bgColor);
 
-  const activeSocials = socialIcons
-    .filter((s) => s.is_active)
-    .slice(0, 4);
-
-  const mutedText = isDark
-    ? `${store.textColor}99`
-    : `${store.textColor}88`;
+  // secondaryTextColor is the preferred muted source (template-defined).
+  // Fall back to alpha-blended textColor so legacy settings without it still look right.
+  const mutedText = store.secondaryTextColor
+    ? store.secondaryTextColor
+    : isDark
+      ? `${store.textColor}99`
+      : `${store.textColor}88`;
 
   // Scale the fixed-size card to fit the wrapper container
   useEffect(() => {
@@ -96,6 +472,8 @@ export function CardPreview({ cardRef, demoMode = false }: CardPreviewProps) {
     if (wrapperRef.current) observer.observe(wrapperRef.current);
     return () => observer.disconnect();
   }, []);
+
+  const cardBackground = store.bgGradient ?? store.bgColor;
 
   return (
     <div
@@ -115,6 +493,7 @@ export function CardPreview({ cardRef, demoMode = false }: CardPreviewProps) {
           width: CARD_WIDTH,
           height: CARD_HEIGHT,
           borderRadius: 20,
+          background: cardBackground,
           backgroundColor: store.bgColor,
           transform: `scale(${scale}) ${isHovered ? "" : "rotateY(-5deg) rotateX(5deg)"}`,
           transformOrigin: "top left",
@@ -129,7 +508,9 @@ export function CardPreview({ cardRef, demoMode = false }: CardPreviewProps) {
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
             crossOrigin="anonymous"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = "none";
+            }}
           />
         )}
 
@@ -163,211 +544,81 @@ export function CardPreview({ cardRef, demoMode = false }: CardPreviewProps) {
           />
         )}
 
-        {/* Card content — split layout */}
-        <div className="relative z-10 flex h-full">
-          {/* Left side (55%) */}
-          <div className="flex flex-col justify-between w-[55%] p-8">
-            {/* Logo */}
-            <div>
-              {logoSrc ? (
-                <img
-                  src={logoSrc}
-                  alt="Logo"
-                  style={{
-                    width: store.logoSize,
-                    height: store.logoSize,
-                    borderRadius: store.logoShape === "circle" ? "50%" : store.logoShape === "square" ? 0 : 16,
-                  }}
-                  className="object-cover"
-                  crossOrigin="anonymous"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+        {/* Card content — layout switch */}
+        {store.cardLayout === "centered" ? (
+          <div className="relative z-10 flex flex-col items-center justify-between h-full px-8 py-6 text-center">
+            <LogoBlock store={store} isDark={isDark} />
+            <div style={{ width: "100%", maxWidth: 380, minWidth: 0 }}>
+              <NameBlock store={store} mutedText={mutedText} t={t} align="center" />
+              <BrandName store={store} align="center" />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+              <QrBlock
+                store={store}
+                qrValue={qrValue}
+                maxSize={120}
+                mutedText={mutedText}
+                isDark={isDark}
+                t={t}
+              />
+              <SocialIcons store={store} socials={socialIcons} isDark={isDark} align="center" />
+            </div>
+          </div>
+        ) : store.cardLayout === "left-aligned" ? (
+          <div className="relative z-10 h-full flex flex-col justify-between px-10 py-8">
+            <div className="flex items-start justify-between gap-6">
+              <LogoBlock store={store} isDark={isDark} />
+              <BrandName store={store} align="right" />
+            </div>
+            <div className="flex items-end justify-between gap-6">
+              <div style={{ flex: "1 1 auto", minWidth: 0 }}>
+                <NameBlock store={store} mutedText={mutedText} t={t} align="left" />
+                <SocialIcons store={store} socials={socialIcons} isDark={isDark} align="left" />
+              </div>
+              <div style={{ flexShrink: 0 }}>
+                <QrBlock
+                  store={store}
+                  qrValue={qrValue}
+                  maxSize={110}
+                  mutedText={mutedText}
+                  isDark={isDark}
+                  t={t}
                 />
-              ) : (
-                <div
-                  className="flex items-center justify-center text-white font-black"
-                  style={{
-                    width: store.logoSize,
-                    height: store.logoSize,
-                    borderRadius: store.logoShape === "circle" ? "50%" : store.logoShape === "square" ? 0 : 16,
-                    fontSize: store.logoSize * 0.35,
-                    background: `linear-gradient(135deg, ${store.primaryColor}, ${store.primaryColor}cc)`,
-                    boxShadow: `0 4px 24px ${store.primaryColor}40`,
-                  }}
-                >
-                  {(store.brandName || "V").charAt(0).toUpperCase()}
-                </div>
-              )}
-            </div>
-
-            {/* Name, Title, Contact */}
-            <div>
-              <h2
-                className="font-black leading-tight tracking-tight"
-                style={{
-                  color: store.textColor,
-                  fontSize: store.nameFontSize,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {store.fullName || t("yourName")}
-              </h2>
-              <p
-                className="font-semibold"
-                style={{
-                  color: store.accentColor,
-                  fontSize: store.titleFontSize,
-                  marginTop: 4,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {store.jobTitle || t("yourTitle")}
-              </p>
-
-              {/* Contact info */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 16 }}>
-                {store.phone && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <Phone style={{ width: store.contactFontSize + 2, height: store.contactFontSize + 2, flexShrink: 0, color: store.accentColor }} />
-                    <span style={{ fontSize: store.contactFontSize, fontWeight: 500, color: mutedText, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {store.phone}
-                    </span>
-                  </div>
-                )}
-                {store.whatsapp && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <img
-                      src="/icons/social/whatsapp.svg"
-                      alt="WhatsApp"
-                      style={{
-                        width: store.contactFontSize + 2,
-                        height: store.contactFontSize + 2,
-                        flexShrink: 0,
-                        filter: isDark ? "brightness(0) invert(1)" : "none",
-                        opacity: isDark ? 0.8 : 0.7,
-                      }}
-                    />
-                    <span style={{ fontSize: store.contactFontSize, fontWeight: 500, color: mutedText, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {store.whatsapp}
-                    </span>
-                  </div>
-                )}
-                {store.email && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <Mail style={{ width: store.contactFontSize + 2, height: store.contactFontSize + 2, flexShrink: 0, color: store.accentColor }} />
-                    <span style={{ fontSize: store.contactFontSize, fontWeight: 500, color: mutedText, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {store.email}
-                    </span>
-                  </div>
-                )}
-                {store.website && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <Globe style={{ width: store.contactFontSize + 2, height: store.contactFontSize + 2, flexShrink: 0, color: store.accentColor }} />
-                    <span style={{ fontSize: store.contactFontSize, fontWeight: 500, color: mutedText, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {store.website}
-                    </span>
-                  </div>
-                )}
               </div>
-
-              {/* Social icons */}
-              {activeSocials.length > 0 && (
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 16 }}>
-                  {activeSocials.map((social) => (
-                    <div
-                      key={social.id}
-                      style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: 8,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        backgroundColor: `${store.accentColor}15`,
-                        border: `1px solid ${store.accentColor}25`,
-                      }}
-                    >
-                      <img
-                        src={getBrandIconPath(social.platform as Parameters<typeof getBrandIconPath>[0])}
-                        alt={social.platform}
-                        style={{
-                          width: 16,
-                          height: 16,
-                          filter: isDark ? "brightness(0) invert(1)" : "none",
-                          opacity: isDark ? 0.8 : 0.7,
-                        }}
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
-
-          {/* Right side (45%) */}
-          <div className="flex flex-col items-center justify-between w-[45%] p-8">
-            {/* Brand name */}
-            <p
-              className="font-bold text-center leading-snug"
-              style={{
-                color: store.accentColor,
-                fontSize: store.brandNameFontSize,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical" as const,
-              }}
+        ) : (
+          // "split" — default two-column
+          <div className="relative z-10 flex h-full">
+            {/* Left side (55%) */}
+            <div
+              className="flex flex-col justify-between"
+              style={{ width: "55%", padding: "32px 20px 32px 32px", minWidth: 0 }}
             >
-              {store.brandName || t("yourBrand")}
-            </p>
-
-            {/* QR Code */}
-            {store.showQrCode && (
-              <div className="flex flex-col items-center">
-                <div
-                  style={{
-                    padding: 4,
-                    borderRadius: 16,
-                    background: `linear-gradient(135deg, ${store.accentColor}60, ${store.accentColor}20, ${store.accentColor}60)`,
-                    boxShadow: isDark
-                      ? `0 0 30px ${store.accentColor}15, inset 0 0 20px ${store.accentColor}08`
-                      : "none",
-                  }}
-                >
-                  <div
-                    style={{
-                      padding: 2,
-                      borderRadius: 12,
-                      background: `linear-gradient(135deg, ${store.accentColor}80, ${store.accentColor}30)`,
-                    }}
-                  >
-                    <div style={{ backgroundColor: "#fff", borderRadius: 8, padding: 8 }}>
-                      <QRCodeCanvas
-                        value={qrValue}
-                        size={store.qrCodeSize}
-                        bgColor="#FFFFFF"
-                        fgColor="#000000"
-                        level="H"
-                        marginSize={1}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <p
-                  className="font-medium text-center"
-                  style={{ color: mutedText, fontSize: 10, marginTop: 8 }}
-                >
-                  {t("scanToVisit")}
-                </p>
+              <LogoBlock store={store} isDark={isDark} />
+              <div style={{ minWidth: 0 }}>
+                <NameBlock store={store} mutedText={mutedText} t={t} align="left" />
+                <SocialIcons store={store} socials={socialIcons} isDark={isDark} align="left" />
               </div>
-            )}
+            </div>
+
+            {/* Right side (45%) */}
+            <div
+              className="flex flex-col items-center justify-between"
+              style={{ width: "45%", padding: "32px 24px", minWidth: 0 }}
+            >
+              <BrandName store={store} align="center" />
+              <QrBlock
+                store={store}
+                qrValue={qrValue}
+                maxSize={CARD_WIDTH * 0.45 - 64}
+                mutedText={mutedText}
+                isDark={isDark}
+                t={t}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Corner sparkle dots (dark themes) */}
         {isDark && (

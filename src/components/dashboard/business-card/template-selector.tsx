@@ -11,7 +11,7 @@ export function TemplateSelector() {
   const t = useTranslations("dashboard.businessCard");
   const selectedTemplateId = useBusinessCardStore((s) => s.selectedTemplateId);
   const setSelectedTemplate = useBusinessCardStore((s) => s.setSelectedTemplate);
-  const applyTemplateColors = useBusinessCardStore((s) => s.applyTemplateColors);
+  const applyTemplate = useBusinessCardStore((s) => s.applyTemplate);
 
   return (
     <div className="bg-white rounded-2xl p-6 border border-border shadow-sm">
@@ -29,7 +29,7 @@ export function TemplateSelector() {
               type="button"
               onClick={() => {
                 setSelectedTemplate(template.id);
-                applyTemplateColors(template);
+                applyTemplate(template);
               }}
               className={cn(
                 "group relative rounded-xl overflow-hidden border-2 transition-all duration-200",

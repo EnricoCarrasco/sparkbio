@@ -89,7 +89,7 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
     }
 
     // Debounced save — only sends the accumulated dirty fields
-    debouncedSave(async () => {
+    debouncedSave.schedule(async () => {
       const current = get().theme;
       if (!current || dirtyKeys.size === 0) return;
 

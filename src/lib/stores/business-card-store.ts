@@ -1,6 +1,9 @@
 import { create } from "zustand";
 import { createClient } from "@/lib/supabase/client";
 import { createDebouncedSave } from "@/lib/utils/debounced-save";
+import type { CardTemplate } from "@/components/dashboard/business-card/card-templates";
+
+export type CardLayout = "split" | "centered" | "left-aligned";
 
 interface BusinessCardSettings {
   brandName: string;
@@ -16,6 +19,11 @@ interface BusinessCardSettings {
   textColor: string;
   accentColor: string;
   bgColor: string;
+  bgGradient: string | null;
+  secondaryTextColor: string;
+  cardLayout: CardLayout;
+  qrFgColor: string;
+  qrBgColor: string;
   logoSize: number;
   logoShape: "rounded" | "circle" | "square";
   nameFontSize: number;
@@ -43,11 +51,7 @@ interface BusinessCardState extends BusinessCardSettings {
   setAiLogoUrl: (url: string | null) => void;
   setAiLogoLoading: (loading: boolean) => void;
   setDownloading: (downloading: boolean) => void;
-  applyTemplateColors: (template: {
-    bgColor: string;
-    textColor: string;
-    accentColor: string;
-  }) => void;
+  applyTemplate: (template: CardTemplate) => void;
   loadFromSupabase: (profileId: string) => Promise<void>;
   initFromProfile: (
     profile: {
@@ -60,6 +64,7 @@ interface BusinessCardState extends BusinessCardSettings {
     },
     socialIcons: { platform: string; url: string }[]
   ) => void;
+  flushSave: () => Promise<void>;
   reset: () => void;
 }
 
@@ -74,9 +79,14 @@ const defaultSettings: BusinessCardSettings = {
   logoUrl: null,
   showQrCode: true,
   primaryColor: "#FF6B35",
-  textColor: "#FFFFFF",
+  textColor: "#F5F5DC",
   accentColor: "#D4AF37",
   bgColor: "#0a0a0a",
+  bgGradient: "radial-gradient(ellipse at 30% 50%, #1a1a2e 0%, #0a0a0a 70%)",
+  secondaryTextColor: "#D4AF37",
+  cardLayout: "split",
+  qrFgColor: "#D4AF37",
+  qrBgColor: "#0a0a0a",
   logoSize: 80,
   logoShape: "rounded",
   nameFontSize: 30,
@@ -93,33 +103,17 @@ const defaultSettings: BusinessCardSettings = {
 const debouncedSave = createDebouncedSave(500);
 
 function triggerSave(getState: () => BusinessCardState, profileId: string) {
-  debouncedSave(async () => {
+  debouncedSave.schedule(async () => {
     const state = getState();
-    const settings: BusinessCardSettings = {
-      brandName: state.brandName,
-      fullName: state.fullName,
-      jobTitle: state.jobTitle,
-      email: state.email,
-      website: state.website,
-      phone: state.phone,
-      whatsapp: state.whatsapp,
-      logoUrl: state.logoUrl,
-      showQrCode: state.showQrCode,
-      primaryColor: state.primaryColor,
-      textColor: state.textColor,
-      accentColor: state.accentColor,
-      bgColor: state.bgColor,
-      logoSize: state.logoSize,
-      logoShape: state.logoShape,
-      nameFontSize: state.nameFontSize,
-      titleFontSize: state.titleFontSize,
-      contactFontSize: state.contactFontSize,
-      brandNameFontSize: state.brandNameFontSize,
-      qrCodeSize: state.qrCodeSize,
-      selectedTemplateId: state.selectedTemplateId,
-      aiBackgroundUrl: state.aiBackgroundUrl,
-      aiLogoUrl: state.aiLogoUrl,
-    };
+    // Don't overwrite saved data with defaults while the initial load is still in flight.
+    if (!state.loaded) return;
+
+    const settings = Object.fromEntries(
+      (Object.keys(defaultSettings) as (keyof BusinessCardSettings)[]).map(
+        (key) => [key, state[key]]
+      )
+    ) as unknown as BusinessCardSettings;
+
     const supabase = createClient();
     const { error } = await supabase
       .from("profiles")
@@ -131,7 +125,8 @@ function triggerSave(getState: () => BusinessCardState, profileId: string) {
   });
 }
 
-// Store the profile ID for debounced saves
+// Stored at module scope so every setField/applyTemplate call can schedule a save
+// without re-reading the profile from the auth session.
 let currentProfileId: string | null = null;
 
 export const useBusinessCardStore = create<BusinessCardState>((set, get) => ({
@@ -167,16 +162,26 @@ export const useBusinessCardStore = create<BusinessCardState>((set, get) => ({
 
   setDownloading: (downloading) => set({ downloading }),
 
-  applyTemplateColors: (template) => {
+  applyTemplate: (template) => {
     set({
       bgColor: template.bgColor,
+      bgGradient: template.bgGradient ?? null,
       textColor: template.textColor,
       accentColor: template.accentColor,
+      secondaryTextColor: template.secondaryTextColor,
+      cardLayout: template.layout,
+      qrFgColor: template.qrFgColor,
+      qrBgColor: template.qrBgColor,
     });
     if (currentProfileId) triggerSave(get, currentProfileId);
   },
 
   loadFromSupabase: async (profileId: string) => {
+    // Set before the await so that concurrent user edits during the round-trip
+    // still schedule a save. The `loaded` gate in triggerSave prevents that save
+    // from overwriting persisted data until loading completes.
+    currentProfileId = profileId;
+
     const supabase = createClient();
     const { data } = await supabase
       .from("profiles")
@@ -196,7 +201,6 @@ export const useBusinessCardStore = create<BusinessCardState>((set, get) => ({
     } else {
       set({ loaded: true });
     }
-    currentProfileId = profileId;
   },
 
   initFromProfile: (profile, socialIcons) => {
@@ -253,6 +257,8 @@ export const useBusinessCardStore = create<BusinessCardState>((set, get) => ({
 
     set(updates);
   },
+
+  flushSave: () => debouncedSave.flush(),
 
   reset: () => {
     set({ ...defaultSettings, loaded: false });

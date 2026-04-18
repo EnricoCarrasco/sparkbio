@@ -47,6 +47,7 @@ export function BusinessCardTab() {
   const socialIcons = useSocialStore((s) => s.socialIcons);
   const initFromProfile = useBusinessCardStore((s) => s.initFromProfile);
   const loadFromSupabase = useBusinessCardStore((s) => s.loadFromSupabase);
+  const flushSave = useBusinessCardStore((s) => s.flushSave);
   const loaded = useBusinessCardStore((s) => s.loaded);
   const username = useProfileStore((s) => s.profile?.username);
 
@@ -67,6 +68,19 @@ export function BusinessCardTab() {
       initFromProfile(profile, socialIcons);
     }
   }, [profile, socialIcons, loaded, initFromProfile]);
+
+  // Flush any pending debounced save when the user navigates away or the tab unmounts.
+  // Without this, an edit made <500ms before leaving is silently lost.
+  useEffect(() => {
+    const onHide = () => {
+      void flushSave();
+    };
+    window.addEventListener("pagehide", onHide);
+    return () => {
+      window.removeEventListener("pagehide", onHide);
+      void flushSave();
+    };
+  }, [flushSave]);
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto">
