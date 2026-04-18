@@ -2,6 +2,7 @@ import { create } from "zustand";
 import type { SocialIcon, SocialPlatform, SocialDisplayMode } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { triggerRevalidation } from "@/lib/utils/revalidate";
+import { isSafeUrl } from "@/lib/validators/url";
 
 interface SocialState {
   socialIcons: SocialIcon[];
@@ -48,6 +49,7 @@ export const useSocialStore = create<SocialState>((set, get) => ({
   },
 
   addSocialIcon: async (platform, url, displayMode = "icon", displayTitle = null) => {
+    if (!isSafeUrl(url)) return;
     const supabase = createClient();
     const {
       data: { user },
@@ -78,6 +80,7 @@ export const useSocialStore = create<SocialState>((set, get) => ({
   },
 
   updateSocialIcon: async (id, updates) => {
+    if (typeof updates.url === "string" && !isSafeUrl(updates.url)) return;
     const { socialIcons } = get();
     const prevIcons = [...socialIcons];
 

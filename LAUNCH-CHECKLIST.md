@@ -9,7 +9,7 @@
 
 - [x] Full product built and deployed
 - [x] Free tier (6 themes, drag-and-drop, 7-day analytics)
-- [x] Pro tier with LemonSqueezy payments (checkout, webhooks, portal)
+- [x] Pro tier with Stripe Embedded Checkout (checkout, webhooks, billing portal)
 - [x] 7-day free trial, no credit card required
 - [x] Landing page with pricing + Linktree comparison table
 - [x] Bilingual (EN + PT-BR)
@@ -135,7 +135,7 @@ Built it as a solo dev with:
 - Next.js 16 (App Router)
 - Supabase (auth + database)
 - Tailwind CSS v4
-- LemonSqueezy (payments)
+- Stripe (payments)
 
 Fully bilingual (EN + PT-BR).
 ```
@@ -175,7 +175,7 @@ What Viopage does:
 
 The free plan includes everything most creators need. Pro ($9/mo) adds premium themes, animated wallpapers, advanced analytics, and the ability to hide branding.
 
-Tech stack: Next.js 16, Supabase, Tailwind CSS v4, LemonSqueezy for payments.
+Tech stack: Next.js 16, Supabase, Tailwind CSS v4, Stripe for payments.
 
 Would love to hear your feedback! What would make you switch from Linktree?
 
@@ -199,7 +199,7 @@ Some things I learned:
 
 2. Pricing matters less than you think. I agonized over $9/mo vs $7/mo. Turns out people care more about whether the themes look good than the price.
 
-3. Payments through LemonSqueezy = no headaches. They handle tax, chargebacks, everything. Worth the commission.
+3. Stripe handles the heavy lifting — subscriptions, invoices, tax, disputes — so I can stay focused on the product.
 
 4. Building bilingual (English + Portuguese) from day one doubled my addressable market.
 

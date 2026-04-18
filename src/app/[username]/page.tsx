@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ProfilePage } from "@/components/profile/profile-page";
 import type { Metadata } from "next";
 import type { PublicProfile } from "@/types";
-import { generatePersonJsonLd } from "@/lib/json-ld";
+import { generatePersonJsonLd, safeJsonLdString } from "@/lib/json-ld";
 import { isSubscriptionActive } from "@/lib/constants";
 import { stripProFields } from "@/lib/pro-fields";
 
@@ -126,7 +126,7 @@ export default async function PublicProfilePage({ params }: Props) {
       <script
         type="application/ld+json"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: controlled server-generated JSON-LD
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLdString(jsonLd) }}
       />
       <ProfilePage data={publicData} />
     </>

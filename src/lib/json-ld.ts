@@ -56,3 +56,18 @@ export function generatePersonJsonLd({
 
   return jsonLd;
 }
+
+/**
+ * Serialise a JSON-LD object for embedding inside a <script> tag. Escapes the
+ * `<` / `>` / `&` characters that could otherwise break out of the script
+ * context when user-supplied strings (name, description) contain them.
+ *
+ * `JSON.stringify` escapes quotes but not angle brackets, so a bio containing
+ * `</script><script>alert(1)</script>` would otherwise escape the JSON-LD tag.
+ */
+export function safeJsonLdString(obj: unknown): string {
+  return JSON.stringify(obj)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026");
+}

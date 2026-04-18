@@ -4,17 +4,19 @@ import Replicate from "replicate";
 import { generateBackgroundSchema } from "@/lib/validators/business-card";
 import { extractReplicateUrl } from "@/lib/replicate";
 import { createRateLimiter } from "@/lib/rate-limit";
+import { requireProUser } from "@/lib/auth/require-pro";
 
 // 5 requests per 10 minutes per user
 const limiter = createRateLimiter(10 * 60 * 1000, 5);
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  // Auth
+  // Auth + Pro gate — AI generation burns Replicate credits, paid-only.
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireProUser(supabase);
+  if (!gate.ok) {
+    return NextResponse.json({ error: gate.code }, { status: gate.status });
   }
+  const { user } = gate;
 
   // Rate limit
   if (limiter(user.id).limited) {

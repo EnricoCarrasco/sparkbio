@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import { safeJsonLdString } from "@/lib/json-ld";
 
 interface BlogFAQProps {
   faqs: { question: string; answer: string }[];
@@ -58,7 +59,7 @@ export function BlogFAQ({ faqs, heading = "Frequently Asked Questions" }: BlogFA
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: safeJsonLdString({
             "@context": "https://schema.org",
             "@type": "FAQPage",
             mainEntity: faqs.map(({ question, answer }) => ({

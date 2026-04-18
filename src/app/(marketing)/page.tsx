@@ -9,6 +9,7 @@ import { MidCTA } from "@/components/landing/mid-cta";
 import { PricingPreview } from "@/components/landing/pricing-preview";
 import { FAQ } from "@/components/landing/faq";
 import { CTA } from "@/components/landing/cta";
+import { safeJsonLdString } from "@/lib/json-ld";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://viopage.com";
 
@@ -41,7 +42,7 @@ export default function LandingPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: safeJsonLdString({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
             name: "Viopage",
