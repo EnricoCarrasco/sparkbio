@@ -26,6 +26,7 @@ export function Footer() {
       links: [
         { label: t("about"), href: "/about" },
         { label: t("blog"), href: "/blog" },
+        { label: t("contact"), href: "mailto:support@viopage.com" },
       ],
     },
     {

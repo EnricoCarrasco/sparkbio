@@ -12,9 +12,11 @@ import {
   LogOut,
   ChevronLeft,
   ShieldCheck,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { ContactDialog } from "@/components/dashboard/contact-dialog";
 import { useProfileStore } from "@/lib/stores/profile-store";
 import { useDashboardStore, type DashboardTab } from "@/lib/stores/dashboard-store";
 import { createClient } from "@/lib/supabase/client";
@@ -40,6 +42,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
   const activeTab = useDashboardStore((s) => s.activeTab);
   const setActiveTab = useDashboardStore((s) => s.setActiveTab);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
 
   useEffect(() => {
     // Admin detection is server-authoritative: /api/admin/stats checks the
@@ -132,6 +135,18 @@ export function Sidebar({ onNavigate }: SidebarProps) {
           </a>
         )}
 
+        {/* Contact us */}
+        <button
+          type="button"
+          onClick={() => setContactOpen(true)}
+          className="flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-3 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+        >
+          <Mail className="size-5" strokeWidth={1.5} />
+          <span className="text-[11px] font-medium leading-tight">
+            {t("contact")}
+          </span>
+        </button>
+
         {/* Language switcher */}
         <div className="py-1">
           <LanguageSwitcher />
@@ -148,6 +163,8 @@ export function Sidebar({ onNavigate }: SidebarProps) {
           </span>
         </button>
       </div>
+
+      <ContactDialog open={contactOpen} onOpenChange={setContactOpen} />
     </div>
   );
 }

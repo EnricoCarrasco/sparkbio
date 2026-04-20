@@ -292,6 +292,7 @@
       "pricing": "Preços",
       "about": "Sobre",
       "blog": "Blog",
+      "contact": "Contato",
       "privacy": "Privacidade",
       "terms": "Termos",
       "copyright": "© {year} Viopage. Todos os direitos reservados.",
@@ -398,7 +399,17 @@
       "card": "Cartão",
       "viewProfile": "Ver meu Viopage",
       "earn": "Ganhar",
+      "contact": "Contato",
       "signOut": "Sair"
+    },
+    "contactDialog": {
+      "title": "Fale conosco",
+      "description": "Dúvidas, feedback ou precisa de ajuda? Adoraríamos ouvir você.",
+      "emailLabel": "Envie um e-mail para",
+      "copy": "Copiar e-mail",
+      "copied": "E-mail copiado",
+      "sendEmail": "Enviar e-mail",
+      "replyTime": "Geralmente respondemos em até 24 horas."
     },
     "links": {
       "title": "Links",
@@ -1023,7 +1034,7 @@
     },
     "contact": {
       "heading": "14. Contato",
-      "content": "Se você tiver dúvidas sobre estes Termos, entre em contato conosco em legal@viopage.com."
+      "content": "Se você tiver dúvidas sobre estes Termos, entre em contato conosco em support@viopage.com."
     }
   },
   "privacy": {
@@ -1060,11 +1071,11 @@
     },
     "yourRights": {
       "heading": "8. Seus Direitos",
-      "content": "Sob a Lei Geral de Proteção de Dados (LGPD) do Brasil e, quando aplicável, o Regulamento Geral sobre a Proteção de Dados (GDPR) europeu, você tem o direito de: (a) Acesso — solicitar uma cópia dos dados pessoais que mantemos sobre você; (b) Correção — solicitar a correção de dados imprecisos ou incompletos; (c) Exclusão — solicitar a exclusão dos seus dados pessoais; (d) Portabilidade — solicitar seus dados em formato estruturado e legível por máquina; (e) Revogação do consentimento — revogar o consentimento para processamento de dados a qualquer momento; (f) Oposição — se opor a certos tipos de processamento de dados; (g) Reclamação — junto à Autoridade Nacional de Proteção de Dados (ANPD) do Brasil ou à autoridade supervisora local. Para exercer qualquer um desses direitos, entre em contato conosco em privacy@viopage.com."
+      "content": "Sob a Lei Geral de Proteção de Dados (LGPD) do Brasil e, quando aplicável, o Regulamento Geral sobre a Proteção de Dados (GDPR) europeu, você tem o direito de: (a) Acesso — solicitar uma cópia dos dados pessoais que mantemos sobre você; (b) Correção — solicitar a correção de dados imprecisos ou incompletos; (c) Exclusão — solicitar a exclusão dos seus dados pessoais; (d) Portabilidade — solicitar seus dados em formato estruturado e legível por máquina; (e) Revogação do consentimento — revogar o consentimento para processamento de dados a qualquer momento; (f) Oposição — se opor a certos tipos de processamento de dados; (g) Reclamação — junto à Autoridade Nacional de Proteção de Dados (ANPD) do Brasil ou à autoridade supervisora local. Para exercer qualquer um desses direitos, entre em contato conosco em support@viopage.com."
     },
     "childrenPrivacy": {
       "heading": "9. Privacidade de Crianças",
-      "content": "O Viopage não se destina a crianças menores de 13 anos. Não coletamos intencionalmente informações pessoais de crianças menores de 13 anos. Se descobrirmos que coletamos dados de uma criança menor de 13 anos, excluiremos prontamente essas informações. Se você é pai, mãe ou responsável e acredita que seu filho nos forneceu informações pessoais, entre em contato conosco em privacy@viopage.com."
+      "content": "O Viopage não se destina a crianças menores de 13 anos. Não coletamos intencionalmente informações pessoais de crianças menores de 13 anos. Se descobrirmos que coletamos dados de uma criança menor de 13 anos, excluiremos prontamente essas informações. Se você é pai, mãe ou responsável e acredita que seu filho nos forneceu informações pessoais, entre em contato conosco em support@viopage.com."
     },
     "internationalTransfers": {
       "heading": "10. Transferências Internacionais de Dados",
@@ -1080,7 +1091,7 @@
     },
     "contact": {
       "heading": "13. Contato",
-      "content": "Se você tiver dúvidas sobre esta Política de Privacidade ou deseja exercer seus direitos sobre dados, entre em contato conosco em privacy@viopage.com."
+      "content": "Se você tiver dúvidas sobre esta Política de Privacidade ou deseja exercer seus direitos sobre dados, entre em contato conosco em support@viopage.com."
     }
   },
   "addToHome": {

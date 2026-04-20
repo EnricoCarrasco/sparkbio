@@ -291,6 +291,7 @@
       "pricing": "Pricing",
       "about": "About",
       "blog": "Blog",
+      "contact": "Contact",
       "privacy": "Privacy",
       "terms": "Terms",
       "copyright": "© {year} Viopage. All rights reserved.",
@@ -397,7 +398,17 @@
       "card": "Card",
       "viewProfile": "View my Viopage",
       "earn": "Earn",
+      "contact": "Contact",
       "signOut": "Sign out"
+    },
+    "contactDialog": {
+      "title": "Contact us",
+      "description": "Questions, feedback, or need help? We'd love to hear from you.",
+      "emailLabel": "Email us at",
+      "copy": "Copy email",
+      "copied": "Email copied",
+      "sendEmail": "Send email",
+      "replyTime": "We usually reply within 24 hours."
     },
     "links": {
       "title": "Links",
@@ -1025,7 +1036,7 @@
     },
     "contact": {
       "heading": "14. Contact",
-      "content": "If you have questions about these Terms, please contact us at legal@viopage.com."
+      "content": "If you have questions about these Terms, please contact us at support@viopage.com."
     }
   },
   "privacy": {
@@ -1062,11 +1073,11 @@
     },
     "yourRights": {
       "heading": "8. Your Rights",
-      "content": "Under the Brazilian General Data Protection Law (LGPD) and, where applicable, the European General Data Protection Regulation (GDPR), you have the right to: (a) Access — request a copy of the personal data we hold about you; (b) Correction — request correction of inaccurate or incomplete data; (c) Deletion — request deletion of your personal data; (d) Portability — request your data in a structured, machine-readable format; (e) Withdrawal of consent — withdraw consent for data processing at any time; (f) Objection — object to certain types of data processing; (g) File a complaint — with the Brazilian National Data Protection Authority (ANPD) or your local supervisory authority. To exercise any of these rights, contact us at privacy@viopage.com."
+      "content": "Under the Brazilian General Data Protection Law (LGPD) and, where applicable, the European General Data Protection Regulation (GDPR), you have the right to: (a) Access — request a copy of the personal data we hold about you; (b) Correction — request correction of inaccurate or incomplete data; (c) Deletion — request deletion of your personal data; (d) Portability — request your data in a structured, machine-readable format; (e) Withdrawal of consent — withdraw consent for data processing at any time; (f) Objection — object to certain types of data processing; (g) File a complaint — with the Brazilian National Data Protection Authority (ANPD) or your local supervisory authority. To exercise any of these rights, contact us at support@viopage.com."
     },
     "childrenPrivacy": {
       "heading": "9. Children's Privacy",
-      "content": "Viopage is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If we discover that we have collected data from a child under 13, we will promptly delete it. If you are a parent or guardian and believe your child has provided us with personal information, please contact us at privacy@viopage.com."
+      "content": "Viopage is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If we discover that we have collected data from a child under 13, we will promptly delete it. If you are a parent or guardian and believe your child has provided us with personal information, please contact us at support@viopage.com."
     },
     "internationalTransfers": {
       "heading": "10. International Data Transfers",
@@ -1082,7 +1093,7 @@
     },
     "contact": {
       "heading": "13. Contact",
-      "content": "If you have questions about this Privacy Policy or wish to exercise your data rights, please contact us at privacy@viopage.com."
+      "content": "If you have questions about this Privacy Policy or wish to exercise your data rights, please contact us at support@viopage.com."
     }
   },
   "addToHome": {
