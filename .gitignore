@@ -69,3 +69,15 @@ skills-lock.json
 .claude/skills/stripe-best-practices
 .claude/skills/stripe-projects
 .claude/skills/upgrade-stripe
+.claude/skills/heygen/
+
+# HeyGen CLI (project-local install)
+/bin/
+/tmp/
+
+# marketing asset workspace
+/marketing/
+
+# HeyGen session logs
+heygen-video-log.jsonl
+AVATAR-*.md
