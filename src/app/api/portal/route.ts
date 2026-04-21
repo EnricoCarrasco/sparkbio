@@ -21,7 +21,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const { data: sub } = await supabase
     .from("subscriptions")
-    .select("stripe_customer_id, provider")
+    .select("stripe_customer_id")
     .eq("user_id", user.id)
     .maybeSingle();
 
