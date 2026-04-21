@@ -15,6 +15,7 @@ import { processReferralConversion, cancelPendingReferralEarnings } from "@/lib/
 //   - customer.subscription.created
 //   - customer.subscription.updated
 //   - customer.subscription.deleted
+//   - customer.updated            (portal edits — logged for drift detection)
 //   - invoice.paid                (defensive period rollover confirmation)
 //   - invoice.payment_failed      (past_due)
 //   - checkout.session.completed  (mainly for analytics / referral fallback)
@@ -86,6 +87,23 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           sessionId: session.id,
           userId: session.client_reference_id ?? session.metadata?.user_id,
           subscriptionId: session.subscription,
+        });
+        break;
+      }
+      case "customer.updated": {
+        // User edited name/email/address in the Billing Portal. We don't
+        // write this back to auth.users today (email changes there would
+        // need verification flow), but we log so drift is observable.
+        const customer = event.data.object as Stripe.Customer;
+        const previous = event.data.previous_attributes as
+          | Partial<Stripe.Customer>
+          | undefined;
+        console.log("[webhook] customer.updated", {
+          customerId: customer.id,
+          userId: customer.metadata?.user_id,
+          email: customer.email,
+          previousEmail: previous?.email,
+          changed: previous ? Object.keys(previous) : [],
         });
         break;
       }
