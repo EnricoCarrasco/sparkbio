@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import { useTranslations } from "next-intl";
-import { motion, useInView } from "framer-motion";
 import {
   CheckCircle,
   QrCode,
@@ -11,24 +10,17 @@ import {
   Eye,
   MousePointerClick,
 } from "lucide-react";
-import {
-  fadeUp as _fadeUp,
-  slideIn,
-  stagger as _stagger,
-} from "@/lib/motion-variants";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// ─── Animation constants ──────────────────────────────────────────────────────
-
-const fadeUp = _fadeUp(30, 0.6);
-const slideLeft = slideIn(-40);
-const slideRight = slideIn(40);
-const stagger = _stagger(0.1, 0.05);
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 // ─── Shared sub-components ────────────────────────────────────────────────────
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-block text-[11px] font-semibold uppercase tracking-widest text-[#FF6B35] mb-4">
+    <span className="inline-block text-[11px] font-semibold uppercase tracking-widest text-[#FF6B35] mb-4 hiw-anim">
       {children}
     </span>
   );
@@ -37,10 +29,9 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 function DisplayHeading({ children }: { children: React.ReactNode }) {
   return (
     <h2
-      className="text-[32px] sm:text-[38px] md:text-[46px] leading-[1.1] tracking-[-0.025em] font-bold text-[#1b1b1d]"
+      className="text-[32px] sm:text-[38px] md:text-[46px] leading-[1.1] tracking-[-0.025em] font-bold text-[#1b1b1d] hiw-anim"
       style={{
-        fontFamily:
-          "var(--font-display), 'Instrument Serif', Georgia, serif",
+        fontFamily: "var(--font-display), 'Instrument Serif', Georgia, serif",
       }}
     >
       {children}
@@ -50,7 +41,7 @@ function DisplayHeading({ children }: { children: React.ReactNode }) {
 
 function CheckItem({ children }: { children: React.ReactNode }) {
   return (
-    <li className="flex items-start gap-3">
+    <li className="flex items-start gap-3 hiw-check">
       <CheckCircle
         className="text-[#FF6B35] mt-0.5 shrink-0"
         size={18}
@@ -61,14 +52,88 @@ function CheckItem({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * Base entry animation for a HowItWorks block.
+ * Text column slides from `textFrom`; visual column slides from opposite side.
+ */
+function useBlockReveal(
+  sectionRef: React.RefObject<HTMLDivElement | null>,
+  textFrom: "left" | "right",
+) {
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      const sign = textFrom === "left" ? -1 : 1;
+
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const textEls = sectionRef.current?.querySelectorAll(".hiw-anim");
+        const visualEl = sectionRef.current?.querySelector(".hiw-visual");
+        const checks = sectionRef.current?.querySelectorAll(".hiw-check");
+
+        if (textEls) {
+          gsap.from(textEls, {
+            opacity: 0,
+            x: sign * -40,
+            duration: 0.7,
+            stagger: 0.08,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 75%",
+              toggleActions: "play none none reverse",
+            },
+          });
+        }
+        if (visualEl) {
+          gsap.from(visualEl, {
+            opacity: 0,
+            x: sign * 50,
+            scale: 0.96,
+            duration: 0.9,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 75%",
+              toggleActions: "play none none reverse",
+            },
+          });
+        }
+        if (checks) {
+          gsap.from(checks, {
+            opacity: 0,
+            y: 10,
+            duration: 0.5,
+            stagger: 0.1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 70%",
+              toggleActions: "play none none reverse",
+            },
+          });
+        }
+      });
+
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set(sectionRef.current?.querySelectorAll(".hiw-anim, .hiw-visual, .hiw-check") ?? [], {
+          clearProps: "all",
+          opacity: 1,
+        });
+      });
+
+      return () => mm.revert();
+    },
+    { scope: sectionRef },
+  );
+}
+
 // ─── Block A — Customize ──────────────────────────────────────────────────────
 
 function BlockCustomize() {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
   const t = useTranslations("landing.features.customize");
+  useBlockReveal(ref, "left");
 
-  // Split heading around the highlighted portion
   const heading = t("heading");
   const highlight = t("headingHighlight");
   const parts = heading.split(highlight);
@@ -77,43 +142,21 @@ function BlockCustomize() {
     <div ref={ref} className="bg-white py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Text — LEFT */}
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            animate={inView ? "visible" : "hidden"}
-            className="flex flex-col"
-          >
-            <motion.div variants={slideLeft}>
-              <Eyebrow>{t("eyebrow")}</Eyebrow>
-            </motion.div>
-
-            <motion.div variants={slideLeft}>
-              <DisplayHeading>
-                {parts[0]}
-                <em className="italic font-normal">{highlight}</em>
-                {parts[1]}
-              </DisplayHeading>
-            </motion.div>
-
-            <motion.p
-              variants={slideLeft}
-              className="mt-5 text-[16px] md:text-[17px] text-[#666] leading-relaxed max-w-md"
-            >
+          <div className="flex flex-col">
+            <Eyebrow>{t("eyebrow")}</Eyebrow>
+            <DisplayHeading>
+              {parts[0]}
+              <em className="italic font-normal">{highlight}</em>
+              {parts[1]}
+            </DisplayHeading>
+            <p className="mt-5 text-[16px] md:text-[17px] text-[#666] leading-relaxed max-w-md hiw-anim">
               {t("description")}
-            </motion.p>
-
-            <motion.ul variants={stagger} className="mt-8 flex flex-col gap-3">
-              <motion.div variants={slideLeft}>
-                <CheckItem>{t("check1")}</CheckItem>
-              </motion.div>
-              <motion.div variants={slideLeft}>
-                <CheckItem>{t("check2")}</CheckItem>
-              </motion.div>
-            </motion.ul>
-          </motion.div>
-
-          {/* Visual placeholder removed — theme previews now in ThemeGallery */}
+            </p>
+            <ul className="mt-8 flex flex-col gap-3">
+              <CheckItem>{t("check1")}</CheckItem>
+              <CheckItem>{t("check2")}</CheckItem>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -165,10 +208,53 @@ const PLATFORMS = [
 
 function BlockShare() {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
   const t = useTranslations("landing.features.share");
+  useBlockReveal(ref, "right");
 
-  // Split heading around the highlighted portion
+  // Extra signature: platform icons bounce-stagger
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const icons = ref.current?.querySelectorAll(".platform-icon");
+        const miniCards = ref.current?.querySelectorAll(".mini-feature-card");
+
+        if (icons) {
+          gsap.from(icons, {
+            opacity: 0,
+            scale: 0.3,
+            y: 20,
+            rotate: -15,
+            duration: 0.6,
+            stagger: 0.08,
+            ease: "back.out(1.8)",
+            scrollTrigger: {
+              trigger: ref.current,
+              start: "top 70%",
+              toggleActions: "play none none reverse",
+            },
+          });
+        }
+        if (miniCards) {
+          gsap.from(miniCards, {
+            opacity: 0,
+            y: 20,
+            duration: 0.6,
+            stagger: 0.12,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: ref.current,
+              start: "top 65%",
+              toggleActions: "play none none reverse",
+            },
+          });
+        }
+      });
+      return () => mm.revert();
+    },
+    { scope: ref },
+  );
+
   const heading = t("heading");
   const highlight = t("headingHighlight");
   const parts = heading.split(highlight);
@@ -177,19 +263,13 @@ function BlockShare() {
     <div ref={ref} className="bg-[#F6F3F5] py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Visual — LEFT */}
-          <motion.div
-            variants={slideLeft}
-            initial="hidden"
-            animate={inView ? "visible" : "hidden"}
-          >
+          <div className="hiw-visual">
             <div className="flex flex-col gap-5">
-              {/* Platform icons grid */}
               <div className="grid grid-cols-4 gap-3">
                 {PLATFORMS.map(({ name, gradient, icon }) => (
                   <div
                     key={name}
-                    className={`aspect-square rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center`}
+                    className={`platform-icon aspect-square rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center will-change-transform`}
                     style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.12)" }}
                   >
                     {icon}
@@ -197,88 +277,67 @@ function BlockShare() {
                 ))}
               </div>
 
-              {/* Feature mini cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div
-                  className="flex items-start gap-3 rounded-2xl bg-white p-4"
+                  className="mini-feature-card flex items-start gap-3 rounded-2xl bg-white p-4"
                   style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}
                 >
                   <div className="rounded-xl bg-[#FF6B35]/10 p-2 shrink-0">
                     <QrCode size={18} className="text-[#FF6B35]" />
                   </div>
                   <div>
-                    <p className="text-[13px] font-semibold text-[#1b1b1d]">
-                      {t("qrTitle")}
-                    </p>
-                    <p className="text-[12px] text-[#888] mt-0.5 leading-snug">
-                      {t("qrDesc")}
-                    </p>
+                    <p className="text-[13px] font-semibold text-[#1b1b1d]">{t("qrTitle")}</p>
+                    <p className="text-[12px] text-[#888] mt-0.5 leading-snug">{t("qrDesc")}</p>
                   </div>
                 </div>
 
                 <div
-                  className="flex items-start gap-3 rounded-2xl bg-white p-4"
+                  className="mini-feature-card flex items-start gap-3 rounded-2xl bg-white p-4"
                   style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}
                 >
                   <div className="rounded-xl bg-[#FF6B35]/10 p-2 shrink-0">
                     <AtSign size={18} className="text-[#FF6B35]" />
                   </div>
                   <div>
-                    <p className="text-[13px] font-semibold text-[#1b1b1d]">
-                      {t("emailTagsTitle")}
-                    </p>
-                    <p className="text-[12px] text-[#888] mt-0.5 leading-snug">
-                      {t("emailTagsDesc")}
-                    </p>
+                    <p className="text-[13px] font-semibold text-[#1b1b1d]">{t("emailTagsTitle")}</p>
+                    <p className="text-[12px] text-[#888] mt-0.5 leading-snug">{t("emailTagsDesc")}</p>
                   </div>
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Text — RIGHT */}
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            animate={inView ? "visible" : "hidden"}
-            className="flex flex-col"
-          >
-            <motion.div variants={slideRight}>
-              <Eyebrow>{t("eyebrow")}</Eyebrow>
-            </motion.div>
-
-            <motion.div variants={slideRight}>
-              <DisplayHeading>
-                {parts[0]}
-                <em className="italic font-normal">{highlight}</em>
-                {parts[1]}
-              </DisplayHeading>
-            </motion.div>
-
-            <motion.p
-              variants={slideRight}
-              className="mt-5 text-[16px] md:text-[17px] text-[#666] leading-relaxed max-w-md"
-            >
+          <div className="flex flex-col">
+            <Eyebrow>{t("eyebrow")}</Eyebrow>
+            <DisplayHeading>
+              {parts[0]}
+              <em className="italic font-normal">{highlight}</em>
+              {parts[1]}
+            </DisplayHeading>
+            <p className="mt-5 text-[16px] md:text-[17px] text-[#666] leading-relaxed max-w-md hiw-anim">
               {t("description")}
-            </motion.p>
-          </motion.div>
+            </p>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-// ─── Analytics bar chart ──────────────────────────────────────────────────────
+// ─── Analytics bar chart with scroll-scrub grow ──────────────────────────────
 
 const BAR_HEIGHTS = [38, 55, 72, 61, 88, 100, 76];
 
-function BarChart() {
+function BarChart({ barsRef }: { barsRef: React.MutableRefObject<(HTMLDivElement | null)[]> }) {
   return (
     <div className="flex items-end gap-2 h-28 w-full">
       {BAR_HEIGHTS.map((h, i) => (
         <div
           key={i}
-          className="flex-1 rounded-t-md"
+          ref={(el) => {
+            barsRef.current[i] = el;
+          }}
+          className="flex-1 rounded-t-md origin-bottom"
           style={{
             height: `${h}%`,
             background: "linear-gradient(to top, #FF6B35, #FFAB87)",
@@ -294,10 +353,67 @@ function BarChart() {
 
 function BlockAnalytics() {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
   const t = useTranslations("landing.features.analyticsBlock");
+  const barsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const viewsRef = useRef<HTMLParagraphElement>(null);
+  const ctrRef = useRef<HTMLParagraphElement>(null);
+  useBlockReveal(ref, "left");
 
-  // Split heading around the highlighted portion
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        // Bar chart: grow from 0 with stagger on scroll entry
+        const bars = barsRef.current.filter(Boolean) as HTMLDivElement[];
+        if (bars.length) {
+          gsap.from(bars, {
+            scaleY: 0,
+            opacity: 0,
+            duration: 0.7,
+            stagger: 0.08,
+            ease: "power4.out",
+            scrollTrigger: {
+              trigger: bars[0],
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
+          });
+        }
+
+        // Count-up 42,892 and 8.4%
+        const countUp = (el: HTMLElement | null, target: number, decimals = 0, format?: (v: number) => string) => {
+          if (!el) return;
+          ScrollTrigger.create({
+            trigger: el,
+            start: "top 85%",
+            once: true,
+            onEnter: () => {
+              const proxy = { val: 0 };
+              gsap.to(proxy, {
+                val: target,
+                duration: 1.8,
+                ease: "power3.out",
+                onUpdate: () => {
+                  const v = proxy.val;
+                  el.textContent = format
+                    ? format(v)
+                    : decimals > 0
+                      ? v.toFixed(decimals)
+                      : Math.round(v).toLocaleString("en-US");
+                },
+              });
+            },
+          });
+        };
+
+        countUp(viewsRef.current, 42892);
+        countUp(ctrRef.current, 8.4, 1, (v) => `${v.toFixed(1)}%`);
+      });
+      return () => mm.revert();
+    },
+    { scope: ref },
+  );
+
   const heading = t("heading");
   const highlight = t("headingHighlight");
   const parts = heading.split(highlight);
@@ -306,16 +422,8 @@ function BlockAnalytics() {
     <div ref={ref} className="bg-white py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Visual — LEFT */}
-          <motion.div
-            variants={slideLeft}
-            initial="hidden"
-            animate={inView ? "visible" : "hidden"}
-          >
-            <div
-              className="rounded-3xl bg-[#F6F3F5] p-6 md:p-8 flex flex-col gap-4"
-            >
-              {/* Growth badge */}
+          <div className="hiw-visual">
+            <div className="rounded-3xl bg-[#F6F3F5] p-6 md:p-8 flex flex-col gap-4">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-[13px] font-semibold text-emerald-600">
                   <TrendingUp size={14} strokeWidth={2.5} />
@@ -323,7 +431,6 @@ function BlockAnalytics() {
                 </span>
               </div>
 
-              {/* Stats row */}
               <div className="grid grid-cols-2 gap-4">
                 <div
                   className="rounded-2xl bg-white p-4"
@@ -333,7 +440,10 @@ function BlockAnalytics() {
                     <Eye size={13} />
                     <span className="text-[12px]">{t("totalViews")}</span>
                   </div>
-                  <p className="text-[22px] font-bold text-[#1b1b1d] leading-none">
+                  <p
+                    ref={viewsRef}
+                    className="text-[22px] font-bold text-[#1b1b1d] leading-none tabular-nums"
+                  >
                     42,892
                   </p>
                 </div>
@@ -346,60 +456,43 @@ function BlockAnalytics() {
                     <MousePointerClick size={13} />
                     <span className="text-[12px]">{t("clickThroughRate")}</span>
                   </div>
-                  <p className="text-[22px] font-bold text-[#1b1b1d] leading-none">
+                  <p
+                    ref={ctrRef}
+                    className="text-[22px] font-bold text-[#1b1b1d] leading-none tabular-nums"
+                  >
                     8.4%
                   </p>
                 </div>
               </div>
 
-              {/* Bar chart */}
               <div
                 className="rounded-2xl bg-white p-4"
                 style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}
               >
-                <p className="text-[12px] font-medium text-[#888] mb-3">
-                  {t("viewsThisWeek")}
-                </p>
-                <BarChart />
+                <p className="text-[12px] font-medium text-[#888] mb-3">{t("viewsThisWeek")}</p>
+                <BarChart barsRef={barsRef} />
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Text — RIGHT */}
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            animate={inView ? "visible" : "hidden"}
-            className="flex flex-col order-first lg:order-last"
-          >
-            <motion.div variants={slideRight}>
-              <Eyebrow>{t("eyebrow")}</Eyebrow>
-            </motion.div>
-
-            <motion.div variants={slideRight}>
-              <DisplayHeading>
-                {parts[0]}
-                <em className="italic font-normal">{highlight}</em>
-                {parts[1]}
-              </DisplayHeading>
-            </motion.div>
-
-            <motion.p
-              variants={slideRight}
-              className="mt-5 text-[16px] md:text-[17px] text-[#666] leading-relaxed max-w-md"
-            >
+          <div className="flex flex-col order-first lg:order-last">
+            <Eyebrow>{t("eyebrow")}</Eyebrow>
+            <DisplayHeading>
+              {parts[0]}
+              <em className="italic font-normal">{highlight}</em>
+              {parts[1]}
+            </DisplayHeading>
+            <p className="mt-5 text-[16px] md:text-[17px] text-[#666] leading-relaxed max-w-md hiw-anim">
               {t("description")}
-            </motion.p>
-
-            <motion.a
-              variants={slideRight}
+            </p>
+            <a
               href="#"
-              className="mt-6 inline-flex items-center gap-1.5 text-[15px] font-semibold text-[#FF6B35] hover:underline underline-offset-4 self-start"
+              className="mt-6 inline-flex items-center gap-1.5 text-[15px] font-semibold text-[#FF6B35] hover:underline underline-offset-4 self-start hiw-anim"
             >
               {t("viewReport")}
               <span aria-hidden>→</span>
-            </motion.a>
-          </motion.div>
+            </a>
+          </div>
         </div>
       </div>
     </div>

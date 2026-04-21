@@ -2,29 +2,12 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import { motion, useInView, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { EASE, stagger, fadeUp as _fadeUp } from "@/lib/motion-variants";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// ── Animation constants ───────────────────────────────────────────────────────
-
-const staggerCards = stagger(0.13, 0.05);
-const fadeUp = _fadeUp();
-
-const staggerPress: Variants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
-  },
-};
-
-const pressFadeIn: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { duration: 0.45, ease: EASE },
-  },
-};
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 // ── Types & data ──────────────────────────────────────────────────────────────
 
@@ -68,15 +51,14 @@ function TestimonialCard({
   t: ReturnType<typeof useTranslations>;
 }) {
   return (
-    <motion.div
-      variants={fadeUp}
-      className="flex flex-col rounded-2xl bg-white p-8"
+    <div
+      className="testimonial-card flex flex-col rounded-2xl bg-white p-8 will-change-transform"
       style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.06)" }}
     >
       {/* Decorative large opening quote mark */}
       <span
         aria-hidden="true"
-        className="select-none font-serif leading-none"
+        className="testimonial-quote select-none font-serif leading-none inline-block"
         style={{
           fontSize: "4rem",
           lineHeight: "0.75",
@@ -87,15 +69,12 @@ function TestimonialCard({
         &ldquo;
       </span>
 
-      {/* Quote body */}
       <p className="mt-4 flex-1 text-[15px] leading-relaxed text-[#444]">
         {t(data.quoteKey)}
       </p>
 
-      {/* Horizontal rule */}
       <hr className="my-6 border-[#eee]" />
 
-      {/* Author row: avatar + name + role */}
       <div className="flex items-center gap-3">
         <Image
           src={data.avatar}
@@ -110,7 +89,7 @@ function TestimonialCard({
           <p className="mt-0.5 text-[13px] text-[#594139]">{t(data.roleKey)}</p>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -119,12 +98,93 @@ function TestimonialCard({
 export function Testimonials() {
   const t = useTranslations("landing.testimonials");
   const sectionRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const pressRef = useRef<HTMLDivElement>(null);
 
-  // Cards animate when the section top reaches 80px above the viewport bottom
-  const cardsInView = useInView(sectionRef, { once: true, margin: "-80px" });
-  // Press logos get their own observer so they fire slightly after the cards
-  const pressInView = useInView(pressRef, { once: true, margin: "-60px" });
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        // Heading
+        gsap.from(headingRef.current, {
+          opacity: 0,
+          y: 30,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: headingRef.current,
+            start: "top 85%",
+            toggleActions: "play none none reverse",
+          },
+        });
+
+        // Cards — subtle tilt + lift stagger
+        const cards = sectionRef.current?.querySelectorAll(".testimonial-card");
+        if (cards) {
+          gsap.from(cards, {
+            opacity: 0,
+            y: 50,
+            rotate: (i: number) => (i - 1) * 2,
+            duration: 0.8,
+            stagger: 0.12,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: cards[0],
+              start: "top 80%",
+              toggleActions: "play none none reverse",
+            },
+          });
+        }
+
+        // Quote marks — scale + rotate in after cards settle
+        const quotes = sectionRef.current?.querySelectorAll(".testimonial-quote");
+        if (quotes) {
+          gsap.from(quotes, {
+            scale: 0,
+            rotate: -30,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.15,
+            ease: "back.out(2)",
+            scrollTrigger: {
+              trigger: quotes[0],
+              start: "top 80%",
+              toggleActions: "play none none reverse",
+            },
+          });
+        }
+
+        // Press row — fade stagger
+        const pressItems = pressRef.current?.querySelectorAll(".press-item");
+        if (pressItems) {
+          gsap.from(pressItems, {
+            opacity: 0,
+            y: 10,
+            duration: 0.5,
+            stagger: 0.06,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: pressRef.current,
+              start: "top 90%",
+              toggleActions: "play none none reverse",
+            },
+          });
+        }
+      });
+
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set(
+          sectionRef.current?.querySelectorAll(".testimonial-card, .testimonial-quote, .press-item") ??
+            [],
+          { clearProps: "all", opacity: 1 },
+        );
+      });
+
+      return () => mm.revert();
+    },
+    { scope: sectionRef },
+  );
 
   return (
     <section
@@ -134,69 +194,50 @@ export function Testimonials() {
       aria-label="Testimonials"
     >
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-
         {/* ── Heading ── */}
-        <motion.h2
-          variants={fadeUp}
-          initial="hidden"
-          animate={cardsInView ? "visible" : "hidden"}
+        <h2
+          ref={headingRef}
           className="text-center text-[32px] sm:text-[38px] md:text-[46px] font-bold leading-[1.1] tracking-[-0.025em] text-[#1b1b1d]"
           style={{ fontFamily: "var(--font-sans), 'Poppins', sans-serif" }}
         >
           {t("heading")}{" "}
           <em
             style={{
-              fontFamily:
-                "var(--font-display), 'Instrument Serif', Georgia, serif",
+              fontFamily: "var(--font-display), 'Instrument Serif', Georgia, serif",
               fontStyle: "italic",
             }}
           >
             {t("headingHighlight")}
           </em>{" "}
           {t("headingAfter")}
-        </motion.h2>
+        </h2>
 
-        {/* ── Cards grid: staggered fade-up on scroll ── */}
-        <motion.div
-          variants={staggerCards}
-          initial="hidden"
-          animate={cardsInView ? "visible" : "hidden"}
-          className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3"
-        >
+        {/* ── Cards grid ── */}
+        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
           {TESTIMONIALS.map((data) => (
             <TestimonialCard key={data.name} data={data} t={t} />
           ))}
-        </motion.div>
+        </div>
 
         {/* ── "As featured in" press row ── */}
         <div ref={pressRef} className="mt-16">
-          <motion.div
-            variants={staggerPress}
-            initial="hidden"
-            animate={pressInView ? "visible" : "hidden"}
-            className="flex flex-col items-center gap-6"
-          >
-            <motion.p
-              variants={pressFadeIn}
-              className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#bbb]"
-            >
+          <div className="flex flex-col items-center gap-6">
+            <p className="press-item text-[11px] font-semibold uppercase tracking-[0.2em] text-[#bbb]">
               {t("featuredIn")}
-            </motion.p>
+            </p>
 
             <div className="flex flex-wrap items-center justify-center gap-3">
               {PLATFORMS.map((platform) => (
-                <motion.span
+                <span
                   key={platform}
-                  variants={pressFadeIn}
-                  className="rounded-full bg-[#F0EDF0] px-4 py-2 text-[13px] font-medium text-[#594139]"
+                  className="press-item rounded-full bg-[#F0EDF0] px-4 py-2 text-[13px] font-medium text-[#594139]"
                 >
                   {platform}
-                </motion.span>
+                </span>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
-
       </div>
     </section>
   );

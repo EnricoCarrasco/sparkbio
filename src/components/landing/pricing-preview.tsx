@@ -2,22 +2,22 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { CheckIcon, XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { EASE, stagger as _stagger, fadeUp as _fadeUp } from "@/lib/motion-variants";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { EASE } from "@/lib/motion-variants";
 import { useGeoPricing } from "@/hooks/use-geo-pricing";
 
-// ── Animation constants ───────────────────────────────────────────────────────
-
-const stagger = _stagger(0.1, 0.05);
-const fadeUp = _fadeUp();
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function CheckItem({ children }: { children: React.ReactNode }) {
   return (
-    <li className="flex items-center gap-2.5">
+    <li className="pricing-feature flex items-center gap-2.5">
       <CheckIcon
         className="h-4 w-4 shrink-0 text-[#FF6B35]"
         strokeWidth={2.5}
@@ -55,7 +55,7 @@ export function PricingPreview() {
   const tc = useTranslations("landing.comparison");
   const geo = useGeoPricing();
   const sectionRef = useRef<HTMLElement>(null);
-  const inView = useInView(sectionRef, { once: true, margin: "-60px" });
+  const proCardRef = useRef<HTMLDivElement>(null);
   const [isYearly, setIsYearly] = useState(false);
 
   const PRO_FEATURES = [
@@ -74,30 +74,10 @@ export function PricingPreview() {
       ltFree: tc("premiumThemesLtFree"),
       ltPro: tc("premiumThemesLtPro"),
     },
-    {
-      label: tc("analytics"),
-      viopage: "check",
-      ltFree: "x",
-      ltPro: "check",
-    },
-    {
-      label: tc("customDomain"),
-      viopage: "check",
-      ltFree: "x",
-      ltPro: "check",
-    },
-    {
-      label: tc("removeBranding"),
-      viopage: "check",
-      ltFree: "x",
-      ltPro: "check",
-    },
-    {
-      label: tc("dragAndDrop"),
-      viopage: "check",
-      ltFree: "check",
-      ltPro: "check",
-    },
+    { label: tc("analytics"), viopage: "check", ltFree: "x", ltPro: "check" },
+    { label: tc("customDomain"), viopage: "check", ltFree: "x", ltPro: "check" },
+    { label: tc("removeBranding"), viopage: "check", ltFree: "x", ltPro: "check" },
+    { label: tc("dragAndDrop"), viopage: "check", ltFree: "check", ltPro: "check" },
     {
       label: tc("freeTrial"),
       viopage: tc("freeTrialViopage"),
@@ -118,6 +98,101 @@ export function PricingPreview() {
     return <span className="text-[13px] text-[#555]">{value}</span>;
   }
 
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        // Header stagger
+        gsap.from(".pricing-header > *", {
+          opacity: 0,
+          y: 30,
+          duration: 0.7,
+          stagger: 0.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+          },
+        });
+
+        // Pro card: pop in with scale + slight rotate
+        if (proCardRef.current) {
+          gsap.from(proCardRef.current, {
+            opacity: 0,
+            y: 40,
+            scale: 0.94,
+            duration: 0.9,
+            ease: "back.out(1.4)",
+            scrollTrigger: {
+              trigger: proCardRef.current,
+              start: "top 80%",
+              toggleActions: "play none none reverse",
+            },
+          });
+
+          // Continuous subtle lift on the popular card (premium feel)
+          gsap.to(proCardRef.current, {
+            y: -6,
+            duration: 3,
+            ease: "sine.inOut",
+            repeat: -1,
+            yoyo: true,
+            delay: 1,
+          });
+        }
+
+        // Feature list stagger after card reveal
+        const features = sectionRef.current?.querySelectorAll(".pricing-feature");
+        if (features) {
+          gsap.from(features, {
+            opacity: 0,
+            x: -12,
+            duration: 0.45,
+            stagger: 0.07,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: proCardRef.current,
+              start: "top 75%",
+              toggleActions: "play none none reverse",
+            },
+          });
+        }
+
+        // Comparison table rows
+        const rows = sectionRef.current?.querySelectorAll(".comparison-row");
+        if (rows) {
+          gsap.from(rows, {
+            opacity: 0,
+            y: 14,
+            duration: 0.5,
+            stagger: 0.05,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: rows[0],
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
+          });
+        }
+      });
+
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set(
+          sectionRef.current?.querySelectorAll(
+            ".pricing-header > *, .pricing-feature, .comparison-row",
+          ) ?? [],
+          { clearProps: "all", opacity: 1 },
+        );
+        if (proCardRef.current) gsap.set(proCardRef.current, { clearProps: "all", opacity: 1 });
+      });
+
+      return () => mm.revert();
+    },
+    { scope: sectionRef },
+  );
+
   return (
     <section
       ref={sectionRef}
@@ -126,95 +201,82 @@ export function PricingPreview() {
       aria-label="Pricing"
     >
       <div className="mx-auto max-w-4xl px-6 lg:px-8">
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          animate={inView ? "visible" : "hidden"}
-          className="flex flex-col items-center"
-        >
-          {/* ── Eyebrow ── */}
-          <motion.span
-            variants={fadeUp}
-            className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#FF6B35]"
-          >
-            {t("eyebrow")}
-          </motion.span>
+        <div className="flex flex-col items-center">
+          {/* ── Header ── */}
+          <div className="pricing-header flex flex-col items-center">
+            <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#FF6B35]">
+              {t("eyebrow")}
+            </span>
 
-          {/* ── Heading ── */}
-          <motion.h2
-            variants={fadeUp}
-            className="mt-4 text-center text-[34px] md:text-[46px] leading-[1.1] tracking-[-0.025em] text-[#1b1b1d]"
-            style={{ fontFamily: "var(--font-sans), 'Poppins', sans-serif" }}
-          >
-            {t("heading")}{" "}
-            <em
-              style={{
-                fontFamily:
-                  "var(--font-display), 'Instrument Serif', Georgia, serif",
-                fontStyle: "italic",
-              }}
+            <h2
+              className="mt-4 text-center text-[34px] md:text-[46px] leading-[1.1] tracking-[-0.025em] text-[#1b1b1d]"
+              style={{ fontFamily: "var(--font-sans), 'Poppins', sans-serif" }}
             >
-              {t("headingHighlight")}
-            </em>{" "}
-            {t("headingAfter")}
-          </motion.h2>
+              {t("heading")}{" "}
+              <em
+                style={{
+                  fontFamily:
+                    "var(--font-display), 'Instrument Serif', Georgia, serif",
+                  fontStyle: "italic",
+                }}
+              >
+                {t("headingHighlight")}
+              </em>{" "}
+              {t("headingAfter")}
+            </h2>
 
-          {/* ── Monthly / Yearly toggle ── */}
-          <motion.div variants={fadeUp} className="mt-8">
-            <div
-              className="inline-flex items-center rounded-full p-1"
-              style={{ backgroundColor: "#F0EDF0" }}
-              role="group"
-              aria-label="Billing frequency"
-            >
-              <button
-                type="button"
-                onClick={() => setIsYearly(false)}
-                className={`rounded-full px-5 py-2 text-[14px] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-1 ${
-                  !isYearly
-                    ? "bg-white font-semibold text-[#1b1b1d] shadow-sm"
-                    : "font-medium text-[#594139]"
-                }`}
-                aria-pressed={!isYearly}
+            {/* Monthly / Yearly toggle */}
+            <div className="mt-8">
+              <div
+                className="inline-flex items-center rounded-full p-1"
+                style={{ backgroundColor: "#F0EDF0" }}
+                role="group"
+                aria-label="Billing frequency"
               >
-                {t("monthly")}
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsYearly(true)}
-                className={`flex items-center gap-2 rounded-full px-5 py-2 text-[14px] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-1 ${
-                  isYearly
-                    ? "bg-white font-semibold text-[#1b1b1d] shadow-sm"
-                    : "font-medium text-[#594139]"
-                }`}
-                aria-pressed={isYearly}
-              >
-                {t("yearly")}
-                <span className="rounded-full bg-[#FF6B35]/10 px-2 py-0.5 text-[11px] font-semibold text-[#FF6B35]">
-                  {t("savePercent")}
-                </span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setIsYearly(false)}
+                  className={`rounded-full px-5 py-2 text-[14px] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-1 ${
+                    !isYearly
+                      ? "bg-white font-semibold text-[#1b1b1d] shadow-sm"
+                      : "font-medium text-[#594139]"
+                  }`}
+                  aria-pressed={!isYearly}
+                >
+                  {t("monthly")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsYearly(true)}
+                  className={`flex items-center gap-2 rounded-full px-5 py-2 text-[14px] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-1 ${
+                    isYearly
+                      ? "bg-white font-semibold text-[#1b1b1d] shadow-sm"
+                      : "font-medium text-[#594139]"
+                  }`}
+                  aria-pressed={isYearly}
+                >
+                  {t("yearly")}
+                  <span className="rounded-full bg-[#FF6B35]/10 px-2 py-0.5 text-[11px] font-semibold text-[#FF6B35]">
+                    {t("savePercent")}
+                  </span>
+                </button>
+              </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* ── Pricing card ── */}
-          <motion.div
-            variants={stagger}
-            className="mt-10 w-full max-w-md mx-auto"
-          >
-            {/* Pro card */}
-            <motion.div variants={fadeUp} className="relative">
+          <div className="mt-10 w-full max-w-md mx-auto">
+            <div ref={proCardRef} className="relative will-change-transform">
               <div className="flex h-full flex-col rounded-2xl border-2 border-[#FF6B35] bg-[#FFF8F5] p-8">
-                {/* Most Popular badge */}
                 <span className="absolute right-5 top-5 rounded-full bg-[#FF6B35] px-3 py-1 text-[12px] font-semibold text-white">
                   {t("proBadge")}
                 </span>
 
                 <p className="text-[17px] font-semibold text-[#1b1b1d]">{t("proName")}</p>
 
-                {/* Price with smooth swap animation */}
+                {/* Price with smooth swap (framer AnimatePresence handles the toggle) */}
                 <div className="mt-3 flex items-baseline gap-1.5">
-                  <span className="relative overflow-hidden text-5xl font-bold leading-none text-[#1b1b1d]">
+                  <span className="relative overflow-hidden text-5xl font-bold leading-none text-[#1b1b1d] tabular-nums">
                     <AnimatePresence mode="wait">
                       <motion.span
                         key={isYearly ? "yearly" : "monthly"}
@@ -228,7 +290,9 @@ export function PricingPreview() {
                       </motion.span>
                     </AnimatePresence>
                   </span>
-                  <span className="text-[14px] text-[#999]">{geo.isBR ? "/mês" : t("proPeriod")}</span>
+                  <span className="text-[14px] text-[#999]">
+                    {geo.isBR ? "/mês" : t("proPeriod")}
+                  </span>
                 </div>
 
                 <AnimatePresence>
@@ -245,9 +309,7 @@ export function PricingPreview() {
                   )}
                 </AnimatePresence>
 
-                <p className="mt-3 text-[14px] leading-relaxed text-[#777]">
-                  {t("proDesc")}
-                </p>
+                <p className="mt-3 text-[14px] leading-relaxed text-[#777]">{t("proDesc")}</p>
 
                 <hr className="my-6 border-[#FF6B35]/15" />
 
@@ -264,18 +326,15 @@ export function PricingPreview() {
                   {t("proButton")}
                 </Link>
 
-                {/* Cancel guarantee */}
-                <p className="mt-3 text-center text-[13px] text-[#999]">
-                  {t("cancelGuarantee")}
-                </p>
+                <p className="mt-3 text-center text-[13px] text-[#999]">{t("cancelGuarantee")}</p>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
           {/* ── Comparison table ── */}
-          <motion.div variants={fadeUp} className="mt-16 w-full">
+          <div className="mt-16 w-full">
             <h3
-              className="text-center text-[22px] md:text-[28px] font-bold tracking-[-0.02em] text-[#1b1b1d] mb-8"
+              className="pricing-header text-center text-[22px] md:text-[28px] font-bold tracking-[-0.02em] text-[#1b1b1d] mb-8"
               style={{ fontFamily: "var(--font-sans), 'Poppins', sans-serif" }}
             >
               {tc("title")}
@@ -301,26 +360,20 @@ export function PricingPreview() {
                 </thead>
                 <tbody>
                   {COMPARISON_ROWS.map((row) => (
-                    <tr key={row.label} className="border-b border-[#f5f5f5]">
+                    <tr key={row.label} className="comparison-row border-b border-[#f5f5f5]">
                       <td className="py-3.5 pr-4 text-[14px] font-medium text-[#333]">
                         {row.label}
                       </td>
-                      <td className="py-3.5 px-4 text-center">
-                        {renderCell(row.viopage)}
-                      </td>
-                      <td className="py-3.5 px-4 text-center">
-                        {renderCell(row.ltFree)}
-                      </td>
-                      <td className="py-3.5 pl-4 text-center">
-                        {renderCell(row.ltPro)}
-                      </td>
+                      <td className="py-3.5 px-4 text-center">{renderCell(row.viopage)}</td>
+                      <td className="py-3.5 px-4 text-center">{renderCell(row.ltFree)}</td>
+                      <td className="py-3.5 pl-4 text-center">{renderCell(row.ltPro)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </section>
   );

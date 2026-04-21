@@ -1,17 +1,24 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { ContactDialog } from "@/components/dashboard/contact-dialog";
+
+type FooterLink =
+  | { label: string; href: string }
+  | { label: string; action: "openContact" };
 
 interface FooterColumn {
   heading: string;
-  links: { label: string; href: string }[];
+  links: FooterLink[];
 }
 
 export function Footer() {
   const t = useTranslations("landing.footer");
   const currentYear = new Date().getFullYear();
+  const [contactOpen, setContactOpen] = useState(false);
 
   const columns: FooterColumn[] = [
     {
@@ -26,7 +33,7 @@ export function Footer() {
       links: [
         { label: t("about"), href: "/about" },
         { label: t("blog"), href: "/blog" },
-        { label: t("contact"), href: "mailto:support@viopage.com" },
+        { label: t("contact"), action: "openContact" },
       ],
     },
     {
@@ -37,6 +44,9 @@ export function Footer() {
       ],
     },
   ];
+
+  const linkClass =
+    "text-[14px] text-[#888] hover:text-[#111113] transition-colors duration-150";
 
   return (
     <footer className="bg-white border-t border-black/[0.06]">
@@ -68,13 +78,20 @@ export function Footer() {
               </h3>
               <ul className="flex flex-col gap-3">
                 {col.links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-[14px] text-[#888] hover:text-[#111113] transition-colors duration-150"
-                    >
-                      {link.label}
-                    </Link>
+                  <li key={"href" in link ? link.href : link.action}>
+                    {"action" in link ? (
+                      <button
+                        type="button"
+                        onClick={() => setContactOpen(true)}
+                        className={`${linkClass} text-left cursor-pointer bg-transparent p-0 border-0`}
+                      >
+                        {link.label}
+                      </button>
+                    ) : (
+                      <Link href={link.href} className={linkClass}>
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -95,6 +112,8 @@ export function Footer() {
           </Link>
         </div>
       </div>
+
+      <ContactDialog open={contactOpen} onOpenChange={setContactOpen} />
     </footer>
   );
 }
