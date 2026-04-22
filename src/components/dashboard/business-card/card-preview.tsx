@@ -482,6 +482,7 @@ export function CardPreview({ cardRef, demoMode = false }: CardPreviewProps) {
       style={{
         height: CARD_HEIGHT * scale,
         perspective: "1000px",
+        aspectRatio: "1.6 / 1",
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -498,7 +499,8 @@ export function CardPreview({ cardRef, demoMode = false }: CardPreviewProps) {
           transform: `scale(${scale}) ${isHovered ? "" : "rotateY(-5deg) rotateX(5deg)"}`,
           transformOrigin: "top left",
           transition: "transform 700ms ease-out",
-          boxShadow: "0 25px 60px -12px rgba(0,0,0,0.25)",
+          boxShadow:
+            "0 30px 60px -20px rgba(17,17,19,0.35), 0 12px 24px -10px rgba(17,17,19,0.18), 0 0 0 1px rgba(17,17,19,0.04)",
         }}
       >
         {/* AI Background Image */}

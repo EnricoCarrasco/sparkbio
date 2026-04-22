@@ -21,6 +21,7 @@ import { LinkCard } from "@/components/dashboard/link-card";
 import { LinkInsightsModal } from "@/components/dashboard/link-insights-modal";
 import { useLinkStore } from "@/lib/stores/link-store";
 import { useLinkClickCounts } from "@/lib/hooks/use-link-click-counts";
+import { SectionHead, DASH } from "./_dash-primitives";
 
 export function LinkList() {
   const t = useTranslations("dashboard.links");
@@ -62,15 +63,19 @@ export function LinkList() {
     return null;
   }
 
+  const liveCount = links.filter((l) => l.is_active).length;
+
   return (
     <>
       {/* Links section header */}
-      <div className="flex items-center gap-2">
-        <Link2 className="size-3.5 text-muted-foreground" />
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          {t("regularLinks")}
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginTop: 20 }}>
+        <SectionHead
+          icon={<Link2 className="size-3.5" />}
+          label={`${t("regularLinks")} (${liveCount} live)`}
+        />
+        <span style={{ fontSize: 11, color: DASH.muted, letterSpacing: "-0.01em" }}>
+          {links.length} total
         </span>
-        <div className="flex-1 h-px bg-border" />
       </div>
 
       <DndContext
@@ -82,7 +87,10 @@ export function LinkList() {
           items={links.map((l) => l.id)}
           strategy={verticalListSortingStrategy}
         >
-          <div className="space-y-3">
+          <div
+            className="dash-links-list"
+            style={{ display: "flex", flexDirection: "column", gap: 10 }}
+          >
             {links.map((link) => (
               <LinkCard
                 key={link.id}

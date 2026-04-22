@@ -3,19 +3,17 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { Crown } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
 import { useThemeStore } from "@/lib/stores/theme-store";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { PREMADE_GRADIENTS } from "@/lib/constants";
+import { Eyebrow } from "@/components/dashboard/_dash-primitives";
 import { ColorInput } from "./color-input";
-import { cn } from "@/lib/utils";
 import type { WallpaperStyle } from "@/types";
 
 interface WallpaperStyleCardProps {
   label: string;
   preview: React.ReactNode;
   isActive: boolean;
-  isPro?: boolean;
   showCrown?: boolean;
   onClick: () => void;
 }
@@ -31,27 +29,67 @@ function WallpaperStyleCard({
     <button
       type="button"
       onClick={onClick}
-      className={cn(
-        "group relative flex flex-col overflow-hidden rounded-2xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-2",
-        isActive
-          ? "border-2 border-[#FF6B35] bg-orange-50/50 shadow-sm"
-          : "border border-zinc-100 bg-white hover:border-zinc-200 hover:shadow-sm"
-      )}
+      style={{
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        borderRadius: 16,
+        padding: 0,
+        background: "var(--dash-panel)",
+        border: `1px solid ${isActive ? "var(--dash-orange)" : "var(--dash-line)"}`,
+        boxShadow: isActive ? "0 0 0 3px var(--dash-orange-tint)" : "none",
+        cursor: "pointer",
+        transition: "all 0.15s",
+        textAlign: "left",
+      }}
     >
       {showCrown && (
-        <span className="absolute top-2 right-2 z-10 flex size-5 items-center justify-center rounded-full bg-white/95 shadow-sm">
+        <span
+          style={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            zIndex: 10,
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 22,
+            height: 22,
+            borderRadius: 999,
+            background: "rgba(255,255,255,0.95)",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+          }}
+        >
           <Crown className="size-3 text-amber-500" />
         </span>
       )}
-      <div className="relative w-full min-h-[120px] aspect-[3/4] overflow-hidden">
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          minHeight: 110,
+          aspectRatio: "3 / 4",
+          overflow: "hidden",
+        }}
+      >
         {preview}
       </div>
-      <div className="px-2 py-2.5 text-center">
+      <div
+        style={{
+          padding: "10px 10px 10px",
+          textAlign: "center",
+          background: "var(--dash-panel-2)",
+          borderTop: "1px solid var(--dash-line)",
+        }}
+      >
         <span
-          className={cn(
-            "text-xs font-semibold tracking-wide transition-colors",
-            isActive ? "text-[#FF6B35]" : "text-zinc-500 group-hover:text-zinc-700"
-          )}
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            letterSpacing: "-0.005em",
+            color: isActive ? "var(--dash-orange-deep)" : "var(--dash-muted)",
+          }}
         >
           {label}
         </span>
@@ -100,8 +138,7 @@ export function WallpaperPanel() {
       label: t("fill"),
       preview: (
         <div
-          className="w-full h-full"
-          style={{ backgroundColor: theme.bg_color || "#111111" }}
+          style={{ width: "100%", height: "100%", background: theme.bg_color || "#111" }}
         />
       ),
     },
@@ -110,8 +147,9 @@ export function WallpaperPanel() {
       label: t("gradientLabel"),
       preview: (
         <div
-          className="w-full h-full"
           style={{
+            width: "100%",
+            height: "100%",
             background: `linear-gradient(to bottom, ${theme.bg_gradient_from ?? "#3d1f6e"}, ${theme.bg_gradient_to ?? "#1a0836"})`,
           }}
         />
@@ -121,9 +159,40 @@ export function WallpaperPanel() {
       value: "blur",
       label: t("blur"),
       preview: (
-        <div className="w-full h-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 relative overflow-hidden">
-          <div className="absolute top-2 left-2 w-8 h-8 rounded-full bg-slate-500/60 blur-md" />
-          <div className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-slate-600/50 blur-lg" />
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            background:
+              "linear-gradient(135deg, #334155 0%, #1E293B 50%, #0F172A 100%)",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 8,
+              left: 8,
+              width: 32,
+              height: 32,
+              borderRadius: 999,
+              background: "rgba(100,116,139,0.6)",
+              filter: "blur(10px)",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              bottom: 8,
+              right: 8,
+              width: 40,
+              height: 40,
+              borderRadius: 999,
+              background: "rgba(71,85,105,0.55)",
+              filter: "blur(14px)",
+            }}
+          />
         </div>
       ),
     },
@@ -132,8 +201,10 @@ export function WallpaperPanel() {
       label: t("pattern"),
       preview: (
         <div
-          className="w-full h-full bg-slate-900"
           style={{
+            width: "100%",
+            height: "100%",
+            background: "#0F172A",
             backgroundImage:
               "radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)",
             backgroundSize: "8px 8px",
@@ -143,14 +214,22 @@ export function WallpaperPanel() {
     },
   ];
 
+  const animateOn = theme.wallpaper_animate;
+  const noiseOn = theme.wallpaper_noise;
+
   return (
-    <div className="space-y-6">
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {/* Wallpaper Style */}
-      <section>
-        <h2 className="text-lg font-bold text-zinc-900 mb-4">
-          {t("wallpaperStyle")}
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="dash-panel">
+        <Eyebrow>{t("wallpaperStyle")}</Eyebrow>
+        <div
+          style={{
+            marginTop: 12,
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))",
+            gap: 12,
+          }}
+        >
           {wallpaperCards.map((card) => (
             <WallpaperStyleCard
               key={card.value}
@@ -162,167 +241,204 @@ export function WallpaperPanel() {
             />
           ))}
         </div>
-      </section>
+      </div>
 
-        {/* Fill: background color picker */}
-        {activeStyle === "fill" && (
-          <section className="bg-white p-6 rounded-2xl border border-zinc-100">
-            <h2 className="text-lg font-bold text-zinc-900 mb-6">
-              {t("bgColor")}
-            </h2>
+      {/* Fill: background color picker */}
+      {activeStyle === "fill" && (
+        <div className="dash-panel">
+          <Eyebrow>{t("bgColor")}</Eyebrow>
+          <div style={{ marginTop: 12 }}>
             <ColorInput
               id="wallpaper-bg"
               label={t("bgColor")}
               value={theme.bg_color}
               onChange={(v) => updateTheme({ bg_color: v })}
             />
-          </section>
-        )}
-
-        {/* Gradient controls */}
-        {activeStyle === "gradient" && (
-          <section className="bg-white p-6 rounded-2xl border border-zinc-100">
-            <h2 className="text-lg font-bold text-zinc-900 mb-6">
-              {t("gradientStyle")}
-            </h2>
-
-            {/* Custom / Premade toggle */}
-            <div className="flex gap-2 mb-6">
-              <button
-                type="button"
-                onClick={() =>
-                  updateTheme({ wallpaper_gradient_style: "custom" })
-                }
-                className={cn(
-                  "flex-1 py-2.5 rounded-full text-sm font-medium transition-all",
-                  theme.wallpaper_gradient_style !== "premade"
-                    ? "border-2 border-foreground bg-white shadow-sm text-foreground"
-                    : "border border-border bg-transparent text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {t("custom")}
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  updateTheme({ wallpaper_gradient_style: "premade" })
-                }
-                className={cn(
-                  "flex-1 py-2.5 rounded-full text-sm font-medium transition-all",
-                  theme.wallpaper_gradient_style === "premade"
-                    ? "border-2 border-foreground bg-white shadow-sm text-foreground"
-                    : "border border-border bg-transparent text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {t("premade")}
-              </button>
-            </div>
-
-            {/* Custom: from/to color pickers + preview bar */}
-            {theme.wallpaper_gradient_style !== "premade" && (
-              <div className="space-y-5">
-                <div className="grid grid-cols-2 gap-4">
-                  <ColorInput
-                    id="gradient-from"
-                    label="From"
-                    value={theme.bg_gradient_from ?? theme.bg_color}
-                    onChange={(v) => updateTheme({ bg_gradient_from: v })}
-                  />
-                  <ColorInput
-                    id="gradient-to"
-                    label="To"
-                    value={theme.bg_gradient_to ?? "#FFFFFF"}
-                    onChange={(v) => updateTheme({ bg_gradient_to: v })}
-                  />
-                </div>
-                <div
-                  className="w-full h-12 rounded-xl border border-zinc-100 shadow-inner"
-                  style={{
-                    background: `linear-gradient(${theme.bg_gradient_direction ?? "to bottom"}, ${theme.bg_gradient_from ?? theme.bg_color}, ${theme.bg_gradient_to ?? "#FFFFFF"})`,
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Pre-made gradient swatches */}
-            {theme.wallpaper_gradient_style === "premade" && (
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-zinc-700">
-                  {t("gradientSwatches")}
-                </h3>
-                <div className="grid grid-cols-5 sm:grid-cols-6 gap-3">
-                  {PREMADE_GRADIENTS.map((g) => {
-                    const isActive =
-                      theme.wallpaper_gradient_preset === g.name;
-                    return (
-                      <button
-                        key={g.name}
-                        type="button"
-                        title={g.name}
-                        onClick={() => {
-                          updateTheme({
-                            wallpaper_gradient_preset: g.name,
-                            bg_gradient_from: g.from,
-                            bg_gradient_to: g.to,
-                            bg_gradient_direction:
-                              theme.bg_gradient_direction ?? "to bottom",
-                          });
-                        }}
-                        className={cn(
-                          "size-10 rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35]",
-                          isActive
-                            ? "ring-2 ring-offset-2 ring-foreground scale-110 shadow-md"
-                            : "hover:scale-105 hover:shadow-sm"
-                        )}
-                        style={{
-                          background: `linear-gradient(135deg, ${g.from}, ${g.to})`,
-                        }}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </section>
-        )}
-
-      {/* Effects */}
-      <section className="bg-white p-6 rounded-2xl border border-zinc-100">
-        <h2 className="text-lg font-bold text-zinc-900 mb-4 flex items-center gap-2">
-          {t("animate")}
-          {!isPro && <Crown className="size-4 text-amber-500" />}
-        </h2>
-        <div className="space-y-3">
-          {/* Animate toggle */}
-          <div className="flex items-center justify-between rounded-xl bg-zinc-50 border border-zinc-100 p-4">
-            <span className="text-sm font-medium text-zinc-900">
-              {t("animate")}
-            </span>
-            <Switch
-              checked={theme.wallpaper_animate}
-              onCheckedChange={(v) =>
-                updateTheme({ wallpaper_animate: v })
-              }
-            />
-          </div>
-
-          {/* Noise toggle */}
-          <div className="flex items-center justify-between rounded-xl bg-zinc-50 border border-zinc-100 p-4">
-            <div className="space-y-0.5">
-              <p className="text-sm font-medium text-zinc-900">
-                {t("noise")}
-              </p>
-              <p className="text-xs text-zinc-500">{t("noiseDesc")}</p>
-            </div>
-            <Switch
-              checked={theme.wallpaper_noise}
-              onCheckedChange={(v) =>
-                updateTheme({ wallpaper_noise: v })
-              }
-            />
           </div>
         </div>
-      </section>
+      )}
+
+      {/* Gradient controls */}
+      {activeStyle === "gradient" && (
+        <div className="dash-panel">
+          <Eyebrow>{t("gradientStyle")}</Eyebrow>
+
+          {/* Custom / Premade chip toggle */}
+          <div
+            className="chip-row"
+            style={{
+              display: "flex",
+              gap: 8,
+              flexWrap: "wrap",
+              marginTop: 12,
+              marginBottom: 16,
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => updateTheme({ wallpaper_gradient_style: "custom" })}
+              className={`dash-chip${theme.wallpaper_gradient_style !== "premade" ? " active" : ""}`}
+            >
+              {t("custom")}
+            </button>
+            <button
+              type="button"
+              onClick={() => updateTheme({ wallpaper_gradient_style: "premade" })}
+              className={`dash-chip${theme.wallpaper_gradient_style === "premade" ? " active" : ""}`}
+            >
+              {t("premade")}
+            </button>
+          </div>
+
+          {/* Custom: from/to color pickers + preview bar */}
+          {theme.wallpaper_gradient_style !== "premade" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                  gap: 14,
+                }}
+              >
+                <ColorInput
+                  id="gradient-from"
+                  label="From"
+                  value={theme.bg_gradient_from ?? theme.bg_color}
+                  onChange={(v) => updateTheme({ bg_gradient_from: v })}
+                />
+                <ColorInput
+                  id="gradient-to"
+                  label="To"
+                  value={theme.bg_gradient_to ?? "#FFFFFF"}
+                  onChange={(v) => updateTheme({ bg_gradient_to: v })}
+                />
+              </div>
+              <div
+                style={{
+                  width: "100%",
+                  height: 48,
+                  borderRadius: 12,
+                  border: "1px solid var(--dash-line)",
+                  boxShadow: "inset 0 2px 6px rgba(0,0,0,0.06)",
+                  background: `linear-gradient(${theme.bg_gradient_direction ?? "to bottom"}, ${theme.bg_gradient_from ?? theme.bg_color}, ${theme.bg_gradient_to ?? "#FFFFFF"})`,
+                }}
+              />
+            </div>
+          )}
+
+          {/* Pre-made gradient swatches */}
+          {theme.wallpaper_gradient_style === "premade" && (
+            <div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "var(--dash-muted)",
+                  fontWeight: 500,
+                  marginBottom: 10,
+                }}
+              >
+                {t("gradientSwatches")}
+              </div>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(40px, 1fr))",
+                  gap: 10,
+                }}
+              >
+                {PREMADE_GRADIENTS.map((g) => {
+                  const isActive = theme.wallpaper_gradient_preset === g.name;
+                  return (
+                    <button
+                      key={g.name}
+                      type="button"
+                      title={g.name}
+                      onClick={() => {
+                        updateTheme({
+                          wallpaper_gradient_preset: g.name,
+                          bg_gradient_from: g.from,
+                          bg_gradient_to: g.to,
+                          bg_gradient_direction:
+                            theme.bg_gradient_direction ?? "to bottom",
+                        });
+                      }}
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 999,
+                        background: `linear-gradient(135deg, ${g.from}, ${g.to})`,
+                        border: 0,
+                        cursor: "pointer",
+                        boxShadow: isActive
+                          ? "0 0 0 3px var(--dash-ink), 0 0 0 5px var(--dash-panel)"
+                          : "0 1px 2px rgba(0,0,0,0.1)",
+                        transform: isActive ? "scale(1.08)" : "scale(1)",
+                        transition: "all 0.15s",
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Effects (animate / noise toggles) */}
+      <div className="dash-panel">
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Eyebrow>{t("animate")}</Eyebrow>
+          {!isPro && <Crown className="size-3 text-amber-500" />}
+        </div>
+
+        <div style={{ marginTop: 6 }}>
+          <label className="dash-toggle-row">
+            <span style={{ fontWeight: 500 }}>{t("animate")}</span>
+            <span className="dash-switch" data-on={animateOn}>
+              <input
+                type="checkbox"
+                checked={animateOn}
+                onChange={(e) =>
+                  updateTheme({ wallpaper_animate: e.target.checked })
+                }
+                style={{ display: "none" }}
+              />
+              <span className="dash-switch-track">
+                <span className="dash-switch-thumb" />
+              </span>
+            </span>
+          </label>
+
+          <label className="dash-toggle-row">
+            <span>
+              <div style={{ fontWeight: 500 }}>{t("noise")}</div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "var(--dash-muted)",
+                  marginTop: 3,
+                  fontWeight: 400,
+                }}
+              >
+                {t("noiseDesc")}
+              </div>
+            </span>
+            <span className="dash-switch" data-on={noiseOn}>
+              <input
+                type="checkbox"
+                checked={noiseOn}
+                onChange={(e) =>
+                  updateTheme({ wallpaper_noise: e.target.checked })
+                }
+                style={{ display: "none" }}
+              />
+              <span className="dash-switch-track">
+                <span className="dash-switch-thumb" />
+              </span>
+            </span>
+          </label>
+        </div>
+      </div>
     </div>
   );
 }

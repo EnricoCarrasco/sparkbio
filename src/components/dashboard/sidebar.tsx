@@ -10,24 +10,32 @@ import {
   CreditCard,
   ExternalLink,
   LogOut,
-  ChevronLeft,
   ShieldCheck,
   Mail,
+  X,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ContactDialog } from "@/components/dashboard/contact-dialog";
 import { useProfileStore } from "@/lib/stores/profile-store";
-import { useDashboardStore, type DashboardTab } from "@/lib/stores/dashboard-store";
+import {
+  useDashboardStore,
+  type DashboardTab,
+} from "@/lib/stores/dashboard-store";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { DASH_SERIF } from "./_dash-primitives";
 
 interface SidebarProps {
   onNavigate: () => void;
+  variant?: "desktop" | "mobile";
 }
 
-const NAV_ITEMS: { key: DashboardTab; labelKey: string; icon: React.ElementType }[] = [
+const NAV_ITEMS: {
+  key: DashboardTab;
+  labelKey: string;
+  icon: React.ElementType;
+}[] = [
   { key: "content", labelKey: "content", icon: FileText },
   { key: "design", labelKey: "design", icon: Paintbrush },
   { key: "analytics", labelKey: "analytics", icon: BarChart3 },
@@ -35,7 +43,31 @@ const NAV_ITEMS: { key: DashboardTab; labelKey: string; icon: React.ElementType 
   { key: "settings", labelKey: "settings", icon: Settings },
 ];
 
-export function Sidebar({ onNavigate }: SidebarProps) {
+function LogoMark({ size = 34 }: { size?: number }) {
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        borderRadius: 10,
+        background: "var(--dash-ink)",
+        color: "var(--dash-orange)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: DASH_SERIF,
+        fontSize: Math.round(size * 0.65),
+        fontStyle: "italic",
+        fontWeight: 400,
+        lineHeight: 1,
+      }}
+    >
+      v
+    </div>
+  );
+}
+
+export function Sidebar({ onNavigate, variant = "desktop" }: SidebarProps) {
   const t = useTranslations("dashboard.sidebar");
   const router = useRouter();
   const profile = useProfileStore((s) => s.profile);
@@ -43,12 +75,12 @@ export function Sidebar({ onNavigate }: SidebarProps) {
   const setActiveTab = useDashboardStore((s) => s.setActiveTab);
   const [isAdmin, setIsAdmin] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
+  const isMobile = variant === "mobile";
 
   useEffect(() => {
-    // Admin detection is server-authoritative: /api/admin/stats checks the
-    // caller's email against ADMIN_EMAILS (server-only). We don't expose the
-    // list client-side — it shouldn't be in a public bundle.
-    fetch("/api/admin/stats").then((r) => setIsAdmin(r.ok)).catch(() => {});
+    fetch("/api/admin/stats")
+      .then((r) => setIsAdmin(r.ok))
+      .catch(() => {});
   }, []);
 
   async function handleSignOut() {
@@ -67,18 +99,72 @@ export function Sidebar({ onNavigate }: SidebarProps) {
   }
 
   return (
-    <div className="flex flex-col h-full py-3">
-      {/* Logo */}
-      <div className="flex items-center justify-center mb-4 px-1">
-        <img
-          src="/images/landing/logo-viopage.png"
-          alt="Viopage"
-          className="h-9 w-auto select-none object-contain"
-        />
-      </div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        padding: isMobile ? "20px 16px" : "18px 10px",
+        gap: 4,
+      }}
+    >
+      {isMobile ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 12,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <LogoMark />
+            <span
+              style={{
+                fontWeight: 700,
+                fontSize: 18,
+                letterSpacing: "-0.02em",
+                color: "var(--dash-ink)",
+              }}
+            >
+              Viopage
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={onNavigate}
+            aria-label="Close menu"
+            style={{
+              color: "var(--dash-muted)",
+              background: "transparent",
+              border: 0,
+              cursor: "pointer",
+              padding: 4,
+            }}
+          >
+            <X className="size-5" />
+          </button>
+        </div>
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            padding: "6px 0 14px",
+          }}
+        >
+          <LogoMark />
+        </div>
+      )}
 
-      {/* Nav icons */}
-      <nav className="flex flex-col items-center gap-1 flex-1 px-1">
+      <nav
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          flex: 1,
+        }}
+      >
         {NAV_ITEMS.map(({ key, labelKey, icon: Icon }) => {
           const isActive = activeTab === key;
           return (
@@ -86,81 +172,84 @@ export function Sidebar({ onNavigate }: SidebarProps) {
               key={key}
               type="button"
               onClick={() => handleTabClick(key)}
-              className={cn(
-                "flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-3 transition-colors",
-                isActive
-                  ? "bg-[#FF6B35]/10 text-[#FF6B35]"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
+              className={`dash-sidebtn ${isActive ? "active" : ""} ${isMobile ? "dash-sidebtn-row" : ""}`}
             >
-              <Icon className="size-5" strokeWidth={isActive ? 2 : 1.5} />
-              <span className="text-[11px] font-medium leading-tight">
-                {t(labelKey)}
-              </span>
+              <Icon
+                className="size-5"
+                strokeWidth={isActive ? 2 : 1.5}
+              />
+              <span>{t(labelKey)}</span>
             </button>
           );
         })}
-      </nav>
 
-      {/* Admin link */}
-      {isAdmin && (
-        <div className="flex flex-col items-center px-1 mt-2">
+        {isAdmin && (
           <button
             type="button"
-            onClick={() => { router.push("/admin"); onNavigate(); }}
-            className="flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-3 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            onClick={() => {
+              router.push("/admin");
+              onNavigate();
+            }}
+            className={`dash-sidebtn ${isMobile ? "dash-sidebtn-row" : ""}`}
           >
             <ShieldCheck className="size-5" strokeWidth={1.5} />
-            <span className="text-[11px] font-medium leading-tight">
-              Admin
-            </span>
+            <span>Admin</span>
           </button>
-        </div>
-      )}
+        )}
+      </nav>
 
-      {/* Bottom actions */}
-      <div className="flex flex-col items-center gap-1 px-1 mt-auto">
-        {/* View my Viopage */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: isMobile ? "row" : "column",
+          gap: 2,
+          borderTop: "1px solid var(--dash-line)",
+          paddingTop: 8,
+          marginTop: 8,
+          alignItems: isMobile ? "center" : "stretch",
+          justifyContent: isMobile ? "space-around" : "stretch",
+          flexWrap: "wrap",
+        }}
+      >
         {profile?.username && (
           <a
             href={`/${profile.username}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-3 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            className={`dash-sidebtn ${isMobile ? "dash-sidebtn-row" : ""}`}
+            style={{ textDecoration: "none" }}
           >
             <ExternalLink className="size-5" strokeWidth={1.5} />
-            <span className="text-[11px] font-medium leading-tight">
-              {t("viewProfile")}
-            </span>
+            <span>{t("viewProfile")}</span>
           </a>
         )}
 
-        {/* Contact us */}
         <button
           type="button"
           onClick={() => setContactOpen(true)}
-          className="flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-3 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          className={`dash-sidebtn ${isMobile ? "dash-sidebtn-row" : ""}`}
         >
           <Mail className="size-5" strokeWidth={1.5} />
-          <span className="text-[11px] font-medium leading-tight">
-            {t("contact")}
-          </span>
+          <span>{t("contact")}</span>
         </button>
 
-        {/* Language switcher */}
-        <div className="py-1">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            padding: "6px 0",
+          }}
+        >
           <LanguageSwitcher />
         </div>
 
-        {/* Sign out */}
         <button
+          type="button"
           onClick={handleSignOut}
-          className="flex flex-col items-center gap-0.5 w-full rounded-xl px-2 py-3 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          className={`dash-sidebtn ${isMobile ? "dash-sidebtn-row" : ""}`}
         >
           <LogOut className="size-5" strokeWidth={1.5} />
-          <span className="text-[11px] font-medium leading-tight">
-            {t("signOut")}
-          </span>
+          <span>{t("signOut")}</span>
         </button>
       </div>
 

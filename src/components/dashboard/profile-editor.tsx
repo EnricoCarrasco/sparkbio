@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Camera, User } from "lucide-react";
+import { Camera } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import {
 import { useProfileStore } from "@/lib/stores/profile-store";
 import { AVATAR_MAX_SIZE, AVATAR_ACCEPTED_TYPES } from "@/lib/constants";
 import { AvatarCropDialog } from "@/components/dashboard/avatar-crop-dialog";
+import { DASH, Eyebrow } from "./_dash-primitives";
 
 const BIO_MAX_LENGTH = 300;
 
@@ -103,8 +104,21 @@ export function ProfileEditor() {
   const bioRemaining = BIO_MAX_LENGTH - bio.length;
 
   return (
-    <div className="p-6 border border-border rounded-xl bg-orange-50 space-y-5">
-      <h2 className="text-base font-semibold text-foreground">{t("title")}</h2>
+    <div className="dash-card" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <div>
+        <Eyebrow>Profile</Eyebrow>
+        <h2
+          style={{
+            fontSize: 18,
+            fontWeight: 600,
+            letterSpacing: "-0.02em",
+            color: DASH.ink,
+            margin: "6px 0 0",
+          }}
+        >
+          {t("title")}
+        </h2>
+      </div>
 
       {/* Avatar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -135,19 +149,19 @@ export function ProfileEditor() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-foreground">
+          <span style={{ fontSize: 13, fontWeight: 600, color: DASH.ink }}>
             {t("avatar")}
           </span>
-          <Button
+          <button
             type="button"
-            variant="outline"
-            size="sm"
             onClick={() => fileInputRef.current?.click()}
             disabled={avatarUploading}
+            className="dash-btn-ghost"
+            style={{ padding: "8px 14px", fontSize: 12.5 }}
           >
             {avatarUploading ? "Uploading…" : t("avatarUpload")}
-          </Button>
-          <span className="text-xs text-muted-foreground">
+          </button>
+          <span style={{ fontSize: 11.5, color: DASH.muted }}>
             JPEG, PNG, WebP or GIF · max 2 MB
           </span>
         </div>
@@ -200,7 +214,8 @@ export function ProfileEditor() {
       <Button
         onClick={handleSave}
         disabled={saving}
-        className="bg-[#FF6B35] hover:bg-[#e55a25] text-white border-transparent"
+        className="dash-btn-primary self-start"
+        style={{ background: DASH.ink, color: "#fff", border: 0 }}
       >
         {saving ? "Saving…" : t("save")}
       </Button>

@@ -3,11 +3,7 @@
 import React, { useCallback, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash2, Plus, Globe } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { SOCIAL_PLATFORMS } from "@/lib/constants";
 import {
   LUCIDE_ICON_MAP,
@@ -15,7 +11,7 @@ import {
 } from "@/lib/social-icon-map";
 import { useSocialStore } from "@/lib/stores/social-store";
 import type { SocialIcon, SocialPlatform } from "@/types";
-import { cn } from "@/lib/utils";
+import { DASH, Eyebrow, SectionHead } from "./_dash-primitives";
 
 function renderPlatformIcon(
   iconName: string | undefined,
@@ -51,7 +47,6 @@ function ActiveIconRow({
   );
   const label = platformEntry?.label ?? icon.platform;
 
-  // Local URL state so the input feels responsive while debouncing saves
   const [localUrl, setLocalUrl] = useState(icon.url);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -89,73 +84,75 @@ function ActiveIconRow({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
-      className="flex flex-col gap-2 p-3 rounded-xl border border-border bg-white sm:flex-row sm:items-center sm:gap-3"
+      className="dash-link-row"
+      style={{ padding: "12px 14px", flexWrap: "wrap" }}
     >
-      {/* Top row on mobile: icon + label + toggle + delete */}
-      <div className="flex items-center gap-2.5 sm:w-32 sm:shrink-0">
+      {/* Icon + label */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 140 }}>
         <div
-          className={cn(
-            "flex items-center justify-center size-8 rounded-lg shrink-0",
-            icon.is_active
-              ? "bg-foreground text-white"
-              : "bg-muted text-muted-foreground"
-          )}
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 10,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            background: icon.is_active ? DASH.ink : DASH.cream2,
+            color: icon.is_active ? "#fff" : DASH.muted,
+          }}
         >
           {renderPlatformIcon(platformEntry?.icon, {
             size: 16,
             strokeWidth: 1.75,
           })}
         </div>
-        <span className="text-sm font-medium text-foreground truncate flex-1">
+        <span
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: DASH.ink,
+            letterSpacing: "-0.01em",
+          }}
+        >
           {label}
         </span>
-
-        {/* On mobile, show toggle + delete inline with the label */}
-        <div className="flex items-center gap-2 sm:hidden ml-auto shrink-0">
-          <Switch
-            checked={icon.is_active}
-            onCheckedChange={() => onToggle(icon.id)}
-            aria-label={`Toggle ${label}`}
-          />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-8 shrink-0 text-muted-foreground hover:text-destructive"
-            onClick={() => onDelete(icon.id)}
-            aria-label={`Remove ${label}`}
-          >
-            <Trash2 size={15} />
-          </Button>
-        </div>
       </div>
 
-      {/* URL input — full width on mobile, flex-1 on desktop */}
+      {/* URL input */}
       <Input
         value={localUrl}
         onChange={handleChange}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         placeholder={getPlatformUrlPrefix(icon.platform) || "https://"}
-        className="h-8 text-sm w-full sm:flex-1"
         aria-label={`${label} URL`}
+        className="h-9 text-sm"
+        style={{ flex: 1, minWidth: 200 }}
       />
 
-      {/* Toggle + delete — desktop only */}
-      <div className="hidden sm:flex items-center gap-2 shrink-0">
-        <Switch
-          checked={icon.is_active}
-          onCheckedChange={() => onToggle(icon.id)}
+      {/* Toggle + delete */}
+      <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginLeft: "auto" }}>
+        <button
+          type="button"
+          className="dash-switch"
+          data-on={icon.is_active}
+          onClick={() => onToggle(icon.id)}
           aria-label={`Toggle ${label}`}
-        />
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-8 shrink-0 text-muted-foreground hover:text-destructive"
+          aria-pressed={icon.is_active}
+        >
+          <span className="dash-switch-track">
+            <span className="dash-switch-thumb" />
+          </span>
+        </button>
+        <button
+          type="button"
+          className="dash-icon-btn danger"
           onClick={() => onDelete(icon.id)}
           aria-label={`Remove ${label}`}
         >
           <Trash2 size={15} />
-        </Button>
+        </button>
       </div>
     </motion.div>
   );
@@ -182,25 +179,40 @@ function InactivePlatformButton({
     <motion.button
       type="button"
       onClick={() => onAdd(platform)}
-      className={cn(
-        "flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border border-border bg-white",
-        "text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-muted/40",
-        "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      )}
       whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.97 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
       aria-label={`Add ${label}`}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 6,
+        padding: "12px 8px",
+        borderRadius: 14,
+        background: DASH.panel,
+        border: `1px solid ${DASH.line}`,
+        color: DASH.muted,
+        cursor: "pointer",
+        transition: "all 0.12s",
+      }}
+      className="hover:!bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       {renderPlatformIcon(iconName, { size: 20, strokeWidth: 1.75 })}
-      <span className="text-[11px] font-medium leading-tight text-center">
+      <span
+        style={{
+          fontSize: 11,
+          fontWeight: 600,
+          lineHeight: 1.2,
+          textAlign: "center",
+          color: DASH.ink,
+          letterSpacing: "-0.01em",
+        }}
+      >
         {label}
       </span>
-      <Plus
-        size={12}
-        className="text-muted-foreground opacity-60"
-        strokeWidth={2}
-      />
+      <Plus size={12} strokeWidth={2} style={{ color: DASH.orange }} />
     </motion.button>
   );
 }
@@ -213,15 +225,12 @@ export function SocialIconManager() {
   const { socialIcons, addSocialIcon, updateSocialIcon, deleteSocialIcon, toggleSocialIcon } =
     useSocialStore();
 
-  // Build a Set of platforms already configured by the user
   const activePlatforms = new Set(socialIcons.map((i) => i.platform));
 
-  // Platforms NOT yet added by the user
   const availablePlatforms = SOCIAL_PLATFORMS.filter(
     (p) => !activePlatforms.has(p.platform)
   );
 
-  // Sort existing icons by position
   const sortedIcons = [...socialIcons].sort((a, b) => a.position - b.position);
 
   const handleAdd = useCallback(
@@ -254,14 +263,23 @@ export function SocialIconManager() {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="dash-panel" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {/* Section header */}
       <div>
-        <h2 className="text-base font-semibold text-foreground">
-          Social Icons
+        <Eyebrow>Profile footer</Eyebrow>
+        <h2
+          style={{
+            fontSize: 16,
+            fontWeight: 600,
+            color: DASH.ink,
+            margin: "6px 0 2px",
+            letterSpacing: "-0.02em",
+          }}
+        >
+          Social icons
         </h2>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Add social profile links that appear as icons on your page.
+        <p style={{ fontSize: 13, color: DASH.muted, margin: 0 }}>
+          Add the profiles you want to show as icons on your page.
         </p>
       </div>
 
@@ -273,12 +291,10 @@ export function SocialIconManager() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="space-y-2"
+            style={{ display: "flex", flexDirection: "column", gap: 8 }}
           >
-            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Your Icons
-            </Label>
-            <div className="space-y-2">
+            <SectionHead label="Your icons" />
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               <AnimatePresence mode="popLayout">
                 {sortedIcons.map((icon) => (
                   <ActiveIconRow
@@ -297,16 +313,20 @@ export function SocialIconManager() {
 
       {/* Separator between active and available */}
       {sortedIcons.length > 0 && availablePlatforms.length > 0 && (
-        <Separator />
+        <div style={{ height: 1, background: DASH.line }} />
       )}
 
       {/* Available platforms grid */}
       {availablePlatforms.length > 0 && (
-        <div className="space-y-2">
-          <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Add Platform
-          </Label>
-          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2">
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <SectionHead label="Add platform" />
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(88px, 1fr))",
+              gap: 8,
+            }}
+          >
             <AnimatePresence mode="popLayout">
               {availablePlatforms.map((p) => (
                 <motion.div
@@ -331,7 +351,7 @@ export function SocialIconManager() {
 
       {/* Empty state */}
       {sortedIcons.length === 0 && availablePlatforms.length === 0 && (
-        <p className="text-sm text-muted-foreground text-center py-4">
+        <p style={{ fontSize: 13, color: DASH.muted, textAlign: "center", padding: "8px 0" }}>
           All platforms have been added.
         </p>
       )}

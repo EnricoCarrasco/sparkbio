@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Pencil, Crown } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/lib/stores/theme-store";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { THEME_PRESETS_BASIC, THEME_PRESETS_PREMIUM, THEME_PRESETS } from "@/lib/constants";
+import { Eyebrow } from "@/components/dashboard/_dash-primitives";
 import type { Theme } from "@/types";
 
 type ThemeCatalogTab = "basic" | "premium";
@@ -45,11 +45,11 @@ interface PresetCardProps {
   preset: (typeof THEME_PRESETS)[number];
   isActive: boolean;
   isCustom?: boolean;
-  isPro?: boolean;
+  showCrown?: boolean;
   onClick: () => void;
 }
 
-function PresetCard({ preset, isActive, isCustom, isPro, onClick }: PresetCardProps) {
+function PresetCard({ preset, isActive, isCustom, showCrown, onClick }: PresetCardProps) {
   const btnRadius = getButtonRadius(preset.button_corner);
 
   return (
@@ -58,94 +58,142 @@ function PresetCard({ preset, isActive, isCustom, isPro, onClick }: PresetCardPr
       onClick={onClick}
       aria-pressed={isActive}
       aria-label={`Apply ${preset.name} theme`}
-      className={cn(
-        "relative flex flex-col items-stretch rounded-xl overflow-hidden text-left transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-2",
-        isActive
-          ? "ring-2 ring-foreground shadow-sm"
-          : "ring-1 ring-border hover:ring-foreground/30 hover:shadow-sm"
-      )}
+      style={{
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        textAlign: "left",
+        padding: 10,
+        borderRadius: 16,
+        background: "var(--dash-panel)",
+        border: `1px solid ${isActive ? "var(--dash-orange)" : "var(--dash-line)"}`,
+        boxShadow: isActive ? "0 0 0 3px var(--dash-orange-tint)" : "none",
+        cursor: "pointer",
+        transition: "all 0.15s",
+      }}
     >
-      {/* Card body — mini profile preview */}
+      {showCrown && (
+        <span
+          style={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            zIndex: 2,
+            width: 18,
+            height: 18,
+            borderRadius: 999,
+            background: "#FBBF24",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+          }}
+        >
+          <Crown className="size-2.5 text-white" strokeWidth={2.5} />
+        </span>
+      )}
+      {/* Mini preview box */}
       <div
-        className="w-full flex-1 flex flex-col items-center justify-between p-2.5 pt-3"
         style={{
-          backgroundColor: preset.bg_color,
-          minHeight: "100px",
+          borderRadius: 12,
+          padding: "16px 10px 12px",
+          minHeight: 120,
+          background: preset.bg_color,
+          border: "1px solid var(--dash-line)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        {/* Aa typography sample or pencil icon for custom */}
+        {/* Avatar dot + Aa sample */}
         {isCustom ? (
-          <div className="flex-1 flex items-center justify-center">
-            <Pencil
-              className="size-5"
-              style={{ color: preset.text_color }}
-              strokeWidth={1.5}
-            />
-          </div>
+          <Pencil
+            className="size-5"
+            style={{ color: preset.text_color }}
+            strokeWidth={1.5}
+          />
         ) : (
           <div
-            className="flex-1 flex items-center justify-center text-xl font-bold leading-none"
             style={{
-              color: preset.text_color,
               fontFamily: preset.font_family,
+              color: preset.text_color,
+              fontSize: 22,
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              lineHeight: 1,
             }}
           >
             Aa
           </div>
         )}
 
-        {/* Mini button bar at the bottom */}
-        <div className="w-full space-y-1 mt-2">
-          <div
-            className="w-full h-3"
-            style={{
-              backgroundColor:
-                preset.button_style_v2 === "outline"
-                  ? "transparent"
-                  : preset.button_color,
-              borderRadius: btnRadius,
-              border:
-                preset.button_style_v2 === "outline"
-                  ? `1.5px solid ${preset.button_color}`
-                  : "none",
-            }}
-          />
-          <div
-            className="w-full h-3"
-            style={{
-              backgroundColor:
-                preset.button_style_v2 === "outline"
-                  ? "transparent"
-                  : preset.button_color,
-              borderRadius: btnRadius,
-              border:
-                preset.button_style_v2 === "outline"
-                  ? `1.5px solid ${preset.button_color}`
-                  : "none",
-              opacity: 0.6,
-            }}
-          />
+        {/* 2 mini button bars at the bottom */}
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            gap: 5,
+            marginTop: 12,
+          }}
+        >
+          {[1, 0.6].map((opacity, i) => (
+            <div
+              key={i}
+              style={{
+                width: "100%",
+                height: 10,
+                background:
+                  preset.button_style_v2 === "outline"
+                    ? "transparent"
+                    : preset.button_color,
+                border:
+                  preset.button_style_v2 === "outline"
+                    ? `1.5px solid ${preset.button_color}`
+                    : "none",
+                borderRadius: btnRadius,
+                opacity,
+              }}
+            />
+          ))}
         </div>
       </div>
 
-      {/* Card label */}
-      <div className="px-2 py-1.5 bg-white border-t border-border/60 text-center">
-        <p
-          className={cn(
-            "text-[10px] font-medium text-foreground truncate leading-tight",
-            isActive && "font-semibold"
-          )}
+      {/* Name + accent dot */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "10px 4px 2px",
+        }}
+      >
+        <span
+          style={{
+            fontSize: 13,
+            fontWeight: isActive ? 700 : 600,
+            color: "var(--dash-ink)",
+            letterSpacing: "-0.005em",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            maxWidth: "80%",
+          }}
         >
           {preset.name}
-        </p>
-      </div>
-
-      {/* Pro badge */}
-      {isPro && (
-        <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-amber-400 flex items-center justify-center shadow-sm">
-          <Crown className="size-2.5 text-white" strokeWidth={2.5} />
         </span>
-      )}
+        <span
+          style={{
+            width: 12,
+            height: 12,
+            borderRadius: 999,
+            background: preset.button_color,
+            border: "1px solid rgba(0,0,0,0.08)",
+            flexShrink: 0,
+          }}
+        />
+      </div>
     </button>
   );
 }
@@ -162,9 +210,6 @@ export function ThemePanel() {
   const activePresetName = getActivePresetName(theme);
 
   function handlePresetApply(preset: (typeof THEME_PRESETS)[number]) {
-    // Some premium presets opt into wallpaper/gradient/title customizations.
-    // Apply them when present; otherwise reset to safe defaults so switching
-    // away from a "loud" preset cleans up the carry-over visual state.
     const p = preset as (typeof THEME_PRESETS)[number] & Partial<Theme>;
 
     updateTheme({
@@ -183,7 +228,6 @@ export function ThemePanel() {
       title_font: preset.title_font,
       hide_bio: preset.hide_bio,
       button_font_size: preset.button_font_size ?? "medium",
-      // Optional design-rich fields — reset by default, override if preset declares
       title_color: p.title_color ?? null,
       title_size: p.title_size ?? "small",
       wallpaper_style: p.wallpaper_style ?? "fill",
@@ -196,123 +240,191 @@ export function ThemePanel() {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Basic / Premium tab bar */}
-      <div className="flex gap-5 border-b border-border">
-        {(["basic", "premium"] as ThemeCatalogTab[]).map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            onClick={() => setCatalogTab(tab)}
-            className={cn(
-              "pb-2.5 text-sm font-medium transition-colors capitalize focus-visible:outline-none flex items-center gap-1.5",
-              catalogTab === tab
-                ? "text-foreground border-b-2 border-foreground"
-                : "text-muted-foreground hover:text-foreground border-b-2 border-transparent"
-            )}
-          >
-            {tab === "basic" ? t("basicThemes") : t("premiumThemes")}
-            {tab === "premium" && !isPro && (
-              <Crown className="size-3.5 text-amber-500" strokeWidth={2} />
-            )}
-          </button>
-        ))}
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      {/* Basic / Premium chip toggle */}
+      <div
+        className="chip-row"
+        style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
+      >
+        {(["basic", "premium"] as ThemeCatalogTab[]).map((tab) => {
+          const isActive = catalogTab === tab;
+          return (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setCatalogTab(tab)}
+              className={`dash-chip${isActive ? " active" : ""}`}
+              style={{ textTransform: "capitalize" }}
+            >
+              <span>{tab === "basic" ? t("basicThemes") : t("premiumThemes")}</span>
+              {tab === "premium" && !isPro && (
+                <Crown
+                  className="size-3"
+                  style={{ color: isActive ? "#FBBF24" : "#F59E0B" }}
+                />
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {/* Theme preset grid */}
-      <div>
-        {catalogTab === "basic" ? (
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-            {/* "Custom" card — first slot */}
-            <button
-              type="button"
-              aria-label="Custom theme"
-              className={cn(
-                "relative flex flex-col items-stretch rounded-xl overflow-hidden text-left transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-2",
-                !activePresetName
-                  ? "ring-2 ring-foreground shadow-sm"
-                  : "ring-1 ring-border hover:ring-foreground/30 hover:shadow-sm"
-              )}
-            >
-              <div
-                className="w-full flex-1 flex flex-col items-center justify-between p-2.5 pt-3"
-                style={{ backgroundColor: theme.bg_color, minHeight: "100px" }}
+      <div className="dash-panel">
+        <Eyebrow>
+          {catalogTab === "basic" ? t("basicThemes") : t("premiumThemes")}
+        </Eyebrow>
+        <div
+          style={{
+            marginTop: 14,
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+            gap: 14,
+          }}
+        >
+          {catalogTab === "basic" ? (
+            <>
+              {/* "Custom" card — first slot */}
+              <button
+                type="button"
+                aria-label="Custom theme"
+                style={{
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column",
+                  textAlign: "left",
+                  padding: 10,
+                  borderRadius: 16,
+                  background: "var(--dash-panel)",
+                  border: `1px solid ${!activePresetName ? "var(--dash-orange)" : "var(--dash-line)"}`,
+                  boxShadow: !activePresetName
+                    ? "0 0 0 3px var(--dash-orange-tint)"
+                    : "none",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                }}
               >
-                <div className="flex-1 flex items-center justify-center">
+                <div
+                  style={{
+                    borderRadius: 12,
+                    padding: "16px 10px 12px",
+                    minHeight: 120,
+                    background: theme.bg_color,
+                    border: "1px solid var(--dash-line)",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
                   <Pencil
                     className="size-5"
                     style={{ color: theme.text_color }}
                     strokeWidth={1.5}
                   />
-                </div>
-                <div className="w-full space-y-1 mt-2">
                   <div
-                    className="w-full h-3"
                     style={{
-                      backgroundColor: theme.button_color,
-                      borderRadius: getButtonRadius(theme.button_corner),
+                      width: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 5,
+                      marginTop: 12,
                     }}
-                  />
-                  <div
-                    className="w-full h-3"
-                    style={{
-                      backgroundColor: theme.button_color,
-                      borderRadius: getButtonRadius(theme.button_corner),
-                      opacity: 0.6,
-                    }}
-                  />
+                  >
+                    <div
+                      style={{
+                        width: "100%",
+                        height: 10,
+                        background: theme.button_color,
+                        borderRadius: getButtonRadius(theme.button_corner),
+                      }}
+                    />
+                    <div
+                      style={{
+                        width: "100%",
+                        height: 10,
+                        background: theme.button_color,
+                        borderRadius: getButtonRadius(theme.button_corner),
+                        opacity: 0.6,
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="px-2 py-1.5 bg-white border-t border-border/60 text-center">
-                <p
-                  className={cn(
-                    "text-[10px] font-medium text-foreground truncate leading-tight",
-                    !activePresetName && "font-semibold"
-                  )}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "10px 4px 2px",
+                  }}
                 >
-                  {t("customTheme")}
-                </p>
-              </div>
-            </button>
+                  <span
+                    style={{
+                      fontSize: 13,
+                      fontWeight: !activePresetName ? 700 : 600,
+                      color: "var(--dash-ink)",
+                    }}
+                  >
+                    {t("customTheme")}
+                  </span>
+                  <span
+                    style={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: 999,
+                      background: theme.button_color,
+                      border: "1px solid rgba(0,0,0,0.08)",
+                    }}
+                  />
+                </div>
+              </button>
 
-            {/* Basic preset cards */}
-            {THEME_PRESETS_BASIC.map((preset) => (
+              {THEME_PRESETS_BASIC.map((preset) => (
+                <PresetCard
+                  key={preset.name}
+                  preset={preset}
+                  isActive={activePresetName === preset.name}
+                  onClick={() => handlePresetApply(preset)}
+                />
+              ))}
+            </>
+          ) : (
+            THEME_PRESETS_PREMIUM.map((preset) => (
               <PresetCard
                 key={preset.name}
                 preset={preset}
                 isActive={activePresetName === preset.name}
+                showCrown={!isPro}
                 onClick={() => handlePresetApply(preset)}
               />
-            ))}
-          </div>
-        ) : (
-          /* Premium tab — free users preview Pro presets; the public page
-             server-strips Pro fields until they upgrade. Crown badges
-             remain as a visual cue. */
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-            {THEME_PRESETS_PREMIUM.map((preset) => (
-              <PresetCard
-                key={preset.name}
-                preset={preset}
-                isActive={activePresetName === preset.name}
-                isPro={!isPro}
-                onClick={() => handlePresetApply(preset)}
-              />
-            ))}
-          </div>
+            ))
+          )}
+        </div>
+
+        {catalogTab === "basic" && (
+          <p
+            style={{
+              fontSize: 12,
+              color: "var(--dash-muted)",
+              marginTop: 14,
+              lineHeight: 1.5,
+            }}
+          >
+            {t("themesDesc")}
+          </p>
+        )}
+        {catalogTab === "premium" && !isPro && (
+          <p
+            style={{
+              fontSize: 12,
+              color: "var(--dash-muted)",
+              marginTop: 14,
+              lineHeight: 1.5,
+            }}
+          >
+            {t("premiumThemesDesc")}
+          </p>
         )}
       </div>
-
-      {catalogTab === "basic" && (
-        <p className="text-xs text-muted-foreground">
-          {t("themesDesc")}
-        </p>
-      )}
-      {catalogTab === "premium" && !isPro && (
-        <p className="text-xs text-muted-foreground">
-          {t("premiumThemesDesc")}
-        </p>
-      )}
     </div>
   );
 }

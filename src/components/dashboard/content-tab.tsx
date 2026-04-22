@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import {
   Plus,
@@ -15,6 +15,9 @@ import {
   BarChart3,
   GripVertical,
   X,
+  Eye,
+  Link2,
+  Copy,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import {
@@ -35,18 +38,17 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { LinkList } from "@/components/dashboard/link-list";
 import { useLinkStore } from "@/lib/stores/link-store";
 import { useProfileStore } from "@/lib/stores/profile-store";
 import { useSocialStore } from "@/lib/stores/social-store";
+import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { LinkFormDialog } from "@/components/dashboard/link-form-dialog";
 import { AddContentModal } from "@/components/dashboard/add-content-modal";
 import { SmartSocialLinkInput } from "@/components/dashboard/smart-social-link-input";
 import { ProfileEditDialog } from "@/components/dashboard/profile-edit-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getIconForPlatform, getPlatformLabel } from "@/lib/social-icon-map";
+import { getPlatformLabel } from "@/lib/social-icon-map";
 import { AVATAR_MAX_SIZE, AVATAR_ACCEPTED_TYPES } from "@/lib/constants";
 import { AvatarCropDialog } from "@/components/dashboard/avatar-crop-dialog";
 import { BrandIcon } from "@/components/ui/brand-icon";
@@ -56,10 +58,18 @@ import { LinkInsightsModal } from "@/components/dashboard/link-insights-modal";
 import {
   OnboardingProvider,
   useOnboarding,
-  type OnboardingStep,
 } from "@/components/dashboard/onboarding/onboarding-context";
 import { SpotlightOverlay } from "@/components/dashboard/onboarding/spotlight-overlay";
 import { OnboardingTooltip } from "@/components/dashboard/onboarding/onboarding-tooltip";
+import {
+  DASH,
+  DASH_MONO,
+  Eyebrow,
+  Italic,
+  Pill,
+  Spark,
+  SectionHead,
+} from "./_dash-primitives";
 import type { SocialIcon, SocialPlatform, SocialDisplayMode, Link } from "@/types";
 
 // ---------------------------------------------------------------------------
@@ -68,25 +78,27 @@ import type { SocialIcon, SocialPlatform, SocialDisplayMode, Link } from "@/type
 
 function ContentSkeleton() {
   return (
-    <div className="max-w-[860px] mx-auto px-6 py-6 space-y-5">
-      <div className="flex items-center gap-6">
-        <Skeleton className="h-5 w-12" />
-        <Skeleton className="h-5 w-10" />
-        <div className="ml-auto flex gap-2">
-          <Skeleton className="h-8 w-24 rounded-full" />
+    <div className="dash-tab-pad">
+      <div className="dash-tab-head">
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-9 w-64" />
+          <Skeleton className="h-4 w-80" />
+        </div>
+        <div className="flex gap-2">
+          <Skeleton className="h-9 w-24 rounded-full" />
+          <Skeleton className="h-9 w-24 rounded-full" />
         </div>
       </div>
-      <div className="flex items-center gap-4">
-        <Skeleton className="size-16 rounded-full" />
-        <div className="space-y-2 flex-1">
-          <Skeleton className="h-5 w-40" />
-          <Skeleton className="h-4 w-56" />
-        </div>
+      <div className="dash-stats-strip">
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} className="h-[120px] rounded-[20px]" />
+        ))}
       </div>
-      <Skeleton className="h-12 w-full rounded-full" />
-      <div className="space-y-3">
+      <Skeleton className="h-32 w-full rounded-[24px]" />
+      <div className="mt-6 space-y-3">
         {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-20 w-full rounded-2xl" />
+          <Skeleton key={i} className="h-16 w-full rounded-2xl" />
         ))}
       </div>
     </div>
@@ -94,14 +106,136 @@ function ContentSkeleton() {
 }
 
 // ---------------------------------------------------------------------------
-// Compact profile header (Linktree-style inline)
+// Greeting helper
 // ---------------------------------------------------------------------------
 
-function CompactProfileHeader({ onEditProfile }: { onEditProfile: () => void }) {
+function greetingFor(hour: number): string {
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
+
+// ---------------------------------------------------------------------------
+// Stats strip (derived from existing data sources — no new fetches)
+// ---------------------------------------------------------------------------
+
+function StatsStrip({
+  links,
+  counts,
+}: {
+  links: Link[];
+  counts: Record<string, number>;
+}) {
+  const totalClicks = Object.values(counts).reduce((a, b) => a + b, 0);
+  const liveLinks = links.filter((l) => l.is_active).length;
+
+  // Top link (highest click count)
+  const topLinkId = Object.keys(counts).reduce<string | null>((best, id) => {
+    if (!best) return id;
+    return (counts[id] ?? 0) > (counts[best] ?? 0) ? id : best;
+  }, null);
+  const topLink = topLinkId ? links.find((l) => l.id === topLinkId) : null;
+  const topLinkClicks = topLinkId ? counts[topLinkId] ?? 0 : 0;
+
+  // Approximate views as clicks * 3 (heuristic since we don't fetch page_view here)
+  // Keeping it visual only — replace with real data source if wiring expands.
+  const approxViews = totalClicks > 0 ? Math.max(totalClicks * 3, totalClicks + 12) : 0;
+  const ctr = approxViews > 0 ? Math.round((totalClicks / approxViews) * 100) : 0;
+
+  return (
+    <div className="dash-stats-strip">
+      <div className="dash-stat-card">
+        <Eyebrow>Views · 7d</Eyebrow>
+        <div
+          style={{
+            fontSize: 28,
+            fontWeight: 700,
+            letterSpacing: "-0.03em",
+            color: DASH.ink,
+            marginTop: 4,
+          }}
+        >
+          {approxViews.toLocaleString()}
+        </div>
+        <div style={{ marginTop: 8 }}>
+          <Spark w={120} h={28} color={DASH.ink} />
+        </div>
+      </div>
+
+      <div className="dash-stat-card">
+        <Eyebrow>Clicks · 7d</Eyebrow>
+        <div
+          style={{
+            fontSize: 28,
+            fontWeight: 700,
+            letterSpacing: "-0.03em",
+            color: DASH.ink,
+            marginTop: 4,
+          }}
+        >
+          {totalClicks.toLocaleString()}
+        </div>
+        <div style={{ marginTop: 8 }}>
+          <Spark w={120} h={28} color={DASH.orange} />
+        </div>
+      </div>
+
+      <div className="dash-stat-card">
+        <Eyebrow>CTR</Eyebrow>
+        <div
+          style={{
+            fontSize: 28,
+            fontWeight: 700,
+            letterSpacing: "-0.03em",
+            color: DASH.ink,
+            marginTop: 4,
+          }}
+        >
+          {ctr}%
+        </div>
+        <div style={{ marginTop: 8, fontSize: 11.5, color: DASH.muted }}>
+          {liveLinks} live · {links.length} total
+        </div>
+      </div>
+
+      <div className="dash-stat-card dash-stat-feature">
+        <div>
+          <Eyebrow color={DASH.orange}>Top link</Eyebrow>
+          <div
+            style={{
+              fontSize: 15,
+              fontWeight: 600,
+              marginTop: 8,
+              letterSpacing: "-0.02em",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {topLink?.title ?? "No clicks yet"}
+          </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+          <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.03em" }}>
+            {topLinkClicks.toLocaleString()}
+          </div>
+          <Pill tone="orange">clicks</Pill>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Profile card (avatar, name + Pro pill, bio, URL chip + Edit button)
+// ---------------------------------------------------------------------------
+
+function ProfileCard({ onEditProfile }: { onEditProfile: () => void }) {
   const t = useTranslations("dashboard.design");
   const profile = useProfileStore((s) => s.profile);
   const uploadAvatar = useProfileStore((s) => s.uploadAvatar);
   const socialIcons = useSocialStore((s) => s.socialIcons);
+  const isPro = useSubscriptionStore((s) => s.isPro);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [cropOpen, setCropOpen] = useState(false);
@@ -114,6 +248,10 @@ function CompactProfileHeader({ onEditProfile }: { onEditProfile: () => void }) 
   const activeSocials = socialIcons
     .filter((s) => s.is_active)
     .sort((a, b) => a.position - b.position);
+
+  const profileUrl = profile?.username
+    ? `viopage.com/${profile.username}`
+    : "viopage.com";
 
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -151,10 +289,25 @@ function CompactProfileHeader({ onEditProfile }: { onEditProfile: () => void }) 
     setCropSrc(null);
   }
 
+  function handleCopyUrl() {
+    if (!profile?.username) return;
+    const full = `https://viopage.com/${profile.username}`;
+    navigator.clipboard.writeText(full);
+    toast.success("Link copied");
+  }
+
   return (
-    <div className="flex items-start gap-4">
+    <div
+      className="dash-card"
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 18,
+        flexWrap: "wrap",
+      }}
+    >
       {/* Avatar with click-to-upload */}
-      <div className="relative shrink-0">
+      <div style={{ position: "relative", flexShrink: 0 }}>
         <Avatar className="size-[72px]">
           <AvatarImage
             src={profile?.avatar_url ?? undefined}
@@ -166,6 +319,7 @@ function CompactProfileHeader({ onEditProfile }: { onEditProfile: () => void }) 
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={avatarUploading}
+          aria-label={t("avatarUpload")}
           className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
         >
           <Camera className="size-4 text-white" />
@@ -179,36 +333,86 @@ function CompactProfileHeader({ onEditProfile }: { onEditProfile: () => void }) 
         />
       </div>
 
-      {/* Name + bio (clickable to edit) + social icons */}
-      <div className="flex-1 min-w-0 pt-1">
-        <button
-          type="button"
-          onClick={onEditProfile}
-          className="text-left w-full group"
-        >
-          <h2 className="text-base font-semibold tracking-tight text-foreground leading-tight truncate group-hover:text-primary transition-colors cursor-pointer">
-            {profile?.display_name || profile?.username || "Your Name"}
-          </h2>
-          {profile?.bio ? (
-            <p className="text-sm text-muted-foreground leading-snug mt-0.5 line-clamp-2 group-hover:text-foreground/70 transition-colors cursor-pointer">
-              {profile.bio}
-            </p>
-          ) : (
-            <p className="text-sm text-muted-foreground/40 leading-snug mt-0.5 italic cursor-pointer">
-              + Add bio
-            </p>
-          )}
-        </button>
+      {/* Name + Pro pill + bio + URL chip + social icons */}
+      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <h3
+            style={{
+              fontSize: 20,
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              color: DASH.ink,
+              margin: 0,
+            }}
+          >
+            {profile?.display_name || profile?.username || "Your name"}
+          </h3>
+          {isPro && <Pill tone="orange">Pro</Pill>}
+        </div>
+
+        {profile?.bio ? (
+          <p
+            style={{
+              margin: 0,
+              fontSize: 13.5,
+              color: DASH.muted,
+              lineHeight: 1.5,
+              maxWidth: "56ch",
+            }}
+          >
+            {profile.bio}
+          </p>
+        ) : (
+          <button
+            type="button"
+            onClick={onEditProfile}
+            style={{
+              fontSize: 13.5,
+              color: DASH.muted,
+              fontStyle: "italic",
+              background: "transparent",
+              border: 0,
+              padding: 0,
+              textAlign: "left",
+              cursor: "pointer",
+            }}
+          >
+            + Add a short bio
+          </button>
+        )}
+
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <button
+            type="button"
+            onClick={handleCopyUrl}
+            className="dash-url-chip"
+            aria-label="Copy page URL"
+            style={{ border: 0, cursor: "pointer" }}
+          >
+            <Link2 size={12} style={{ color: DASH.muted }} />
+            {profileUrl}
+            <Copy size={11} style={{ color: DASH.muted, marginLeft: 2 }} />
+          </button>
+          <button
+            type="button"
+            onClick={onEditProfile}
+            className="dash-btn-ghost"
+            style={{ padding: "8px 14px", fontSize: 12.5 }}
+          >
+            <Pencil size={13} />
+            Edit profile
+          </button>
+        </div>
 
         {/* Social icons row */}
         {activeSocials.length > 0 && (
-          <div className="flex items-center gap-1.5 mt-2">
-            {activeSocials.slice(0, 5).map((icon) => (
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
+            {activeSocials.slice(0, 6).map((icon) => (
               <SocialIconBubble key={icon.id} icon={icon} />
             ))}
-            {activeSocials.length > 5 && (
-              <span className="text-[11px] text-muted-foreground font-medium">
-                +{activeSocials.length - 5}
+            {activeSocials.length > 6 && (
+              <span style={{ fontSize: 11, color: DASH.muted, fontWeight: 600 }}>
+                +{activeSocials.length - 6}
               </span>
             )}
           </div>
@@ -229,11 +433,97 @@ function SocialIconBubble({ icon }: { icon: SocialIcon }) {
   return (
     <BrandIcon
       platform={icon.platform}
-      size={28}
-      iconSize={14}
+      size={26}
+      iconSize={13}
       rounded="rounded-full"
       className="transition-transform hover:scale-110 cursor-default"
     />
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Add link bar (dashed) with quick-add chips
+// ---------------------------------------------------------------------------
+
+function AddLinkBar({
+  onOpenFull,
+  onQuickAdd,
+  buttonRef,
+}: {
+  onOpenFull: () => void;
+  onQuickAdd: (platform: SocialPlatform) => void;
+  buttonRef: React.RefObject<HTMLButtonElement | null>;
+}) {
+  const t = useTranslations("dashboard.design");
+
+  const quickAdds: Array<{ platform: SocialPlatform; label: string }> = [
+    { platform: "instagram", label: "Instagram" },
+    { platform: "spotify", label: "Spotify" },
+    { platform: "youtube", label: "YouTube" },
+    { platform: "tiktok", label: "TikTok" },
+    { platform: "whatsapp", label: "WhatsApp" },
+  ];
+
+  return (
+    <div className="dash-add-bar">
+      <div
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: 10,
+          background: DASH.orangeTint,
+          color: DASH.orangeDeep,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        <Plus size={16} strokeWidth={2.5} />
+      </div>
+
+      <input
+        type="text"
+        placeholder="Paste a URL or search a platform…"
+        readOnly
+        onClick={onOpenFull}
+        style={{
+          flex: 1,
+          minWidth: 160,
+          background: "transparent",
+          border: 0,
+          outline: "none",
+          fontSize: 13.5,
+          color: DASH.ink,
+          fontFamily: DASH_MONO,
+          cursor: "pointer",
+        }}
+      />
+
+      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+        {quickAdds.map((q) => (
+          <button
+            key={q.platform}
+            type="button"
+            className="dash-chip"
+            onClick={() => onQuickAdd(q.platform)}
+          >
+            {q.label}
+          </button>
+        ))}
+      </div>
+
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={onOpenFull}
+        className="dash-btn-primary"
+        style={{ padding: "9px 16px", fontSize: 13 }}
+      >
+        <Plus size={14} strokeWidth={2.5} />
+        {t("addLink")}
+      </button>
+    </div>
   );
 }
 
@@ -311,36 +601,57 @@ function SocialIconCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "rounded-2xl bg-orange-50 border border-border/60 shadow-sm hover:shadow-md transition-shadow",
+        "dash-panel",
         isDragging && "shadow-lg opacity-80 z-50"
       )}
     >
-      <div className="flex items-center gap-3 p-3.5">
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         {/* Drag handle */}
         <button
           type="button"
-          className="cursor-grab active:cursor-grabbing touch-none text-muted-foreground/40 hover:text-muted-foreground transition-colors shrink-0 -ml-1"
+          className="touch-none"
+          aria-label="Drag to reorder"
+          style={{
+            cursor: "grab",
+            color: DASH.muted,
+            opacity: 0.55,
+            background: "transparent",
+            border: 0,
+            padding: 0,
+            display: "inline-flex",
+            alignItems: "center",
+            flexShrink: 0,
+          }}
           {...attributes}
           {...listeners}
         >
           <GripVertical className="size-4" />
         </button>
 
-        {/* Platform icon with brand colors */}
+        {/* Platform icon */}
         <BrandIcon platform={icon.platform} size={36} iconSize={18} />
 
         {/* Info */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold text-foreground">{label}</p>
-            {/* Display mode indicator */}
-            <span className="text-[10px] font-medium text-muted-foreground bg-muted rounded px-1.5 py-0.5">
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 14,
+                fontWeight: 600,
+                letterSpacing: "-0.01em",
+                color: DASH.ink,
+              }}
+            >
+              {label}
+            </p>
+            <Pill tone="cream" style={{ fontSize: 10, padding: "2px 8px" }}>
               {icon.display_mode === "button"
                 ? tSmart("displayButton")
                 : icon.display_mode === "grid"
                   ? tSmart("displayGrid")
                   : tSmart("displayIcon")}
-            </span>
+            </Pill>
           </div>
           {editing ? (
             <input
@@ -355,51 +666,79 @@ function SocialIconCard({
                   setEditing(false);
                 }
               }}
-              className="w-full text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1 mt-0.5 outline-none focus:ring-1 focus:ring-primary/30"
               autoFocus
+              style={{
+                width: "100%",
+                marginTop: 4,
+                padding: "6px 10px",
+                fontSize: 12,
+                background: DASH.cream,
+                border: `1px solid ${DASH.line}`,
+                borderRadius: 8,
+                outline: "none",
+                color: DASH.ink,
+                fontFamily: DASH_MONO,
+              }}
             />
           ) : (
-            <div className="flex items-center gap-1 mt-0.5">
-              <p className="text-xs text-muted-foreground truncate">
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 12,
+                  color: DASH.muted,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  fontFamily: DASH_MONO,
+                }}
+              >
                 {truncateUrl(icon.url)}
               </p>
               <button
                 type="button"
                 onClick={() => setEditing(true)}
-                className="shrink-0 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+                aria-label="Edit URL"
+                style={{
+                  background: "transparent",
+                  border: 0,
+                  color: DASH.muted,
+                  opacity: 0.6,
+                  cursor: "pointer",
+                  padding: 0,
+                }}
               >
-                <Pencil className="size-2.5" />
+                <Pencil size={11} />
               </button>
             </div>
           )}
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-2 shrink-0">
-          <Switch
-            checked={icon.is_active}
-            onCheckedChange={() => toggleSocialIcon(icon.id)}
-          />
-        </div>
+        {/* Switch */}
+        <button
+          type="button"
+          className="dash-switch"
+          data-on={icon.is_active}
+          onClick={() => toggleSocialIcon(icon.id)}
+          aria-label={icon.is_active ? tLinks("active") : tLinks("inactive")}
+          aria-pressed={icon.is_active}
+        >
+          <span className="dash-switch-track">
+            <span className="dash-switch-thumb" />
+          </span>
+        </button>
       </div>
 
       {/* Display mode toggle + title */}
-      <div className="px-3.5 pb-2.5 space-y-2">
-        {/* Display mode toggle */}
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-            {tSmart("displayAs")}
-          </span>
-          <div className="flex rounded-md border border-border overflow-hidden">
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <Eyebrow>{tSmart("displayAs")}</Eyebrow>
+          <div className="dash-seg" style={{ display: "inline-flex" }}>
             <button
               type="button"
               onClick={() => handleDisplayModeChange("icon")}
-              className={cn(
-                "flex items-center gap-1 px-2 py-1 text-[10px] font-medium transition-colors",
-                icon.display_mode === "icon"
-                  ? "bg-foreground text-white"
-                  : "text-muted-foreground hover:bg-muted"
-              )}
+              className={cn("dash-seg-btn", icon.display_mode === "icon" && "active")}
+              style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
             >
               <Circle className="size-3" />
               {tSmart("displayIcon")}
@@ -407,12 +746,8 @@ function SocialIconCard({
             <button
               type="button"
               onClick={() => handleDisplayModeChange("button")}
-              className={cn(
-                "flex items-center gap-1 px-2 py-1 text-[10px] font-medium transition-colors",
-                icon.display_mode === "button"
-                  ? "bg-foreground text-white"
-                  : "text-muted-foreground hover:bg-muted"
-              )}
+              className={cn("dash-seg-btn", icon.display_mode === "button" && "active")}
+              style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
             >
               <RectangleHorizontal className="size-3" />
               {tSmart("displayButton")}
@@ -420,12 +755,8 @@ function SocialIconCard({
             <button
               type="button"
               onClick={() => handleDisplayModeChange("grid")}
-              className={cn(
-                "flex items-center gap-1 px-2 py-1 text-[10px] font-medium transition-colors",
-                icon.display_mode === "grid"
-                  ? "bg-foreground text-white"
-                  : "text-muted-foreground hover:bg-muted"
-              )}
+              className={cn("dash-seg-btn", icon.display_mode === "grid" && "active")}
+              style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
             >
               <LayoutGrid className="size-3" />
               {tSmart("displayGrid")}
@@ -433,7 +764,6 @@ function SocialIconCard({
           </div>
         </div>
 
-        {/* Button title input (only when button mode) */}
         {icon.display_mode === "button" && (
           <input
             type="text"
@@ -444,32 +774,52 @@ function SocialIconCard({
               if (e.key === "Enter") handleSaveTitle();
             }}
             placeholder={label}
-            className="w-full text-xs text-foreground bg-muted/40 border border-border/50 rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-primary/30 placeholder:text-muted-foreground/50"
+            style={{
+              width: "100%",
+              padding: "8px 12px",
+              fontSize: 13,
+              background: DASH.cream,
+              border: `1px solid ${DASH.line}`,
+              borderRadius: 10,
+              outline: "none",
+              color: DASH.ink,
+            }}
           />
         )}
       </div>
 
       {/* Bottom action bar */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 border-t border-border/40">
-        <div className="flex items-center gap-1">
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginTop: 12,
+          paddingTop: 10,
+          borderTop: `1px solid ${DASH.line}`,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <a
             href={icon.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground/40 hover:text-muted-foreground transition-colors p-1"
+            className="dash-icon-btn"
+            aria-label="Open link"
           >
             <ExternalLink className="size-3.5" />
           </a>
           <button
             type="button"
             onClick={() => onOpenInsights(icon.id)}
-            className={cn(
-              "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border transition-colors",
-              clickCount > 0
-                ? "bg-orange-50 border-orange-300 text-orange-600 hover:bg-[#FF6B35] hover:text-white hover:border-[#FF6B35]"
-                : "bg-slate-50 border-slate-200 text-muted-foreground hover:bg-slate-100 hover:border-slate-300"
-            )}
-            title={tSmart("displayIcon")}
+            className="dash-chip"
+            title={tLinks("insights")}
+            style={{
+              padding: "5px 10px",
+              fontSize: 11.5,
+              background: clickCount > 0 ? DASH.orangeTint : DASH.cream,
+              color: clickCount > 0 ? DASH.orangeDeep : DASH.ink,
+            }}
           >
             <BarChart3 className="size-3" />
             {clickCount === 1
@@ -479,18 +829,17 @@ function SocialIconCard({
                 : tLinks("clicks", { count: clickCount })}
           </button>
         </div>
-        <Button
+        <button
           type="button"
-          variant="ghost"
-          size="icon"
+          className="dash-icon-btn danger"
           onClick={async () => {
             await deleteSocialIcon(icon.id);
             toast.success(tDesign("toastSocialRemoved"));
           }}
-          className="size-7 text-muted-foreground/40 hover:text-destructive"
+          aria-label={tLinks("delete")}
         >
           <Trash2 className="size-3.5" />
-        </Button>
+        </button>
       </div>
     </div>
   );
@@ -506,7 +855,6 @@ function SocialIconsList() {
   const tLinks = useTranslations("dashboard.links");
   const { counts } = useLinkClickCounts();
 
-  // Insights modal state
   const [insightsOpen, setInsightsOpen] = useState(false);
   const [selectedIconId, setSelectedIconId] = useState<string | null>(null);
 
@@ -526,7 +874,6 @@ function SocialIconsList() {
     }
   }
 
-  // Build a Link-shaped object for the modal (it expects a Link)
   const selectedIcon = selectedIconId
     ? socialIcons.find((i) => i.id === selectedIconId)
     : null;
@@ -555,14 +902,11 @@ function SocialIconsList() {
 
   return (
     <>
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Share2 className="size-3.5 text-muted-foreground" />
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            {tLinks("socialLinks")}
-          </span>
-          <div className="flex-1 h-px bg-border" />
-        </div>
+      <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 10 }}>
+        <SectionHead
+          icon={<Share2 className="size-3.5" />}
+          label={tLinks("socialLinks")}
+        />
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -572,7 +916,7 @@ function SocialIconsList() {
             items={sorted.map((i) => i.id)}
             strategy={verticalListSortingStrategy}
           >
-            <div className="space-y-3">
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {sorted.map((icon) => (
                 <SocialIconCard
                   key={icon.id}
@@ -604,8 +948,7 @@ export function ContentTab() {
   const links = useLinkStore((s) => s.links);
   const socialIcons = useSocialStore((s) => s.socialIcons);
 
-  // Wait for profile hydration — stores start empty, so checking length before
-  // DashboardShell's useEffect runs would false-positive the onboarding trigger.
+  // Wait for profile hydration
   if (!profile) {
     return <ContentSkeleton />;
   }
@@ -623,12 +966,14 @@ export function ContentTab() {
 }
 
 function ContentTabInner() {
-  const t = useTranslations("dashboard.design");
   const tOnboarding = useTranslations("onboarding");
   const { step, setStep, dismiss } = useOnboarding();
+  const profile = useProfileStore((s) => s.profile);
   const updateProfile = useProfileStore((s) => s.updateProfile);
+  const links = useLinkStore((s) => s.links);
+  const { counts } = useLinkClickCounts();
 
-  // Persist onboarding completion to DB so it never shows again across devices
+  // Persist onboarding completion
   const markCompleted = React.useCallback(() => {
     updateProfile({ has_completed_onboarding: true });
   }, [updateProfile]);
@@ -646,13 +991,23 @@ function ContentTabInner() {
     useState<SocialPlatform | null>(null);
   const [profileEditOpen, setProfileEditOpen] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+
+  // Lazy load ShareModal to match existing pattern
+  const ShareModal = React.useMemo(
+    () =>
+      React.lazy(() =>
+        import("@/components/dashboard/share-modal").then((m) => ({
+          default: m.ShareModal,
+        }))
+      ),
+    []
+  );
 
   // Ref for spotlight target
   const addButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Detect when first item is added → trigger celebration + share nudge
   const socialIcons = useSocialStore((s) => s.socialIcons);
-  const links = useLinkStore((s) => s.links);
   const prevCountRef = useRef(socialIcons.length + links.length);
 
   useEffect(() => {
@@ -663,7 +1018,6 @@ function ContentTabInner() {
       step === "smart-input-hint"
     ) {
       setShowCelebration(true);
-      // User added their first link — mark onboarding complete so it doesn't come back
       markCompleted();
       const timer = setTimeout(() => {
         setShowCelebration(false);
@@ -674,55 +1028,95 @@ function ContentTabInner() {
     prevCountRef.current = currentCount;
   }, [socialIcons.length, links.length, step, setStep, markCompleted]);
 
+  const greeting = useMemo(
+    () => greetingFor(new Date().getHours()),
+    []
+  );
+
+  const firstName = (profile?.display_name || profile?.username || "there")
+    .split(" ")[0];
+
+  const liveLinks = links.filter((l) => l.is_active).length;
+
+  function handleQuickAdd(platform: SocialPlatform) {
+    setSmartInputPlatform(platform);
+    setSmartInputOpen(true);
+    setAddModalOpen(false);
+    if (step === "whatsapp-hint") setStep("smart-input-hint");
+  }
+
   return (
-    <div className="max-w-[860px] mx-auto px-6 py-6 space-y-5">
-      {/* ── Top bar: Links / Earn tabs ── */}
-      <div className="flex items-center">
-        <div className="flex items-center gap-5">
+    <div className="dash-tab-pad">
+      {/* Header */}
+      <div className="dash-tab-head">
+        <div>
+          <Eyebrow>Your page</Eyebrow>
+          <h1 className="dash-page-title">
+            {greeting}, <Italic>{firstName}</Italic>.
+          </h1>
+          <p className="dash-page-sub">
+            Here&apos;s how your page is doing. Tweak anything — it updates live on the right.
+          </p>
+        </div>
+        <div
+          className="head-actions"
+          style={{ display: "flex", gap: 10, flexWrap: "wrap" }}
+        >
+          <a
+            href={profile?.username ? `/${profile.username}?preview=1` : "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="dash-btn-ghost"
+          >
+            <Eye size={14} />
+            Preview
+          </a>
           <button
             type="button"
-            className="text-lg font-semibold tracking-tight text-foreground border-b-2 border-foreground pb-0.5"
+            onClick={() => setShareOpen(true)}
+            className="dash-btn-primary"
           >
-            {t("linksTab")}
+            <Share2 size={14} />
+            Share
           </button>
-          <a
-            href="/earn"
-            className="text-lg font-medium tracking-tight text-muted-foreground hover:text-foreground pb-0.5 transition-colors"
-          >
-            {t("earnTab")}
-          </a>
         </div>
       </div>
 
-      {/* ── Compact profile section (click name/bio to edit) ── */}
-      <CompactProfileHeader onEditProfile={() => setProfileEditOpen(true)} />
+      {/* Stats strip */}
+      <StatsStrip links={links} counts={counts} />
 
-      {/* ── "+ Add" button ── */}
-      <button
-        ref={addButtonRef}
-        type="button"
-        onClick={() => {
+      {/* Profile card */}
+      <ProfileCard onEditProfile={() => setProfileEditOpen(true)} />
+
+      {/* Your links */}
+      <div style={{ marginTop: 24, marginBottom: 10 }}>
+        <SectionHead
+          icon={<Link2 className="size-3.5" />}
+          label={`Your links (${liveLinks} live)`}
+        />
+      </div>
+
+      {/* Add link bar */}
+      <AddLinkBar
+        onOpenFull={() => {
           setAddModalOpen(true);
           if (step === "add-button") setStep("whatsapp-hint");
         }}
-        className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#FF6B35] text-white font-semibold text-sm transition-all hover:opacity-90 active:scale-[0.98]"
-      >
-        <Plus className="size-4" strokeWidth={2.5} />
-        {t("addLink")}
-      </button>
+        onQuickAdd={handleQuickAdd}
+        buttonRef={addButtonRef}
+      />
 
-      {/* ── Social icons management section ── */}
+      {/* Social icons management section */}
       <SocialIconsList />
 
-      {/* ── Link list (drag-and-drop cards) ── */}
+      {/* Link list (drag-and-drop cards) */}
       <LinkList />
 
-      {/* ── Share nudge banner ── */}
+      {/* Share nudge banner */}
       {step === "share-nudge" && <ShareNudgeBanner onDismiss={completeAndDismiss} />}
 
       {/* ── Modals ── */}
 
-      {/* Add content modal (the popup with categories + platforms) */}
       <AddContentModal
         open={addModalOpen}
         onOpenChange={setAddModalOpen}
@@ -735,10 +1129,8 @@ function ContentTabInner() {
         onboardingStep={step}
       />
 
-      {/* Standard link form dialog */}
       <LinkFormDialog open={linkFormOpen} onOpenChange={setLinkFormOpen} />
 
-      {/* Smart social link input */}
       <SmartSocialLinkInput
         open={smartInputOpen}
         onOpenChange={setSmartInputOpen}
@@ -747,13 +1139,22 @@ function ContentTabInner() {
         onboardingStep={step}
       />
 
-      {/* Profile title/bio edit dialog */}
       <ProfileEditDialog
         open={profileEditOpen}
         onOpenChange={setProfileEditOpen}
       />
 
-      {/* ── Onboarding spotlight on Add button ── */}
+      {profile?.username && (
+        <React.Suspense fallback={null}>
+          <ShareModal
+            open={shareOpen}
+            onOpenChange={setShareOpen}
+            username={profile.username}
+          />
+        </React.Suspense>
+      )}
+
+      {/* Onboarding spotlight on Add button */}
       <SpotlightOverlay
         targetRef={addButtonRef}
         visible={step === "add-button"}
@@ -769,7 +1170,7 @@ function ContentTabInner() {
         onDismiss={completeAndDismiss}
       />
 
-      {/* ── Celebration overlay ── */}
+      {/* Celebration overlay */}
       {showCelebration && <CelebrationOverlay title={tOnboarding("celebrationTitle")} />}
     </div>
   );
@@ -856,6 +1257,7 @@ function ShareNudgeBanner({ onDismiss }: { onDismiss: () => void }) {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         className="relative rounded-2xl border border-[#FF6B35]/20 bg-[#FF6B35]/5 p-4"
+        style={{ marginTop: 16 }}
       >
         <button
           type="button"

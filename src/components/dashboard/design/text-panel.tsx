@@ -13,6 +13,7 @@ import {
 import { useThemeStore } from "@/lib/stores/theme-store";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { THEME_FONTS } from "@/lib/constants";
+import { Eyebrow } from "@/components/dashboard/_dash-primitives";
 import { ColorInput } from "./color-input";
 import { ToggleGroup } from "./toggle-group";
 import type { TitleSize } from "@/types";
@@ -55,20 +56,15 @@ export function TextPanel() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {/* ── Page Font ── */}
-      <section className="bg-white p-6 rounded-2xl border border-zinc-100">
-        <h2 className="text-lg font-bold text-zinc-900 mb-6">
-          {t("pageFont")}
-        </h2>
-
-        <div className="space-y-4">
+      <div className="dash-panel">
+        <Eyebrow>{t("pageFont")}</Eyebrow>
+        <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 14 }}>
           <Select
             value={theme.font_family}
             onValueChange={(v) => {
               if (!v) return;
-              // Free users can pick any font — the public page strips
-              // Pro fonts server-side. Crown icons remain as a visual cue.
               updateTheme({ font_family: v });
             }}
           >
@@ -95,32 +91,52 @@ export function TextPanel() {
           </Select>
 
           {/* Font preview */}
-          <div className="bg-zinc-50 rounded-xl p-5 border border-zinc-100">
+          <div
+            style={{
+              background: "var(--dash-cream)",
+              border: "1px solid var(--dash-line)",
+              borderRadius: 14,
+              padding: "18px 20px",
+            }}
+          >
             <p
-              className="text-lg text-zinc-700 leading-relaxed"
-              style={{ fontFamily: theme.font_family }}
+              style={{
+                fontFamily: theme.font_family,
+                fontSize: 17,
+                color: "var(--dash-ink)",
+                lineHeight: 1.5,
+                margin: 0,
+              }}
             >
               The quick brown fox jumps over the lazy dog
             </p>
           </div>
 
           {!isPro && (
-            <p className="text-xs text-amber-600 flex items-center gap-1.5">
+            <p
+              style={{
+                fontSize: 12,
+                color: "#B45309",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                margin: 0,
+              }}
+            >
               <Crown className="size-3.5" />
               {tBilling("proOnlyFonts")}
             </p>
           )}
         </div>
-      </section>
+      </div>
 
       {/* ── Title Font ── */}
-      <section className="bg-white p-6 rounded-2xl border border-zinc-100">
-        <h2 className="text-lg font-bold text-zinc-900 mb-6 flex items-center gap-2">
-          {t("titleFont")}
-          {!isPro && <Crown className="size-4 text-amber-500" />}
-        </h2>
-
-        <div className="space-y-4">
+      <div className="dash-panel">
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Eyebrow>{t("titleFont")}</Eyebrow>
+          {!isPro && <Crown className="size-3 text-amber-500" />}
+        </div>
+        <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 14 }}>
           <Select
             value={theme.title_font ?? "__inherit__"}
             onValueChange={(v) => {
@@ -132,9 +148,7 @@ export function TextPanel() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__inherit__">
-                {t("inheritFont")}
-              </SelectItem>
+              <SelectItem value="__inherit__">{t("inheritFont")}</SelectItem>
               {titleFontOptions.map((font) => (
                 <SelectItem key={font.value} value={font.value}>
                   <span
@@ -152,26 +166,40 @@ export function TextPanel() {
           </Select>
 
           {/* Title font preview */}
-          <div className="bg-zinc-50 rounded-xl p-5 border border-zinc-100">
+          <div
+            style={{
+              background: "var(--dash-cream)",
+              border: "1px solid var(--dash-line)",
+              borderRadius: 14,
+              padding: "18px 20px",
+            }}
+          >
             <p
-              className="text-lg text-zinc-700 leading-relaxed"
               style={{
                 fontFamily: theme.title_font ?? theme.font_family,
+                fontSize: 17,
+                color: "var(--dash-ink)",
+                lineHeight: 1.5,
+                margin: 0,
               }}
             >
               The quick brown fox jumps over the lazy dog
             </p>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* ── Colors ── */}
-      <section className="bg-white p-6 rounded-2xl border border-zinc-100">
-        <h2 className="text-lg font-bold text-zinc-900 mb-6">
-          {t("pageTextColor")}
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      {/* ── Text Colors ── */}
+      <div className="dash-panel">
+        <Eyebrow>{t("pageTextColor")}</Eyebrow>
+        <div
+          style={{
+            marginTop: 12,
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: 14,
+          }}
+        >
           <ColorInput
             id="text-color"
             label={t("pageTextColor")}
@@ -185,23 +213,22 @@ export function TextPanel() {
             onChange={(v) => updateTheme({ title_color: v })}
           />
         </div>
-      </section>
+      </div>
 
       {/* ── Title Size ── */}
-      <section className="bg-white p-6 rounded-2xl border border-zinc-100">
-        <h2 className="text-lg font-bold text-zinc-900 mb-4">
-          {t("titleSizeLabel")}
-        </h2>
-
-        <ToggleGroup
-          options={[
-            { value: "small" as TitleSize, label: t("small") },
-            { value: "large" as TitleSize, label: t("large") },
-          ]}
-          value={theme.title_size}
-          onChange={(v) => updateTheme({ title_size: v })}
-        />
-      </section>
+      <div className="dash-panel">
+        <Eyebrow>{t("titleSizeLabel")}</Eyebrow>
+        <div style={{ marginTop: 12 }}>
+          <ToggleGroup
+            options={[
+              { value: "small" as TitleSize, label: t("small") },
+              { value: "large" as TitleSize, label: t("large") },
+            ]}
+            value={theme.title_size}
+            onChange={(v) => updateTheme({ title_size: v })}
+          />
+        </div>
+      </div>
     </div>
   );
 }

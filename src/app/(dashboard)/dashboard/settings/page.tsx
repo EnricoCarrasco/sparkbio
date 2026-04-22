@@ -5,18 +5,13 @@ import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod/v4";
-import { passwordChangeSchema, type PasswordChangeInput } from "@/lib/validators/auth";
+import {
+  passwordChangeSchema,
+  type PasswordChangeInput,
+} from "@/lib/validators/auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import {
-  Copy,
-  Check,
-  LogOut,
-  KeyRound,
-  AtSign,
-  Link2,
-  CreditCard,
-} from "lucide-react";
+import { Copy, Check } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
 import { useProfileStore } from "@/lib/stores/profile-store";
@@ -24,30 +19,174 @@ import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { usernameChangeSchema } from "@/lib/validators/profile";
 import { RESERVED_USERNAMES } from "@/lib/constants";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { UpgradeButton } from "@/components/billing/upgrade-button";
 import { UpgradeDialog } from "@/components/billing/upgrade-dialog";
+
+import { Eyebrow, Italic, Pill, DASH } from "@/components/dashboard/_dash-primitives";
 
 type UsernameChangeInput = z.infer<typeof usernameChangeSchema>;
 
 // ---------------------------------------------------------------------------
-// Profile URL section
+// Plan panel
 // ---------------------------------------------------------------------------
-function ProfileUrlSection() {
+function PlanPanel() {
+  const t = useTranslations("billing");
+  const subscription = useSubscriptionStore((s) => s.subscription);
+  const isPro = useSubscriptionStore((s) => s.isPro);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [openingPortal, setOpeningPortal] = useState(false);
+
+  async function handleOpenPortal() {
+    setOpeningPortal(true);
+    try {
+      const res = await fetch("/api/portal", { method: "POST" });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        toast.error(body?.message ?? "Could not open billing portal");
+        return;
+      }
+      const { url } = await res.json();
+      if (url) {
+        window.location.href = url;
+      } else {
+        toast.error("Could not open billing portal");
+      }
+    } catch {
+      toast.error("Could not open billing portal");
+    } finally {
+      setOpeningPortal(false);
+    }
+  }
+
+  const isCancelled =
+    subscription?.status === "cancelled" ||
+    subscription?.status === "expired";
+
+  const accessUntil = subscription?.current_period_end
+    ? new Date(subscription.current_period_end).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : null;
+
+  const nextBilling = subscription?.current_period_end
+    ? new Date(subscription.current_period_end).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : null;
+
+  const trialEnds = subscription?.trial_ends_at
+    ? new Date(subscription.trial_ends_at).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : null;
+
+  const planLabel = isPro ? "Viopage Pro" : t("free");
+  const isOnTrial = subscription?.status === "on_trial";
+
+  // Build a single-line meta string under the plan label
+  let metaLine = "";
+  if (isPro && !isCancelled) {
+    if (isOnTrial && trialEnds) {
+      metaLine = t("trialEnds", { date: trialEnds });
+    } else if (nextBilling) {
+      metaLine = t("nextBilling", { date: nextBilling });
+    }
+  } else if (isCancelled && accessUntil) {
+    metaLine = t("accessUntil", { date: accessUntil });
+  } else {
+    metaLine = "No paid subscription";
+  }
+
+  return (
+    <div className="dash-panel">
+      <Eyebrow>Plan</Eyebrow>
+      <div
+        style={{
+          marginTop: 14,
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 200 }}>
+          <div
+            style={{
+              fontSize: 18,
+              fontWeight: 700,
+              color: "var(--dash-ink)",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              flexWrap: "wrap",
+            }}
+          >
+            {planLabel}
+            {isPro && !isCancelled && !isOnTrial && (
+              <Pill tone="orange">{t("proBadge")}</Pill>
+            )}
+            {isOnTrial && <Pill tone="orange">{t("statusTrial")}</Pill>}
+            {isCancelled && <Pill tone="cream">{t("cancelled")}</Pill>}
+          </div>
+          <div
+            style={{
+              fontSize: 13,
+              color: "var(--dash-muted)",
+              marginTop: 4,
+            }}
+          >
+            {metaLine}
+          </div>
+        </div>
+
+        {/* CTA: Pro & active → Manage billing */}
+        {isPro && !isCancelled && (
+          <button
+            type="button"
+            className="dash-btn-ghost"
+            onClick={handleOpenPortal}
+            disabled={openingPortal}
+          >
+            {openingPortal ? "…" : t("manageSubscription")}
+          </button>
+        )}
+
+        {/* CTA: Free → Upgrade */}
+        {!isPro && !isCancelled && <UpgradeButton />}
+
+        {/* CTA: Cancelled → Resubscribe (keeps existing UpgradeDialog) */}
+        {isCancelled && (
+          <>
+            <button
+              type="button"
+              className="dash-btn-primary"
+              onClick={() => setUpgradeOpen(true)}
+            >
+              {t("resubscribe")}
+            </button>
+            <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Account panel (profile URL + username change)
+// ---------------------------------------------------------------------------
+function AccountPanel() {
   const t = useTranslations("dashboard.settings");
   const profile = useProfileStore((s) => s.profile);
+  const updateProfile = useProfileStore((s) => s.updateProfile);
   const [copied, setCopied] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const profileUrl = profile?.username
     ? `viopage.com/${profile.username}`
@@ -63,61 +202,6 @@ function ProfileUrlSection() {
       toast.error("Failed to copy to clipboard");
     }
   }, [profile?.username, profileUrl]);
-
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <Link2 className="size-4 text-muted-foreground" />
-          <CardTitle>{t("profileUrl")}</CardTitle>
-        </div>
-        <CardDescription>
-          Share this link with your audience to send them to your Viopage page.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center gap-2">
-          <div className="flex-1 flex items-center h-8 rounded-lg border border-input bg-muted/30 px-2.5 text-sm text-muted-foreground select-all font-mono truncate">
-            {profileUrl}
-          </div>
-          <Button
-            variant="outline"
-            size="default"
-            onClick={handleCopy}
-            className="shrink-0 gap-1.5"
-            disabled={!profile?.username}
-          >
-            {copied ? (
-              <>
-                <Check className="size-4" />
-                {t("copied")}
-              </>
-            ) : (
-              <>
-                <Copy className="size-4" />
-                {t("copy")}
-              </>
-            )}
-          </Button>
-        </div>
-        {copied && (
-          <Badge variant="secondary" className="mt-2">
-            {t("copied")}
-          </Badge>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Change username section
-// ---------------------------------------------------------------------------
-function ChangeUsernameSection() {
-  const t = useTranslations("dashboard.settings");
-  const profile = useProfileStore((s) => s.profile);
-  const updateProfile = useProfileStore((s) => s.updateProfile);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
@@ -172,7 +256,10 @@ function ChangeUsernameSection() {
         }
 
         // Persist
-        await updateProfile({ username: newUsername, has_chosen_username: true });
+        await updateProfile({
+          username: newUsername,
+          has_chosen_username: true,
+        });
         toast.success("Username updated successfully");
         reset();
       } catch {
@@ -185,62 +272,155 @@ function ChangeUsernameSection() {
   );
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <AtSign className="size-4 text-muted-foreground" />
-          <CardTitle>{t("changeUsername")}</CardTitle>
+    <div className="dash-panel" style={{ marginTop: 14 }}>
+      <Eyebrow>Account</Eyebrow>
+
+      {/* Your Viopage URL */}
+      <div style={{ marginTop: 14 }}>
+        <div
+          className="dash-field-label"
+          style={{ marginBottom: 6 }}
+        >
+          {t("profileUrl")}
         </div>
-        <CardDescription>
-          Your current username is{" "}
-          <span className="font-medium text-foreground">
-            @{profile?.username ?? "—"}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            flexWrap: "wrap",
+          }}
+        >
+          <span
+            className="dash-url-chip"
+            style={{ flex: 1, minWidth: 0, overflow: "hidden" }}
+          >
+            <span
+              style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {profileUrl}
+            </span>
           </span>
-          . Changing it will update your Viopage URL.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="new-username">{t("newUsername")}</Label>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground select-none">
+          <button
+            type="button"
+            className="dash-btn-ghost"
+            onClick={handleCopy}
+            disabled={!profile?.username}
+          >
+            {copied ? (
+              <>
+                <Check className="size-4" />
+                {t("copied")}
+              </>
+            ) : (
+              <>
+                <Copy className="size-4" />
+                {t("copy")}
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Change username form */}
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        style={{ marginTop: 18 }}
+        noValidate
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            gap: 14,
+          }}
+        >
+          <label className="dash-field" htmlFor="new-username">
+            <span className="dash-field-label">{t("newUsername")}</span>
+            <div className="dash-field-input">
+              <span
+                style={{
+                  color: "var(--dash-muted)",
+                  fontSize: 13,
+                  fontFamily: "var(--font-jetbrains), ui-monospace, monospace",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 viopage.com/
               </span>
-              <Input
+              <input
                 id="new-username"
                 placeholder={profile?.username ?? "newusername"}
                 autoComplete="off"
                 autoCapitalize="none"
                 spellCheck={false}
                 aria-invalid={!!errors.username}
+                aria-describedby={
+                  errors.username ? "new-username-error" : undefined
+                }
                 {...register("username")}
               />
             </div>
             {errors.username && (
-              <p className="text-xs text-destructive mt-1">
+              <span
+                id="new-username-error"
+                style={{
+                  fontSize: 12,
+                  color: "#b91c1c",
+                  marginTop: 2,
+                }}
+              >
                 {errors.username.message}
-              </p>
+              </span>
             )}
-          </div>
-          <Button
+          </label>
+        </div>
+
+        <div
+          style={{
+            marginTop: 14,
+            display: "flex",
+            gap: 10,
+            flexWrap: "wrap",
+          }}
+        >
+          <button
             type="submit"
+            className="dash-btn-primary"
             disabled={isSubmitting}
-            style={{ backgroundColor: "#FF6B35", color: "#fff" }}
-            className="hover:opacity-90 transition-opacity"
+            style={{ background: DASH.orange }}
           >
             {isSubmitting ? "Updating…" : "Update username"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+          </button>
+        </div>
+      </form>
+
+      <p
+        style={{
+          fontSize: 12.5,
+          color: "var(--dash-muted)",
+          marginTop: 14,
+          lineHeight: 1.5,
+        }}
+      >
+        Current handle:{" "}
+        <span style={{ color: "var(--dash-ink)", fontWeight: 600 }}>
+          @{profile?.username ?? "—"}
+        </span>
+        . Changing it will update your Viopage URL.
+      </p>
+    </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Change password section
+// Password panel
 // ---------------------------------------------------------------------------
-function ChangePasswordSection() {
+function PasswordPanel() {
   const t = useTranslations("dashboard.settings");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -280,238 +460,118 @@ function ChangePasswordSection() {
   );
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <KeyRound className="size-4 text-muted-foreground" />
-          <CardTitle>{t("changePassword")}</CardTitle>
-        </div>
-        <CardDescription>
-          Choose a strong password with at least 8 characters.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="new-password">{t("newPassword")}</Label>
-            <Input
-              id="new-password"
-              type="password"
-              placeholder="••••••••"
-              autoComplete="new-password"
-              aria-invalid={!!errors.newPassword}
-              {...register("newPassword")}
-            />
+    <div className="dash-panel" style={{ marginTop: 14 }}>
+      <Eyebrow>Password</Eyebrow>
+
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        style={{ marginTop: 14 }}
+        noValidate
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fill, minmax(240px, 1fr))",
+            gap: 14,
+          }}
+        >
+          <label className="dash-field" htmlFor="new-password">
+            <span className="dash-field-label">{t("newPassword")}</span>
+            <div className="dash-field-input">
+              <input
+                id="new-password"
+                type="password"
+                placeholder="••••••••"
+                autoComplete="new-password"
+                aria-invalid={!!errors.newPassword}
+                aria-describedby={
+                  errors.newPassword ? "new-password-error" : undefined
+                }
+                {...register("newPassword")}
+              />
+            </div>
             {errors.newPassword && (
-              <p className="text-xs text-destructive mt-1">
+              <span
+                id="new-password-error"
+                style={{
+                  fontSize: 12,
+                  color: "#b91c1c",
+                  marginTop: 2,
+                }}
+              >
                 {errors.newPassword.message}
-              </p>
+              </span>
             )}
-          </div>
+          </label>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="confirm-password">{t("confirmPassword")}</Label>
-            <Input
-              id="confirm-password"
-              type="password"
-              placeholder="••••••••"
-              autoComplete="new-password"
-              aria-invalid={!!errors.confirmPassword}
-              {...register("confirmPassword")}
-            />
+          <label className="dash-field" htmlFor="confirm-password">
+            <span className="dash-field-label">{t("confirmPassword")}</span>
+            <div className="dash-field-input">
+              <input
+                id="confirm-password"
+                type="password"
+                placeholder="••••••••"
+                autoComplete="new-password"
+                aria-invalid={!!errors.confirmPassword}
+                aria-describedby={
+                  errors.confirmPassword ? "confirm-password-error" : undefined
+                }
+                {...register("confirmPassword")}
+              />
+            </div>
             {errors.confirmPassword && (
-              <p className="text-xs text-destructive mt-1">
+              <span
+                id="confirm-password-error"
+                style={{
+                  fontSize: 12,
+                  color: "#b91c1c",
+                  marginTop: 2,
+                }}
+              >
                 {errors.confirmPassword.message}
-              </p>
+              </span>
             )}
-          </div>
+          </label>
+        </div>
 
-          <Button
+        <div
+          style={{
+            marginTop: 14,
+            display: "flex",
+            gap: 10,
+            flexWrap: "wrap",
+          }}
+        >
+          <button
             type="submit"
+            className="dash-btn-primary"
             disabled={isSubmitting}
-            style={{ backgroundColor: "#FF6B35", color: "#fff" }}
-            className="hover:opacity-90 transition-opacity"
+            style={{ background: DASH.orange }}
           >
             {isSubmitting ? "Updating…" : t("updatePassword")}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+          </button>
+        </div>
+      </form>
+
+      <p
+        style={{
+          fontSize: 12.5,
+          color: "var(--dash-muted)",
+          marginTop: 14,
+          lineHeight: 1.5,
+        }}
+      >
+        Choose a strong password with at least 8 characters.
+      </p>
+    </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Billing section
+// Danger zone panel (sign out + delete account placeholder)
 // ---------------------------------------------------------------------------
-function BillingSection() {
-  const t = useTranslations("billing");
-  const subscription = useSubscriptionStore((s) => s.subscription);
-  const isPro = useSubscriptionStore((s) => s.isPro);
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
-  const [openingPortal, setOpeningPortal] = useState(false);
-
-  async function handleOpenPortal() {
-    setOpeningPortal(true);
-    try {
-      const res = await fetch("/api/portal", { method: "POST" });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        toast.error(body?.message ?? "Could not open billing portal");
-        return;
-      }
-      const { url } = await res.json();
-      if (url) {
-        window.location.href = url;
-      } else {
-        toast.error("Could not open billing portal");
-      }
-    } catch {
-      toast.error("Could not open billing portal");
-    } finally {
-      setOpeningPortal(false);
-    }
-  }
-
-  // Derive billing interval from variant ID if needed in the future.
-  // For now we show "Pro" without distinguishing monthly/yearly unless
-  // the subscription object carries explicit interval metadata.
-  const isCancelled =
-    subscription?.status === "cancelled" ||
-    subscription?.status === "expired";
-
-  const accessUntil = subscription?.current_period_end
-    ? new Date(subscription.current_period_end).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : null;
-
-  const nextBilling = subscription?.current_period_end
-    ? new Date(subscription.current_period_end).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : null;
-
-  const trialEnds = subscription?.trial_ends_at
-    ? new Date(subscription.trial_ends_at).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : null;
-
-  return (
-    <>
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <CreditCard className="size-4 text-muted-foreground" />
-            <CardTitle>{t("billing")}</CardTitle>
-          </div>
-          <CardDescription>
-            {t("billingDesc")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Current plan label */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">{t("currentPlan")}</span>
-            {isPro && !isCancelled ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
-                <CreditCard className="size-3" />
-                Pro
-              </span>
-            ) : isCancelled ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                Pro ({t("cancelled")})
-              </span>
-            ) : (
-              <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                {t("free")}
-              </span>
-            )}
-          </div>
-
-          {/* Status rows for pro users */}
-          {isPro && !isCancelled && (
-            <div className="space-y-1.5 text-sm">
-              {subscription?.status === "on_trial" && trialEnds && (
-                <p className="text-muted-foreground">
-                  {t("status")}:{" "}
-                  <span className="font-medium text-foreground">
-                    {t("statusTrial")}
-                  </span>{" "}
-                  &mdash;{" "}
-                  <span className="font-medium text-foreground">
-                    {t("trialEnds", { date: trialEnds })}
-                  </span>
-                </p>
-              )}
-              {subscription?.status === "active" && (
-                <p className="text-muted-foreground">
-                  {t("status")}:{" "}
-                  <span className="font-medium text-foreground">
-                    {t("statusActive")}
-                  </span>
-                </p>
-              )}
-              {nextBilling && (
-                <p className="font-medium text-foreground">
-                  {t("nextBilling", { date: nextBilling })}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Access-until row for cancelled users */}
-          {isCancelled && accessUntil && (
-            <p className="text-sm font-medium text-foreground">
-              {t("accessUntil", { date: accessUntil })}
-            </p>
-          )}
-
-          {/* CTA buttons */}
-          {!isPro && !isCancelled && (
-            <UpgradeButton />
-          )}
-
-          {isPro && !isCancelled && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleOpenPortal}
-              disabled={openingPortal}
-            >
-              {openingPortal ? "…" : t("manageSubscription")}
-            </Button>
-          )}
-
-          {isCancelled && (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1.5 text-amber-600 border-amber-200 hover:bg-amber-50"
-                onClick={() => setUpgradeOpen(true)}
-              >
-                {t("resubscribe")}
-              </Button>
-              <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
-            </>
-          )}
-        </CardContent>
-      </Card>
-    </>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Sign out section
-// ---------------------------------------------------------------------------
-function SignOutSection() {
+function DangerZonePanel() {
   const t = useTranslations("dashboard.settings");
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -529,27 +589,38 @@ function SignOutSection() {
   }, [router]);
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <LogOut className="size-4 text-muted-foreground" />
-          <CardTitle>{t("signOut")}</CardTitle>
-        </div>
-        <CardDescription>
-          You will be redirected to the login page.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Button
-          variant="outline"
+    <div className="dash-panel" style={{ marginTop: 14 }}>
+      <Eyebrow>Danger zone</Eyebrow>
+      <p
+        style={{
+          fontSize: 12.5,
+          color: "var(--dash-muted)",
+          marginTop: 10,
+          lineHeight: 1.5,
+          maxWidth: "56ch",
+        }}
+      >
+        Sign out of this device, or permanently delete your account and all
+        data. Account deletion cannot be undone.
+      </p>
+      <div
+        style={{
+          marginTop: 14,
+          display: "flex",
+          gap: 10,
+          flexWrap: "wrap",
+        }}
+      >
+        <button
+          type="button"
+          className="dash-btn-ghost"
           onClick={handleSignOut}
           disabled={isSigningOut}
         >
-          <LogOut className="size-4" />
           {isSigningOut ? "Signing out…" : t("signOut")}
-        </Button>
-      </CardContent>
-    </Card>
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -557,38 +628,32 @@ function SignOutSection() {
 // Settings page
 // ---------------------------------------------------------------------------
 export default function SettingsPage() {
-  const t = useTranslations("dashboard.settings");
-
   return (
-    <div className="max-w-[680px] mx-auto px-4 py-6 space-y-5">
+    <div className="dash-tab-pad">
       {/* Page heading */}
-      <div>
-        <h1 className="text-xl font-semibold text-foreground tracking-tight">
-          {t("title")}
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Manage your account settings and preferences.
-        </p>
+      <div className="dash-tab-head">
+        <div>
+          <Eyebrow>Settings</Eyebrow>
+          <h1 className="dash-page-title">
+            Account & <Italic>billing</Italic>.
+          </h1>
+          <p className="dash-page-sub">
+            Manage your account, plan and preferences.
+          </p>
+        </div>
       </div>
 
-      <Separator />
+      {/* 1. Plan */}
+      <PlanPanel />
 
-      {/* Section: Profile URL */}
-      <ProfileUrlSection />
+      {/* 2. Account (profile URL + username) */}
+      <AccountPanel />
 
-      {/* Section: Change username */}
-      <ChangeUsernameSection />
+      {/* 3. Password */}
+      <PasswordPanel />
 
-      {/* Section: Change password */}
-      <ChangePasswordSection />
-
-      {/* Section: Billing */}
-      <BillingSection />
-
-      <Separator />
-
-      {/* Section: Sign out */}
-      <SignOutSection />
+      {/* 4. Danger zone */}
+      <DangerZonePanel />
     </div>
   );
 }

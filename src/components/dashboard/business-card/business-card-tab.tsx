@@ -8,6 +8,11 @@ import { useProfileStore } from "@/lib/stores/profile-store";
 import { useSocialStore } from "@/lib/stores/social-store";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { UpgradeDialog } from "@/components/billing/upgrade-dialog";
+import {
+  DASH_MONO,
+  Eyebrow,
+  Italic,
+} from "@/components/dashboard/_dash-primitives";
 import { TemplateSelector } from "./template-selector";
 import { CardEditor } from "./card-editor";
 import { AiBackgroundGenerator } from "./ai-background-generator";
@@ -15,27 +20,38 @@ import { AiLogoGenerator } from "./ai-logo-generator";
 import { CardPreview } from "./card-preview";
 import { DownloadBar } from "./download-bar";
 
-function PreviewHeader() {
+function PreviewBadges() {
   const t = useTranslations("dashboard.businessCard");
+  const badge: React.CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 5,
+    fontSize: 10,
+    letterSpacing: "0.04em",
+    color: "var(--dash-muted)",
+    fontWeight: 500,
+  };
+  const dot = (bg: string, pulse = false): React.CSSProperties => ({
+    width: 6,
+    height: 6,
+    borderRadius: 999,
+    background: bg,
+    boxShadow: pulse ? `0 0 0 3px ${bg}22` : undefined,
+  });
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        {t("livePreview")}
+    <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+      <span style={badge}>
+        <span style={dot("#16a34a", true)} />
+        {t("live")}
       </span>
-      <div className="flex items-center gap-2">
-        <span className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-[10px] text-muted-foreground">{t("live")}</span>
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-[#8B5CF6]" />
-          <span className="text-[10px] text-muted-foreground">{t("aiAssisted")}</span>
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-blue-500" />
-          <span className="text-[10px] text-muted-foreground">{t("highDpi")}</span>
-        </span>
-      </div>
+      <span style={badge}>
+        <span style={dot("#8B5CF6")} />
+        {t("aiAssisted")}
+      </span>
+      <span style={badge}>
+        <span style={dot("#3b82f6")} />
+        {t("highDpi")}
+      </span>
     </div>
   );
 }
@@ -82,54 +98,52 @@ export function BusinessCardTab() {
     };
   }, [flushSave]);
 
+  const cleanUrl = siteUrl.replace(/^https?:\/\//, "");
+
   return (
-    <div className="p-6 lg:p-8 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-1">
-          <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight">
-            {t("title")}
+    <div className="dash-tab-pad">
+      {/* Editorial tab header */}
+      <div className="dash-tab-head">
+        <div>
+          <Eyebrow>Business card studio</Eyebrow>
+          <h1
+            className="dash-page-title"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              flexWrap: "wrap",
+              margin: "6px 0",
+            }}
+          >
+            <span>
+              AI Business <Italic>Card</Italic>
+            </span>
+            <Sparkles style={{ color: "#8B5CF6", width: 26, height: 26 }} />
           </h1>
-          <Sparkles className="w-7 h-7 text-[#8B5CF6]" />
+          <p className="dash-page-sub">
+            Create a professional card with your QR code. AI-generated logos, custom
+            backgrounds, print-ready export.
+          </p>
         </div>
-        <p className="text-muted-foreground text-base">
-          {t("subtitle")}
-        </p>
       </div>
 
-      {/* Mobile: Preview first (order-1), then editor. Desktop: side-by-side */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Preview — shows first on mobile (order), sticky sidebar on desktop */}
-        <div className="order-first lg:order-last lg:col-span-5">
-          <div className="lg:sticky lg:top-24 space-y-5">
-            <PreviewHeader />
-            <CardPreview cardRef={cardRef} demoMode={!isPro} />
-
-            {username && (
-              <p className="text-xs text-muted-foreground text-center">
-                {siteUrl}/{username}
-              </p>
-            )}
-
-            {/* Pro Tip (desktop only) */}
-            <div className="hidden lg:block rounded-2xl p-5 bg-[#FF6B35]/5 border border-[#FF6B35]/10">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#FF6B35]/10 flex items-center justify-center shrink-0">
-                  <Sparkles className="w-4 h-4 text-[#FF6B35]" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold">{t("proTip")}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {t("proTipDescription")}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Left Column — Editor */}
-        <div className="lg:col-span-7 space-y-6">
+      {/* Responsive two-column grid.
+          Desktop: editor 1fr + preview 420px. Mobile: single column, preview on top. */}
+      <div
+        className="bc-grid"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr) 420px",
+          gap: 28,
+          alignItems: "flex-start",
+        }}
+      >
+        {/* Editor column */}
+        <div
+          className="bc-editor-col"
+          style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}
+        >
           {isPro ? (
             <>
               <TemplateSelector />
@@ -139,31 +153,90 @@ export function BusinessCardTab() {
               <DownloadBar cardRef={cardRef} />
             </>
           ) : (
-            <div className="relative">
+            <div style={{ position: "relative" }}>
               {/* Blurred editor preview */}
-              <div className="pointer-events-none select-none opacity-30 blur-[3px]">
+              <div
+                style={{
+                  pointerEvents: "none",
+                  userSelect: "none",
+                  opacity: 0.3,
+                  filter: "blur(3px)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 16,
+                }}
+              >
                 <TemplateSelector />
                 <CardEditor />
               </div>
 
               {/* Upgrade overlay */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="bg-white rounded-2xl shadow-xl border border-zinc-100 p-8 max-w-sm mx-4 text-center">
-                  <div className="inline-flex items-center justify-center size-14 rounded-2xl bg-[#FF6B35]/10 mb-4">
-                    <Crown className="size-7 text-[#FF6B35]" />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <div
+                  className="dash-panel"
+                  style={{
+                    maxWidth: 360,
+                    textAlign: "center",
+                    padding: 28,
+                    boxShadow: "0 18px 40px rgba(17,17,19,0.10)",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 56,
+                      height: 56,
+                      borderRadius: 16,
+                      background: "var(--dash-orange-tint)",
+                      color: "var(--dash-orange)",
+                      marginBottom: 14,
+                    }}
+                  >
+                    <Crown style={{ width: 28, height: 28 }} />
                   </div>
-                  <h3 className="text-xl font-bold text-zinc-900 mb-2">
+                  <h3
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 700,
+                      color: "var(--dash-ink)",
+                      margin: "0 0 8px",
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
                     {t("title")}
                   </h3>
-                  <p className="text-sm text-zinc-500 mb-6 leading-relaxed">
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: "var(--dash-muted)",
+                      lineHeight: 1.5,
+                      margin: "0 0 20px",
+                    }}
+                  >
                     {t("upgradeDescription")}
                   </p>
                   <button
                     type="button"
                     onClick={() => setUpgradeOpen(true)}
-                    className="w-full flex items-center justify-center gap-2 bg-[#FF6B35] hover:bg-[#e85a24] text-white font-bold py-3.5 px-6 rounded-full shadow-lg shadow-orange-100 transition-all active:scale-[0.98]"
+                    className="dash-btn-primary"
+                    style={{
+                      width: "100%",
+                      justifyContent: "center",
+                      background: "var(--dash-orange)",
+                      boxShadow: "0 10px 24px rgba(255,107,53,0.25)",
+                    }}
                   >
-                    <Crown className="size-4" />
+                    <Crown style={{ width: 16, height: 16 }} />
                     {t("upgradeToPro")}
                   </button>
                 </div>
@@ -171,7 +244,113 @@ export function BusinessCardTab() {
             </div>
           )}
         </div>
+
+        {/* Preview column (sticky on desktop) */}
+        <div
+          className="bc-preview-col"
+          style={{ position: "relative", minWidth: 0 }}
+        >
+          <div
+            style={{
+              position: "sticky",
+              top: 20,
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 8,
+              }}
+            >
+              <Eyebrow>{t("livePreview")}</Eyebrow>
+              <PreviewBadges />
+            </div>
+
+            <CardPreview cardRef={cardRef} demoMode={!isPro} />
+
+            {username && (
+              <p
+                style={{
+                  textAlign: "center",
+                  fontSize: 11,
+                  color: "var(--dash-muted)",
+                  fontFamily: DASH_MONO,
+                  margin: 0,
+                  letterSpacing: "0.02em",
+                }}
+              >
+                {cleanUrl}/{username}
+              </p>
+            )}
+
+            {/* Pro Tip box */}
+            <div
+              style={{
+                display: "flex",
+                gap: 12,
+                alignItems: "flex-start",
+                padding: 14,
+                borderRadius: 14,
+                background: "var(--dash-orange-tint)",
+                border: "1px solid rgba(255,107,53,0.15)",
+              }}
+            >
+              <div
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 8,
+                  background: "rgba(255,107,53,0.18)",
+                  color: "var(--dash-orange)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <Sparkles style={{ width: 14, height: 14 }} />
+              </div>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 13, color: "var(--dash-ink)" }}>
+                  {t("proTip")}
+                </div>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "var(--dash-muted)",
+                    marginTop: 2,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {t("proTipDescription")}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Responsive override: stack editor/preview, show preview first on small screens */}
+      <style jsx>{`
+        @media (max-width: 1000px) {
+          :global(.bc-grid) {
+            grid-template-columns: minmax(0, 1fr) !important;
+            gap: 20px !important;
+          }
+          :global(.bc-preview-col) {
+            order: -1;
+          }
+          :global(.bc-preview-col > div) {
+            position: static !important;
+          }
+        }
+      `}</style>
 
       <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
     </div>

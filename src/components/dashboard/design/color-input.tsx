@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { DASH_MONO } from "@/components/dashboard/_dash-primitives";
 
 interface ColorInputProps {
   id?: string;
@@ -15,10 +14,12 @@ export function ColorInput({ id, label, value, onChange }: ColorInputProps) {
   const safeColor = /^#[0-9a-fA-F]{6}$/.test(value) ? value : "#000000";
 
   return (
-    <div className="space-y-1.5">
-      <Label htmlFor={id}>{label}</Label>
-      <div className="flex items-center gap-3">
-        <label className="relative cursor-pointer shrink-0">
+    <div className="dash-field">
+      <label className="dash-field-label" htmlFor={id}>
+        {label}
+      </label>
+      <div className="dash-field-input" style={{ gap: 10 }}>
+        <label className="relative cursor-pointer shrink-0" aria-label={label}>
           <input
             type="color"
             value={safeColor}
@@ -27,17 +28,28 @@ export function ColorInput({ id, label, value, onChange }: ColorInputProps) {
             aria-label={label}
           />
           <div
-            className="w-10 h-10 rounded-lg border border-border shadow-sm transition-transform hover:scale-105"
-            style={{ backgroundColor: safeColor }}
+            style={{
+              width: 26,
+              height: 26,
+              borderRadius: 8,
+              background: safeColor,
+              border: "1px solid var(--dash-line)",
+              boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.5)",
+              transition: "transform 0.15s",
+            }}
           />
         </label>
-        <Input
+        <input
           id={id}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-28 font-mono text-sm"
           maxLength={7}
           placeholder="#000000"
+          style={{
+            fontFamily: DASH_MONO,
+            fontSize: 13,
+            letterSpacing: "-0.005em",
+          }}
         />
       </div>
     </div>

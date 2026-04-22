@@ -2,9 +2,10 @@
 
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2, X } from "lucide-react";
 import { useBusinessCardStore } from "@/lib/stores/business-card-store";
 import { toast } from "sonner";
+import { SectionHead } from "@/components/dashboard/_dash-primitives";
 
 // Keys for i18n display; English prompts sent to the AI API
 const STYLE_PRESETS = [
@@ -72,81 +73,163 @@ export function AiBackgroundGenerator() {
   }
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-border shadow-sm">
-      <div className="flex items-center gap-2 mb-4">
-        <Sparkles className="w-4 h-4 text-[#8B5CF6]" />
-        <h3 className="text-sm font-semibold">{t("aiBackground")}</h3>
-      </div>
+    <div className="dash-panel">
+      <SectionHead
+        icon={<Sparkles style={{ width: 14, height: 14, color: "#8B5CF6" }} />}
+        label={t("aiBackground")}
+      />
 
       {/* Preset style chips */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {STYLE_PRESETS.map((preset) => (
-          <button
-            key={preset.key}
-            type="button"
-            onClick={() => {
-              setSelectedPreset(preset.key);
-              setCustomPrompt("");
-            }}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-              selectedPreset === preset.key
-                ? "bg-[#8B5CF6] text-white"
-                : "bg-muted/50 text-muted-foreground hover:bg-muted"
-            }`}
-          >
-            {t(preset.key)}
-          </button>
-        ))}
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 8,
+          marginBottom: 14,
+        }}
+      >
+        {STYLE_PRESETS.map((preset) => {
+          const isActive = selectedPreset === preset.key;
+          return (
+            <button
+              key={preset.key}
+              type="button"
+              onClick={() => {
+                setSelectedPreset(preset.key);
+                setCustomPrompt("");
+              }}
+              className={`dash-chip${isActive ? " active" : ""}`}
+              style={
+                isActive
+                  ? { background: "#8B5CF6", borderColor: "#8B5CF6", color: "#fff" }
+                  : undefined
+              }
+            >
+              {t(preset.key)}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Custom prompt */}
-      <div className="relative mb-4">
-        <textarea
+      {/* Custom prompt + generate (inline pill bar) */}
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          alignItems: "center",
+          background: "var(--dash-cream)",
+          border: "1px solid var(--dash-line)",
+          borderRadius: 12,
+          padding: "4px 4px 4px 14px",
+        }}
+      >
+        <input
           value={customPrompt}
           onChange={(e) => {
             setCustomPrompt(e.target.value);
             setSelectedPreset(null);
           }}
           placeholder={t("placeholderDescribeVibe")}
-          rows={2}
-          className="w-full px-4 py-3 pr-24 rounded-xl border border-border bg-muted/30 text-sm resize-none focus:outline-none focus:border-[#8B5CF6] transition-colors"
+          style={{
+            flex: 1,
+            background: "transparent",
+            border: 0,
+            outline: 0,
+            fontSize: 13,
+            color: "var(--dash-ink)",
+            minWidth: 0,
+          }}
         />
-      </div>
-
-      {/* Generate button */}
-      <button
-        type="button"
-        onClick={handleGenerate}
-        disabled={store.aiBackgroundLoading || (!customPrompt && !selectedPreset)}
-        className="w-full h-11 rounded-xl bg-[#8B5CF6] text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#7C3AED] disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-[#8B5CF6]/30"
-      >
-        {store.aiBackgroundLoading ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            {t("generating")}
-          </>
-        ) : (
-          <>
-            <Sparkles className="w-4 h-4" />
-            {t("generateBackground")}
-          </>
-        )}
-      </button>
-
-      {/* Clear button */}
-      {store.aiBackgroundUrl && !store.aiBackgroundLoading && (
         <button
           type="button"
-          onClick={() => store.setAiBackgroundUrl(null)}
-          className="w-full mt-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          onClick={handleGenerate}
+          disabled={store.aiBackgroundLoading || (!customPrompt && !selectedPreset)}
+          className="dash-btn-primary"
+          style={{
+            padding: "8px 14px",
+            fontSize: 13,
+            background: "#8B5CF6",
+            boxShadow: "0 8px 18px rgba(139,92,246,0.30)",
+            opacity:
+              store.aiBackgroundLoading || (!customPrompt && !selectedPreset)
+                ? 0.55
+                : 1,
+            cursor:
+              store.aiBackgroundLoading || (!customPrompt && !selectedPreset)
+                ? "not-allowed"
+                : "pointer",
+          }}
         >
-          {t("resetToTemplateBackground")}
+          {store.aiBackgroundLoading ? (
+            <>
+              <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" />
+              {t("generating")}
+            </>
+          ) : (
+            <>
+              <Sparkles style={{ width: 14, height: 14 }} />
+              {t("generateBackground")}
+            </>
+          )}
         </button>
+      </div>
+
+      {/* Active AI background preview row */}
+      {store.aiBackgroundUrl && !store.aiBackgroundLoading && (
+        <div
+          style={{
+            marginTop: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            padding: "8px 12px",
+            borderRadius: 12,
+            background: "var(--dash-cream-2)",
+            border: "1px solid var(--dash-line)",
+          }}
+        >
+          <span
+            style={{
+              fontSize: 12,
+              color: "var(--dash-muted)",
+              flex: 1,
+            }}
+          >
+            AI background active
+          </span>
+          <button
+            type="button"
+            onClick={() => store.setAiBackgroundUrl(null)}
+            className="dash-icon-btn"
+            aria-label={t("resetToTemplateBackground")}
+            title={t("resetToTemplateBackground")}
+          >
+            <X style={{ width: 14, height: 14 }} />
+          </button>
+        </div>
       )}
 
-      <p className="text-[10px] text-muted-foreground mt-3 text-center">
+      {/* Footnote */}
+      <div
+        style={{
+          fontSize: 11.5,
+          color: "var(--dash-muted)",
+          marginTop: 12,
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+        }}
+      >
+        <span
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: 999,
+            background: "#8B5CF6",
+          }}
+        />
         {t("poweredByReplicateAi")}
-      </p>
+      </div>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Upload, Sparkles, Loader2, X } from "lucide-react";
 import { useBusinessCardStore } from "@/lib/stores/business-card-store";
 import { toast } from "sonner";
+import { SectionHead } from "@/components/dashboard/_dash-primitives";
 
 export function AiLogoGenerator() {
   const t = useTranslations("dashboard.businessCard");
@@ -80,83 +81,188 @@ export function AiLogoGenerator() {
   }
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-border shadow-sm">
-      <div className="flex items-center gap-2 mb-4">
-        <Sparkles className="w-4 h-4 text-[#8B5CF6]" />
-        <h3 className="text-sm font-semibold">{t("logo")}</h3>
-      </div>
+    <div className="dash-panel">
+      <SectionHead
+        icon={<Sparkles style={{ width: 14, height: 14, color: "#8B5CF6" }} />}
+        label={t("logo")}
+      />
 
       {/* Current logo preview */}
       {currentLogo && (
-        <div className="flex items-center gap-3 mb-4 p-3 rounded-xl bg-muted/30">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            marginBottom: 14,
+            padding: "10px 12px",
+            borderRadius: 12,
+            background: "var(--dash-cream-2)",
+            border: "1px solid var(--dash-line)",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={currentLogo}
             alt="Logo"
-            className="w-12 h-12 rounded-lg object-cover"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 10,
+              objectFit: "cover",
+              flexShrink: 0,
+            }}
           />
-          <div className="flex-1">
-            <p className="text-xs font-medium">{t("currentLogo")}</p>
-            <p className="text-[10px] text-muted-foreground">
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--dash-ink)" }}>
+              {t("currentLogo")}
+            </div>
+            <div style={{ fontSize: 11, color: "var(--dash-muted)", marginTop: 1 }}>
               {store.aiLogoUrl ? t("aiGenerated") : t("uploaded")}
-            </p>
+            </div>
           </div>
           <button
             type="button"
             onClick={handleRemoveLogo}
-            className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+            className="dash-icon-btn"
+            aria-label="Remove logo"
           >
-            <X className="w-4 h-4 text-muted-foreground" />
+            <X style={{ width: 14, height: 14 }} />
           </button>
         </div>
       )}
 
       {/* Upload button */}
-      <div className="flex gap-2 mb-4">
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="flex-1 h-10 rounded-xl border-2 border-dashed border-border text-sm font-medium text-muted-foreground hover:border-[#FF6B35] hover:text-[#FF6B35] transition-colors flex items-center justify-center gap-2"
-        >
-          <Upload className="w-4 h-4" />
-          {t("uploadLogo")}
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          onChange={handleFileUpload}
-          className="hidden"
-        />
+      <button
+        type="button"
+        onClick={() => fileInputRef.current?.click()}
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+          padding: "12px 14px",
+          borderRadius: 12,
+          border: "1.5px dashed var(--dash-line-strong)",
+          background: "var(--dash-cream)",
+          color: "var(--dash-muted)",
+          fontSize: 13,
+          fontWeight: 500,
+          cursor: "pointer",
+          transition: "all 0.15s",
+          marginBottom: 14,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = "var(--dash-orange)";
+          e.currentTarget.style.color = "var(--dash-orange-deep)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = "var(--dash-line-strong)";
+          e.currentTarget.style.color = "var(--dash-muted)";
+        }}
+      >
+        <Upload style={{ width: 14, height: 14 }} />
+        {t("uploadLogo")}
+      </button>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        onChange={handleFileUpload}
+        style={{ display: "none" }}
+      />
+
+      {/* Divider label */}
+      <div
+        style={{
+          fontSize: 11,
+          color: "var(--dash-muted)",
+          letterSpacing: "0.06em",
+          textTransform: "uppercase",
+          fontWeight: 600,
+          marginBottom: 10,
+        }}
+      >
+        {t("orGenerateWithAi")}
       </div>
 
-      {/* AI Generation */}
-      <div className="space-y-3">
-        <p className="text-xs text-muted-foreground">{t("orGenerateWithAi")}</p>
+      {/* AI generation inline pill bar */}
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          alignItems: "center",
+          background: "var(--dash-cream)",
+          border: "1px solid var(--dash-line)",
+          borderRadius: 12,
+          padding: "4px 4px 4px 14px",
+        }}
+      >
         <input
           type="text"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder={t("placeholderDescribeBrand")}
-          className="w-full h-10 px-3 rounded-lg border border-border bg-muted/30 text-sm focus:outline-none focus:border-[#8B5CF6] transition-colors"
+          style={{
+            flex: 1,
+            background: "transparent",
+            border: 0,
+            outline: 0,
+            fontSize: 13,
+            color: "var(--dash-ink)",
+            minWidth: 0,
+          }}
         />
         <button
           type="button"
           onClick={handleGenerateLogo}
           disabled={store.aiLogoLoading || !description.trim()}
-          className="w-full h-10 rounded-xl bg-[#8B5CF6]/10 text-[#8B5CF6] text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#8B5CF6]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="dash-btn-primary"
+          style={{
+            padding: "8px 14px",
+            fontSize: 13,
+            background: "#8B5CF6",
+            boxShadow: "0 8px 18px rgba(139,92,246,0.30)",
+            opacity: store.aiLogoLoading || !description.trim() ? 0.55 : 1,
+            cursor:
+              store.aiLogoLoading || !description.trim() ? "not-allowed" : "pointer",
+          }}
         >
           {store.aiLogoLoading ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" />
               {t("generating")}
             </>
           ) : (
             <>
-              <Sparkles className="w-4 h-4" />
+              <Sparkles style={{ width: 14, height: 14 }} />
               {t("generateLogo")}
             </>
           )}
         </button>
+      </div>
+
+      {/* Footnote */}
+      <div
+        style={{
+          fontSize: 11.5,
+          color: "var(--dash-muted)",
+          marginTop: 12,
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+        }}
+      >
+        <span
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: 999,
+            background: "#8B5CF6",
+          }}
+        />
+        Powered by Viopage AI · 10 generations/day on Pro
       </div>
     </div>
   );

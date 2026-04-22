@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef, lazy, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Menu } from "lucide-react";
@@ -111,66 +111,80 @@ export function DashboardShell({
     }
   }, [profile, profileLoading]);
 
-  const router = useRouter();
+  const hidePreview = activeTab === "card";
+  const tabTitle = (() => {
+    try { return t(activeTab); } catch { return ""; }
+  })();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#FAFAFA]">
-      {/* Desktop sidebar - narrow icon-only */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-[100px] lg:shrink-0 border-r border-border bg-white">
+    <div className={`dash-shell ${hidePreview ? "no-preview" : ""}`} style={{ height: "100vh", overflow: "hidden" }}>
+      {/* Desktop sidebar */}
+      <aside className="dash-sidebar-col" style={{ overflowY: "auto" }}>
         <Sidebar onNavigate={() => {}} />
       </aside>
 
-      {/* Mobile top bar */}
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        <header className="flex lg:hidden items-center gap-3 px-4 h-14 border-b border-border bg-white shrink-0">
+      {/* Main column */}
+      <main data-dashboard-main className="dash-main-col" style={{ overflowY: "auto", overflowX: "hidden" }}>
+        {/* Mobile topbar */}
+        <header
+          className="dash-mobile-topbar"
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 30,
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            height: 56,
+            padding: "0 14px",
+            background: "rgba(247,242,234,.85)",
+            backdropFilter: "blur(12px)",
+            borderBottom: "1px solid rgba(17,17,19,.09)",
+          }}
+        >
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger
               render={
-                <Button variant="ghost" size="icon" aria-label="Open menu" />
+                <Button variant="ghost" size="icon" aria-label="Open menu" style={{ color: "#111113" }} />
               }
             >
               <Menu className="size-5" />
             </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-[100px]">
-              <Sidebar onNavigate={() => setMobileOpen(false)} />
+            <SheetContent side="left" className="p-0 w-[280px]" style={{ background: "#FFFDF8" }}>
+              <Sidebar onNavigate={() => setMobileOpen(false)} variant="mobile" />
             </SheetContent>
           </Sheet>
 
-          {/* Viopage wordmark */}
-          <span className="font-bold text-lg tracking-tight" style={{ color: "#FF6B35" }}>
-            Viopage
+          <span style={{ fontWeight: 600, fontSize: 15, letterSpacing: "-0.01em", color: "#111113" }}>
+            {tabTitle}
           </span>
         </header>
 
-        {/* Content + preview row */}
-        <div className="flex flex-1 overflow-hidden">
-          {/* Main content — tab-based switching */}
-          <main data-dashboard-main className="flex-1 overflow-y-auto lg:pb-0">
-            {activeTab === "content" && <ContentTab />}
-            {activeTab === "design" && <DesignTab />}
-            {activeTab === "analytics" && (
-              <Suspense fallback={<TabFallback />}>
-                <AnalyticsPage />
-              </Suspense>
-            )}
-            {activeTab === "settings" && (
-              <Suspense fallback={<TabFallback />}>
-                <SettingsPage />
-              </Suspense>
-            )}
-            {activeTab === "card" && (
-              <Suspense fallback={<TabFallback />}>
-                <BusinessCardTab />
-              </Suspense>
-            )}
-          </main>
+        {activeTab === "content" && <ContentTab />}
+        {activeTab === "design" && <DesignTab />}
+        {activeTab === "analytics" && (
+          <Suspense fallback={<TabFallback />}>
+            <AnalyticsPage />
+          </Suspense>
+        )}
+        {activeTab === "settings" && (
+          <Suspense fallback={<TabFallback />}>
+            <SettingsPage />
+          </Suspense>
+        )}
+        {activeTab === "card" && (
+          <Suspense fallback={<TabFallback />}>
+            <BusinessCardTab />
+          </Suspense>
+        )}
+      </main>
 
-          {/* Live preview panel - desktop only (hidden on card tab which has its own preview) */}
-          <aside className={`hidden lg:flex lg:flex-col lg:w-[360px] lg:shrink-0 border-l border-border bg-white overflow-y-auto ${activeTab === "card" ? "lg:hidden" : ""}`}>
-            <PreviewPanel />
-          </aside>
-        </div>
-      </div>
+      {/* Preview panel */}
+      {!hidePreview && (
+        <aside className="dash-preview-col">
+          <PreviewPanel />
+        </aside>
+      )}
 
       {/* Mobile preview FAB + bottom sheet */}
       <MobilePreviewFAB />
