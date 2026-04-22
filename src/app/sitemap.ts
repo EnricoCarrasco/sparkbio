@@ -11,15 +11,27 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://viopage.com";
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Marketing pages with hrefLang alternates (EN at root, PT-BR at /pt-BR/)
-  const marketingPages = ["", "/privacy", "/terms"].map((path) => ({
+  // Use the build timestamp once — not per-URL — so every entry ages together
+  // rather than looking "just updated" on every request, which Google treats
+  // as a dilution signal.
+  const buildDate = new Date();
+  const marketingPaths: Array<{ path: string; priority: number }> = [
+    { path: "", priority: 1 },
+    { path: "/about", priority: 0.7 },
+    { path: "/privacy", priority: 0.4 },
+    { path: "/terms", priority: 0.4 },
+  ];
+
+  const marketingPages = marketingPaths.map(({ path, priority }) => ({
     url: `${siteUrl}${path}`,
-    lastModified: new Date(),
+    lastModified: buildDate,
     changeFrequency: "weekly" as const,
-    priority: path === "" ? 1 : 0.4,
+    priority,
     alternates: {
       languages: {
         en: `${siteUrl}${path}`,
         "pt-BR": `${siteUrl}/pt-BR${path}`,
+        "x-default": `${siteUrl}${path}`,
       },
     },
   }));
@@ -27,13 +39,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Blog index + posts with hrefLang alternates
   const blogIndex = {
     url: `${siteUrl}/blog`,
-    lastModified: new Date(),
+    lastModified: buildDate,
     changeFrequency: "weekly" as const,
     priority: 0.8,
     alternates: {
       languages: {
         en: `${siteUrl}/blog`,
         "pt-BR": `${siteUrl}/pt-BR/blog`,
+        "x-default": `${siteUrl}/blog`,
       },
     },
   };
@@ -47,6 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       languages: {
         en: `${siteUrl}/blog/${post.slug}`,
         "pt-BR": `${siteUrl}/pt-BR/blog/${post.slug}`,
+        "x-default": `${siteUrl}/blog/${post.slug}`,
       },
     },
   }));
@@ -55,13 +69,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const authRoutes: MetadataRoute.Sitemap = [
     {
       url: `${siteUrl}/login`,
-      lastModified: new Date(),
+      lastModified: buildDate,
       changeFrequency: "yearly",
       priority: 0.3,
     },
     {
       url: `${siteUrl}/register`,
-      lastModified: new Date(),
+      lastModified: buildDate,
       changeFrequency: "yearly",
       priority: 0.5,
     },

@@ -11,7 +11,21 @@ import { safeJsonLdString } from "@/lib/json-ld";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-const faqKeys = ["q1", "q2", "q3", "q4", "q5"] as const;
+const faqKeys = [
+  "q1",
+  "q2",
+  "q3",
+  "q4",
+  "q5",
+  "q6",
+  "q7",
+  "q8",
+  "q9",
+  "q10",
+] as const;
+
+type FaqKey = (typeof faqKeys)[number];
+type AnswerKey = `a${FaqKey extends `q${infer N}` ? N : never}`;
 
 export function FAQ() {
   const t = useTranslations("landing.faq");
@@ -20,7 +34,7 @@ export function FAQ() {
 
   const faqs = faqKeys.map((key, i) => ({
     question: t(key),
-    answer: t(key.replace("q", "a") as `a${1 | 2 | 3 | 4 | 5}`),
+    answer: t(key.replace("q", "a") as AnswerKey),
     index: i,
   }));
 

@@ -6,7 +6,11 @@ import { allPosts, getPostBySlug, getRelatedPosts } from "@/lib/blog/posts";
 import type { BlogPost, ContentSection } from "@/lib/blog/types";
 import { BlogFAQ } from "@/components/blog/blog-faq";
 import { BlogCardImage } from "@/components/blog/blog-card-image";
-import { safeJsonLdString } from "@/lib/json-ld";
+import {
+  generateBlogPostingJsonLd,
+  generateBreadcrumbListJsonLd,
+  safeJsonLdString,
+} from "@/lib/json-ld";
 
 const POST_TEXT = {
   en: {
@@ -45,9 +49,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const url = `${siteUrl}/blog/${slug}`;
   const ptBrUrl = `${siteUrl}/pt-BR/blog/${slug}`;
 
+  const imageUrl = post.image
+    ? post.image.startsWith("http")
+      ? post.image
+      : `${siteUrl}${post.image}`
+    : undefined;
+
   return {
     title: post.title,
     description: post.description,
+    keywords: post.keyword,
+    authors: [{ name: post.author }],
     alternates: {
       canonical: url,
       languages: {
@@ -61,8 +73,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.description,
       type: "article",
       url,
+      siteName: "Viopage",
+      locale: post.locale === "pt-BR" ? "pt_BR" : "en_US",
       publishedTime: post.date,
+      modifiedTime: post.date,
       authors: [post.author],
+      section: post.category,
+      tags: [post.keyword],
+      images: imageUrl ? [{ url: imageUrl, alt: post.title }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      images: imageUrl ? [imageUrl] : undefined,
     },
   };
 }
@@ -293,23 +317,42 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Article JSON-LD */}
+      {/* BlogPosting JSON-LD — semantically richer than Article */}
       <script
         type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: controlled server-generated JSON-LD
         dangerouslySetInnerHTML={{
-          __html: safeJsonLdString({
-            "@context": "https://schema.org",
-            "@type": "Article",
-            headline: post.title,
-            description: post.description,
-            author: { "@type": "Organization", name: post.author },
-            datePublished: post.date,
-            publisher: {
-              "@type": "Organization",
-              name: "Viopage",
-              url: siteUrl,
-            },
-          }),
+          __html: safeJsonLdString(
+            generateBlogPostingJsonLd({
+              url: `${siteUrl}/blog/${post.slug}`,
+              headline: post.title,
+              description: post.description,
+              datePublished: post.date,
+              dateModified: post.date,
+              author: {
+                name: post.author,
+                type: post.author === "Viopage Team" ? "Organization" : "Person",
+              },
+              image: post.image,
+              inLanguage: post.locale,
+              keywords: post.keyword,
+            }),
+          ),
+        }}
+      />
+
+      {/* BreadcrumbList JSON-LD — helps Google + AI engines understand position */}
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: controlled server-generated JSON-LD
+        dangerouslySetInnerHTML={{
+          __html: safeJsonLdString(
+            generateBreadcrumbListJsonLd([
+              { name: "Home", url: siteUrl },
+              { name: "Blog", url: `${siteUrl}/blog` },
+              { name: post.title, url: `${siteUrl}/blog/${post.slug}` },
+            ]),
+          ),
         }}
       />
     </article>

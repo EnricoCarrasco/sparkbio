@@ -53,6 +53,37 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      // Encourage rich-snippet behaviour on public marketing + blog pages.
+      // Dashboard, API, preview, and /earn are already blocked via robots.ts
+      // and don't need an extra negative signal.
+      {
+        source: "/blog/:path*",
+        headers: [
+          {
+            key: "X-Robots-Tag",
+            value: "index, follow, max-image-preview:large, max-snippet:-1",
+          },
+        ],
+      },
+      {
+        source: "/about",
+        headers: [
+          {
+            key: "X-Robots-Tag",
+            value: "index, follow, max-image-preview:large, max-snippet:-1",
+          },
+        ],
+      },
+      // llms.txt / llms-full.txt — served as text/plain, but add the header
+      // anyway so CDNs and curl tools see our explicit index intent.
+      {
+        source: "/llms.txt",
+        headers: [{ key: "X-Robots-Tag", value: "index, follow" }],
+      },
+      {
+        source: "/llms-full.txt",
+        headers: [{ key: "X-Robots-Tag", value: "index, follow" }],
+      },
     ];
   },
 };

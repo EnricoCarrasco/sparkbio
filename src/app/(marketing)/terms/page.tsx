@@ -2,11 +2,21 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { LegalPage } from "@/components/landing/legal-page";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://viopage.com";
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("terms");
   return {
     title: t("title"),
     description: t("intro").slice(0, 160),
+    alternates: {
+      canonical: `${siteUrl}/terms`,
+      languages: {
+        en: `${siteUrl}/terms`,
+        "pt-BR": `${siteUrl}/pt-BR/terms`,
+        "x-default": `${siteUrl}/terms`,
+      },
+    },
   };
 }
 

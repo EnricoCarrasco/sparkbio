@@ -5,7 +5,14 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Toaster } from "@/components/ui/sonner";
 import { MetaPixelPageView } from "@/components/meta-pixel-page-view";
+import {
+  generateOrganizationJsonLd,
+  generateWebSiteJsonLd,
+  safeJsonLdString,
+} from "@/lib/json-ld";
 import "./globals.css";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://viopage.com";
 
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
@@ -41,10 +48,51 @@ export const metadata: Metadata = {
   },
   description:
     "Create a professional link-in-bio page in minutes. 12 premium themes, analytics, custom domains. The Linktree alternative with a 7-day free trial. Join 60K+ creators.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  applicationName: "Viopage",
+  metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: "/",
+    languages: {
+      en: siteUrl,
+      "pt-BR": `${siteUrl}/pt-BR`,
+      "x-default": siteUrl,
+    },
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Viopage",
+    url: siteUrl,
+    title: "Link in Bio Tool for Creators | Viopage",
+    description:
+      "Create a professional link-in-bio page in minutes. 12 premium themes, analytics, custom domains. The Linktree alternative with a 7-day free trial.",
+    locale: "en_US",
+    alternateLocale: ["pt_BR"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Link in Bio Tool for Creators | Viopage",
+    description:
+      "Create a professional link-in-bio page in minutes. 12 premium themes, analytics, custom domains.",
+    site: "@viopage",
+    creator: "@viopage",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   icons: {
     icon: "/icons/icon-192x192.png",
     apple: "/icons/apple-touch-icon.png",
+  },
+  verification: {
+    // google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
   },
 };
 
@@ -56,8 +104,23 @@ export default async function RootLayout({
   const locale = await getLocale();
   const messages = await getMessages();
 
+  const organizationJsonLd = generateOrganizationJsonLd();
+  const websiteJsonLd = generateWebSiteJsonLd();
+
   return (
     <html lang={locale} suppressHydrationWarning className={`${inter.variable} ${poppins.variable} ${instrumentSerif.variable} h-full antialiased`}>
+      <head>
+        <script
+          type="application/ld+json"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: controlled server-generated JSON-LD
+          dangerouslySetInnerHTML={{ __html: safeJsonLdString(organizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: controlled server-generated JSON-LD
+          dangerouslySetInnerHTML={{ __html: safeJsonLdString(websiteJsonLd) }}
+        />
+      </head>
       <body className="min-h-full flex flex-col font-sans">
         {META_PIXEL_ID && <MetaPixelPageView />}
         <NextIntlClientProvider messages={messages}>

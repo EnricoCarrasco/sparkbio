@@ -5,7 +5,12 @@ import { notFound } from "next/navigation";
 import { ProfilePage } from "@/components/profile/profile-page";
 import type { Metadata } from "next";
 import type { PublicProfile } from "@/types";
-import { generatePersonJsonLd, safeJsonLdString } from "@/lib/json-ld";
+import {
+  generateBreadcrumbListJsonLd,
+  generatePersonJsonLd,
+  generateProfilePageJsonLd,
+  safeJsonLdString,
+} from "@/lib/json-ld";
 import { isSubscriptionActive } from "@/lib/constants";
 import { stripProFields } from "@/lib/pro-fields";
 
@@ -114,11 +119,29 @@ export default async function PublicProfilePage({ params }: Props) {
   const profileUrl = `${siteUrl}/${username}`;
   const displayName = profile.display_name ?? username;
 
-  const jsonLd = generatePersonJsonLd({
+  // Collect external profile URLs from the creator's social icons so AI
+  // engines can merge identities across Instagram, TikTok, YouTube, etc.
+  const externalProfiles = (data.social_icons ?? [])
+    .filter((icon) => icon.is_active && icon.url)
+    .map((icon) => icon.url);
+
+  const personJsonLd = generatePersonJsonLd({
     name: displayName,
     url: profileUrl,
     description: profile.bio ?? undefined,
     image: profile.avatar_url ?? undefined,
+    sameAs: externalProfiles,
+  });
+
+  const breadcrumbJsonLd = generateBreadcrumbListJsonLd([
+    { name: "Viopage", url: siteUrl },
+    { name: displayName, url: profileUrl },
+  ]);
+
+  const profilePageJsonLd = generateProfilePageJsonLd({
+    url: profileUrl,
+    person: personJsonLd,
+    breadcrumb: breadcrumbJsonLd,
   });
 
   // Pro-field strip: hide aspirational Pro settings from public visitors when
@@ -133,11 +156,12 @@ export default async function PublicProfilePage({ params }: Props) {
 
   return (
     <>
-      {/* Structured data for search engines */}
+      {/* ProfilePage wraps Person — the schema Google/AI engines prefer for
+          creator profiles. Person still readable via mainEntity. */}
       <script
         type="application/ld+json"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: controlled server-generated JSON-LD
-        dangerouslySetInnerHTML={{ __html: safeJsonLdString(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLdString(profilePageJsonLd) }}
       />
       <ProfilePage data={publicData} />
     </>
