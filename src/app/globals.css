@@ -213,7 +213,7 @@
   }
 }
 
-/* ───────── Dashboard tokens (editorial redesign) ───────── */
+/* Dashboard tokens (editorial redesign) */
 :root {
   --dash-cream: #F7F2EA;
   --dash-cream-2: #ECE4D4;
@@ -266,6 +266,18 @@
   position: relative;
   background: var(--dash-cream);
   min-width: 0;
+  min-height: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.dash-sidebar-col {
+  height: 100vh;
+  overflow-y: auto;
+}
+.dash-preview-col {
+  height: 100vh;
+  overflow-y: auto;
 }
 .dash-preview-col {
   background: var(--dash-cream-2);
@@ -692,6 +704,16 @@
   );
   border-radius: 999px;
   transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Mobile topbar — only visible under 780px */
+.dash-mobile-topbar {
+  display: none !important;
+}
+@media (max-width: 780px) {
+  .dash-mobile-topbar {
+    display: flex !important;
+  }
 }
 
 /* Sidebar nav button */

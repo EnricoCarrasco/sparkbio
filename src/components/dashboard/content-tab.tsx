@@ -121,21 +121,29 @@ function greetingFor(hour: number): string {
 
 function StatsStrip({
   links,
+  socialIcons,
   counts,
 }: {
   links: Link[];
+  socialIcons: SocialIcon[];
   counts: Record<string, number>;
 }) {
   const totalClicks = Object.values(counts).reduce((a, b) => a + b, 0);
   const liveLinks = links.filter((l) => l.is_active).length;
 
-  // Top link (highest click count)
-  const topLinkId = Object.keys(counts).reduce<string | null>((best, id) => {
-    if (!best) return id;
-    return (counts[id] ?? 0) > (counts[best] ?? 0) ? id : best;
-  }, null);
-  const topLink = topLinkId ? links.find((l) => l.id === topLinkId) : null;
-  const topLinkClicks = topLinkId ? counts[topLinkId] ?? 0 : 0;
+  // Top item across links + social icons, picking the id with the most clicks.
+  type Entry = { id: string; title: string };
+  const pool: Entry[] = [
+    ...links.map((l) => ({ id: l.id, title: l.title })),
+    ...socialIcons.map((s) => ({
+      id: s.id,
+      title: s.display_title || s.platform,
+    })),
+  ];
+  const topLink = pool
+    .filter((e) => (counts[e.id] ?? 0) > 0)
+    .sort((a, b) => (counts[b.id] ?? 0) - (counts[a.id] ?? 0))[0] ?? null;
+  const topLinkClicks = topLink ? counts[topLink.id] ?? 0 : 0;
 
   // Approximate views as clicks * 3 (heuristic since we don't fetch page_view here)
   // Keeping it visual only — replace with real data source if wiring expands.
@@ -1083,7 +1091,7 @@ function ContentTabInner() {
       </div>
 
       {/* Stats strip */}
-      <StatsStrip links={links} counts={counts} />
+      <StatsStrip links={links} socialIcons={socialIcons} counts={counts} />
 
       {/* Profile card */}
       <ProfileCard onEditProfile={() => setProfileEditOpen(true)} />
