@@ -45,6 +45,7 @@ interface BusinessCardState extends BusinessCardSettings {
 
   // Actions
   setField: (key: string, value: string | boolean | number | null) => void;
+  setBgColor: (color: string) => void;
   setSelectedTemplate: (id: string) => void;
   setAiBackgroundUrl: (url: string | null) => void;
   setAiBackgroundLoading: (loading: boolean) => void;
@@ -138,6 +139,15 @@ export const useBusinessCardStore = create<BusinessCardState>((set, get) => ({
 
   setField: (key, value) => {
     set({ [key]: value });
+    if (currentProfileId) triggerSave(get, currentProfileId);
+  },
+
+  // Picking a solid color via the swatch must clear any template-provided
+  // gradient — otherwise the gradient (used as the CSS `background` shorthand
+  // in the preview) paints over `backgroundColor` and the change looks like
+  // it never saved.
+  setBgColor: (color) => {
+    set({ bgColor: color, bgGradient: null });
     if (currentProfileId) triggerSave(get, currentProfileId);
   },
 

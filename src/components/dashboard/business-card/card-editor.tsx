@@ -109,7 +109,7 @@ export function CardEditor() {
           <ColorField
             label={t("colorBackground")}
             value={store.bgColor}
-            onChange={(v) => store.setField("bgColor", v)}
+            onChange={(v) => store.setBgColor(v)}
           />
           <ColorField
             label={t("colorText")}
