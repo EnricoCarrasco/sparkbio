@@ -4,7 +4,7 @@ import React from "react";
 import { useTranslations } from "next-intl";
 import { useBusinessCardStore } from "@/lib/stores/business-card-store";
 import { cn } from "@/lib/utils";
-import { Palette, User, QrCode, Paintbrush, Image, Sliders } from "lucide-react";
+import { Palette, User, QrCode, Paintbrush, Image, Sliders, Layout } from "lucide-react";
 
 function ColorField({
   label,
@@ -99,13 +99,38 @@ export function CardEditor() {
         </div>
       </div>
 
+      {/* Layout Section */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Layout className="w-4 h-4 text-[#FF6B35]" />
+          <h3 className="text-sm font-semibold">{t("layout")}</h3>
+        </div>
+        <div className="inline-flex rounded-lg border border-border bg-muted/50 p-0.5">
+          {(["split", "centered", "left-aligned"] as const).map((layout) => (
+            <button
+              key={layout}
+              type="button"
+              onClick={() => store.setField("cardLayout", layout)}
+              className={cn(
+                "px-3 py-1.5 text-xs font-medium rounded-md transition-all",
+                store.cardLayout === layout
+                  ? "bg-white text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {t(`layout_${layout === "left-aligned" ? "leftAligned" : layout}`)}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Colors Section */}
       <div>
         <div className="flex items-center gap-2 mb-3">
           <Paintbrush className="w-4 h-4 text-[#FF6B35]" />
           <h3 className="text-sm font-semibold">{t("colors")}</h3>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <ColorField
             label={t("colorBackground")}
             value={store.bgColor}
@@ -115,6 +140,11 @@ export function CardEditor() {
             label={t("colorText")}
             value={store.textColor}
             onChange={(v) => store.setField("textColor", v)}
+          />
+          <ColorField
+            label={t("colorSecondaryText")}
+            value={store.secondaryTextColor}
+            onChange={(v) => store.setField("secondaryTextColor", v)}
           />
           <ColorField
             label={t("colorAccent")}
@@ -239,7 +269,7 @@ export function CardEditor() {
           </label>
         </div>
         {store.showQrCode && (
-          <div className="mt-3">
+          <div className="mt-3 space-y-3">
             <SliderField
               label={t("qrCodeSize")}
               value={store.qrCodeSize}
@@ -247,6 +277,18 @@ export function CardEditor() {
               max={180}
               onChange={(v) => store.setField("qrCodeSize", v)}
             />
+            <div className="grid grid-cols-2 gap-3">
+              <ColorField
+                label={t("qrColorFg")}
+                value={store.qrFgColor}
+                onChange={(v) => store.setField("qrFgColor", v)}
+              />
+              <ColorField
+                label={t("qrColorBg")}
+                value={store.qrBgColor}
+                onChange={(v) => store.setField("qrBgColor", v)}
+              />
+            </div>
           </div>
         )}
       </div>
