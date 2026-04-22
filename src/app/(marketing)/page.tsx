@@ -3,7 +3,6 @@ import { Hero } from "@/components/landing/hero";
 import { StatsBar } from "@/components/landing/scroll-video";
 import { ThemeGallery } from "@/components/landing/theme-gallery";
 import { HowItWorks } from "@/components/landing/how-it-works";
-import { FeaturesBento } from "@/components/landing/features-bento";
 import { Testimonials } from "@/components/landing/testimonials";
 import { MidCTA } from "@/components/landing/mid-cta";
 import { PricingPreview } from "@/components/landing/pricing-preview";
@@ -31,7 +30,6 @@ export default function LandingPage() {
       <StatsBar />
       <ThemeGallery />
       <HowItWorks />
-      <FeaturesBento />
       <Testimonials />
       <MidCTA />
       <PricingPreview />

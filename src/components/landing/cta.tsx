@@ -1,213 +1,217 @@
 "use client";
 
-import { useRef } from "react";
-import Link from "next/link";
+import { useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(useGSAP, ScrollTrigger);
-
-// Word-split helper
-function WordMask({ text, className = "" }: { text: string; className?: string }) {
-  const words = text.split(" ");
-  return (
-    <>
-      {words.map((word, i) => (
-        <span key={`${word}-${i}`} className="inline-block overflow-hidden align-bottom pb-1">
-          <span className={`cta-word inline-block ${className}`}>
-            {word}
-            {i < words.length - 1 ? "\u00A0" : ""}
-          </span>
-        </span>
-      ))}
-    </>
-  );
-}
+import {
+  Eyebrow,
+  Italic,
+  LANDING,
+  SANS_FONT,
+  innerWrap,
+  primaryBtn,
+  sectionWrap,
+  useReveal,
+} from "./_primitives";
 
 export function CTA() {
-  const t = useTranslations("landing.cta");
-  const sectionRef = useRef<HTMLElement>(null);
-  const buttonRef = useRef<HTMLAnchorElement>(null);
-  const shimmerRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations("landing.finalCta");
+  const [username, setUsername] = useState("");
+  const router = useRouter();
+  const ref = useReveal();
 
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        // Hide pre-animation state
-        gsap.set(".cta-word", { yPercent: 110 });
-        gsap.set(".cta-highlight", { yPercent: 110, scale: 0.9, opacity: 0 });
-        gsap.set([".cta-sub", ".cta-button", ".cta-trust"], {
-          opacity: 0,
-          y: 18,
-          filter: "blur(8px)",
-        });
-
-        // Entry timeline
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 75%",
-            toggleActions: "play none none reverse",
-          },
-          defaults: { ease: "power3.out" },
-        });
-
-        tl.to(".cta-word", {
-          yPercent: 0,
-          duration: 1,
-          stagger: 0.06,
-          ease: "expo.out",
-        })
-          .to(
-            ".cta-highlight",
-            {
-              yPercent: 0,
-              scale: 1,
-              opacity: 1,
-              duration: 1,
-              ease: "back.out(1.6)",
-            },
-            "-=0.6",
-          )
-          .to(
-            ".cta-sub",
-            {
-              opacity: 1,
-              y: 0,
-              filter: "blur(0px)",
-              duration: 0.8,
-            },
-            "-=0.5",
-          )
-          .to(
-            ".cta-button",
-            {
-              opacity: 1,
-              y: 0,
-              filter: "blur(0px)",
-              duration: 0.6,
-            },
-            "-=0.5",
-          )
-          .to(
-            ".cta-trust",
-            {
-              opacity: 1,
-              y: 0,
-              filter: "blur(0px)",
-              duration: 0.5,
-            },
-            "-=0.35",
-          );
-
-        // Continuous background shimmer drift
-        if (shimmerRef.current) {
-          gsap.to(shimmerRef.current, {
-            backgroundPosition: "200% 0",
-            duration: 12,
-            ease: "none",
-            repeat: -1,
-          });
-        }
-
-        // Button: hover scale + continuous glow
-        if (buttonRef.current) {
-          gsap.to(buttonRef.current, {
-            boxShadow: "0 18px 50px rgba(255, 255, 255, 0.35)",
-            duration: 1.8,
-            ease: "sine.inOut",
-            repeat: -1,
-            yoyo: true,
-          });
-
-          const btn = buttonRef.current;
-          const enter = () =>
-            gsap.to(btn, { scale: 1.05, duration: 0.25, ease: "power2.out", overwrite: "auto" });
-          const leave = () =>
-            gsap.to(btn, { scale: 1, duration: 0.25, ease: "power2.out", overwrite: "auto" });
-          btn.addEventListener("mouseenter", enter);
-          btn.addEventListener("mouseleave", leave);
-          return () => {
-            btn.removeEventListener("mouseenter", enter);
-            btn.removeEventListener("mouseleave", leave);
-          };
-        }
-      });
-
-      mm.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.set(
-          sectionRef.current?.querySelectorAll(
-            ".cta-word, .cta-highlight, .cta-sub, .cta-button, .cta-trust",
-          ) ?? [],
-          { clearProps: "all", opacity: 1 },
-        );
-      });
-
-      return () => mm.revert();
-    },
-    { scope: sectionRef },
-  );
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const trimmed = username.trim().toLowerCase().replace(/\s+/g, "-");
+    if (!trimmed) return;
+    router.push(`/register?username=${encodeURIComponent(trimmed)}`);
+  }
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative py-24 md:py-32 overflow-hidden"
-      style={{
-        background: "linear-gradient(135deg, #FF6B35 0%, #C74B15 55%, #8B2500 100%)",
-      }}
-      aria-label="Call to action"
-    >
-      {/* Animated shimmer overlay */}
-      <div
-        ref={shimmerRef}
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none opacity-40 mix-blend-overlay"
-        style={{
-          backgroundImage:
-            "linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.35) 40%, rgba(255,255,255,0.35) 60%, transparent 80%)",
-          backgroundSize: "200% 100%",
-          backgroundPosition: "0% 0",
-        }}
-      />
-
-      <div className="relative mx-auto max-w-3xl px-6 text-center lg:px-8">
-        <div className="flex flex-col items-center">
-          {/* ── Main headline ── */}
-          <h2
-            className="text-[38px] md:text-[54px] lg:text-[62px] leading-[1.07] tracking-[-0.03em] text-white"
-            style={{ fontFamily: "var(--font-sans), 'Poppins', sans-serif" }}
+    <section ref={ref} style={{ ...sectionWrap, paddingBottom: 120 }}>
+      <div style={innerWrap}>
+        <div
+          className="reveal"
+          style={{
+            position: "relative",
+            background: LANDING.creamAlt,
+            borderRadius: 32,
+            padding: "clamp(40px, 6vw, 80px)",
+            border: `1px solid ${LANDING.line}`,
+            overflow: "hidden",
+          }}
+        >
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              pointerEvents: "none",
+              background:
+                "radial-gradient(60% 80% at 100% 0%, rgba(255,107,53,.22) 0%, transparent 60%)",
+            }}
+          />
+          <div
+            className="final-grid grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 items-center relative"
           >
-            <WordMask text={t("heading")} />{" "}
-            <span
-              className="cta-highlight inline-block"
+            <div>
+              <Eyebrow>{t("eyebrow")}</Eyebrow>
+              <h2
+                className="reveal"
+                style={{
+                  fontFamily: SANS_FONT,
+                  fontWeight: 700,
+                  fontSize: "clamp(36px, 4.8vw, 68px)",
+                  lineHeight: 1.02,
+                  letterSpacing: "-0.035em",
+                  margin: "18px 0 16px",
+                  color: LANDING.ink,
+                }}
+              >
+                {t.rich("title", {
+                  italic: (chunks) => <Italic>{chunks}</Italic>,
+                })}
+              </h2>
+              <p
+                className="reveal"
+                style={{
+                  margin: 0,
+                  fontSize: 17,
+                  lineHeight: 1.55,
+                  color: LANDING.muted,
+                  maxWidth: 420,
+                }}
+              >
+                {t("body")}
+              </p>
+              <form
+                onSubmit={handleSubmit}
+                className="reveal"
+                style={{
+                  marginTop: 28,
+                  display: "flex",
+                  gap: 10,
+                  flexWrap: "wrap",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    background: "#fff",
+                    border: "1px solid rgba(17,17,19,.1)",
+                    borderRadius: 999,
+                    padding: "6px 6px 6px 20px",
+                    minWidth: 280,
+                    flex: 1,
+                    boxShadow: "0 2px 16px rgba(17,17,19,.06)",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: LANDING.muted2,
+                      fontSize: 14,
+                      fontWeight: 500,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    viopage.com/
+                  </span>
+                  <input
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder={t("placeholder")}
+                    aria-label="Choose your username"
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      border: 0,
+                      outline: 0,
+                      background: "transparent",
+                      padding: "10px 8px",
+                      fontSize: 15,
+                      fontWeight: 500,
+                      color: LANDING.ink,
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    style={{
+                      ...primaryBtn,
+                      padding: "10px 18px",
+                      fontSize: 14,
+                      border: 0,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {t("cta")}
+                  </button>
+                </div>
+              </form>
+              <div
+                className="reveal"
+                style={{
+                  marginTop: 20,
+                  display: "flex",
+                  gap: "6px 20px",
+                  flexWrap: "wrap",
+                }}
+              >
+                {(["trust1", "trust2", "trust3"] as const).map((k) => (
+                  <span
+                    key={k}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      fontSize: 12,
+                      color: LANDING.muted,
+                    }}
+                  >
+                    <span
+                      aria-hidden
+                      style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: 999,
+                        background: LANDING.orangeTint,
+                        color: LANDING.orangeDeep,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 8,
+                        fontWeight: 900,
+                      }}
+                    >
+                      ✓
+                    </span>
+                    {t(k)}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div
+              className="reveal"
               style={{
-                fontFamily: "var(--font-display), 'Instrument Serif', Georgia, serif",
-                fontStyle: "italic",
+                width: "100%",
+                aspectRatio: "1 / 1",
+                borderRadius: 24,
+                overflow: "hidden",
+                border: `1px solid ${LANDING.lineSoft}`,
+                boxShadow: "0 24px 40px rgba(17,17,19,.1)",
+                position: "relative",
               }}
             >
-              {t("headingHighlight")}
-            </span>
-          </h2>
-
-          <p className="cta-sub mt-5 max-w-xl text-[16px] md:text-[18px] leading-relaxed text-white/80">
-            {t("subtitle")}
-          </p>
-
-          <div className="mt-10">
-            <Link
-              ref={buttonRef}
-              href="/register"
-              className="cta-button inline-block rounded-full bg-white px-9 py-4 text-[16px] font-semibold text-[#FF6B35] will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#C74B15]"
-            >
-              {t("button")}
-            </Link>
+              <Image
+                src="/images/landing/finalcta-flatlay.png"
+                alt={t("imageAlt")}
+                fill
+                sizes="(max-width: 1080px) 100vw, 540px"
+                className="object-cover"
+              />
+            </div>
           </div>
-
-          <p className="cta-trust mt-5 text-[13px] text-white/60">{t("trustLine")}</p>
         </div>
       </div>
     </section>

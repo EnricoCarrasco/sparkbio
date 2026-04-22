@@ -1,41 +1,24 @@
 {
   "landing": {
     "hero": {
-      "title": "A Melhor Ferramenta de Link na Bio para Criadores.",
-      "titleLine1": "A Melhor Ferramenta",
-      "titleLine1Connector": "de Link na Bio para",
-      "titleLine2": "Criadores.",
-      "subtitle": "Crie sua página de links profissional em minutos. Compartilhe seu trabalho, redes sociais e produtos — tudo em um único link na bio.",
-      "eyebrow": "A melhor alternativa ao Linktree para criadores",
-      "ctaPrimary": "Reivindique seu link →",
-      "ctaSecondary": "Ver Temas",
-      "trustLine": "Mais de 2 mil criadores esta semana",
-      "statCreators": "Criadores Ativos",
-      "statLinks": "Links Gerados",
-      "statUptime": "Disponibilidade Garantida",
-      "freeNote": "Teste grátis de 7 dias · Pronto em 60 segundos",
-      "claim": "Crie seu link",
-      "placeholder": "viopage.co/Seu Nome",
-      "getStarted": "Iniciar teste grátis",
-      "eyebrowOld": "Teste grátis de 7 dias — pronto em 60 segundos",
-      "inputHint": "Comece seu teste grátis de 7 dias. Configure em menos de 60 segundos.",
-      "trustLine1": "Teste grátis de 7 dias",
-      "trustLine2": "Pronto em 60 seg",
-      "trustLine3": "Cancele a qualquer momento",
-      "marquee": {
-        "creators": "Criadores",
-        "influencers": "Influenciadores",
-        "smallBusinesses": "Pequenos negócios",
-        "musicians": "Músicos",
-        "podcasters": "Podcasters",
-        "athletes": "Atletas",
-        "coaches": "Coaches",
-        "photographers": "Fotógrafos",
-        "writers": "Escritores",
-        "artists": "Artistas",
-        "brands": "Marcas",
-        "freelancers": "Freelancers"
-      }
+      "titleLine1": "Cada link,",
+      "titleLine2": "cada você,",
+      "titleLine3": "na sua",
+      "titleHighlight": "bio.",
+      "subtitle": "Crie uma página linda para tudo o que você faz. Um único link para suas redes, loja, agendamentos e música — pronto em 60 segundos.",
+      "eyebrow": "O link-in-bio que os criadores realmente querem compartilhar",
+      "trustLine": "Mais de <bold>24.000</bold> criadores entraram este mês",
+      "trustLine1": "Plano grátis para sempre",
+      "trustLine2": "Sem cartão de crédito",
+      "trustLine3": "No ar em 60 segundos",
+      "claim": "Criar meu link →",
+      "placeholder": "seunome",
+      "tickerFeatures": "Link na bio · 12 temas · Analytics · Domínio próprio",
+      "tickerScroll": "Role ↓",
+      "stickerClicks": "Cliques / semana",
+      "stickerCreators": "+24 mil criadores",
+      "stickerLinkHost": "viopage.com/",
+      "stickerLinkUser": "juno"
     },
     "socialProof": {
       "headingBefore": "O link na bio em que confiam",
@@ -129,175 +112,132 @@
     },
     "pricing": {
       "eyebrow": "Preços",
-      "title": "Simples e transparente.",
-      "subtitle": "Comece com um teste grátis de 7 dias. Cancele a qualquer momento.",
+      "title": "Simples. <italic>Honesto.</italic>",
+      "lede": "Comece grátis, faça upgrade quando precisar de mais. Cancele a qualquer momento.",
+      "toggleMonthly": "Mensal",
+      "toggleYearly": "Anual · economize 22%",
+      "popular": "mais popular",
       "perMonth": "/ mês",
-      "pro": "Pro",
-      "proPrice": "R$25",
-      "proYearlyPrice": "R$18",
-      "proBilledYearly": "cobrado anualmente",
-      "startTrial": "Iniciar teste grátis de 7 dias",
-      "hideBranding": "Ocultar marca Viopage",
-      "unlimitedLinks": "Links ilimitados",
-      "customThemes": "Todos os 12 temas premium",
-      "advancedAnalytics": "Análises e insights avançados",
-      "customDomains": "Suporte a domínio personalizado",
-      "prioritySupport": "Suporte prioritário",
-      "mostPopular": "Mais popular",
-      "proDesc": "Tudo que você precisa para crescer seu público"
-    },
-    "themeGallery": {
-      "eyebrow": "Personalização",
-      "heading": "Deixe seu link na bio com a sua cara.",
-      "headingHighlight": "sua cara.",
-      "subheading": "12 temas incríveis para sua página de links. Personalize cores, fontes e mais."
+      "freeName": "Grátis",
+      "freeForever": "para sempre",
+      "freeTagline": "Tudo para começar.",
+      "freeCta": "Começar grátis",
+      "freeUnlimited": "Links ilimitados",
+      "freeThemes": "6 temas essenciais",
+      "freeAnalytics": "Analytics básico",
+      "freeAvatar": "Avatar personalizado",
+      "freeQr": "QR code",
+      "proName": "Pro",
+      "proTagline": "para criadores sérios",
+      "proMonthlyNote": "Cobrado mensalmente · cancele quando quiser",
+      "proYearlyNote": "Cobrado €84/ano · economize €24",
+      "proCta": "Iniciar teste grátis de 7 dias →",
+      "proEverything": "Tudo do plano Grátis",
+      "proThemes": "Todos os 12 temas premium",
+      "proAnalytics": "Analytics avançado",
+      "proDomain": "Domínio personalizado",
+      "proBranding": "Remover marca Viopage",
+      "proSupport": "Suporte prioritário"
     },
     "themes": {
-      "eyebrow": "TEMAS",
-      "headingLine1": "12 temas incríveis.",
-      "headingLine1Highlight": "temas incríveis.",
-      "headingLine2": "Um clique para aplicar.",
-      "subtitle": "Troque todo o visual instantaneamente sem perder nenhum conteúdo."
+      "eyebrow": "12 temas premium",
+      "title": "Um visual para cada <italic>versão sua</italic>.",
+      "lede": "Troque de tema em um clique. Cada um é pensado para um ofício criativo — desenhado por humanos, não por templates.",
+      "browseAll": "Ver todos os 12 temas →",
+      "modernist": {
+        "name": "Modernist",
+        "sub": "para fotógrafos",
+        "alt": "Pré-visualização do tema Modernist — página link-in-bio editorial em tons quentes para fotógrafos"
+      },
+      "electric": {
+        "name": "Electric",
+        "sub": "para músicos",
+        "alt": "Pré-visualização do tema Electric — página link-in-bio vibrante para músicos"
+      },
+      "executive": {
+        "name": "Executive",
+        "sub": "para designers",
+        "alt": "Pré-visualização do tema Executive — página link-in-bio minimalista escura para designers"
+      }
     },
     "howItWorks": {
       "eyebrow": "Como funciona",
-      "heading": "Crie seu link na bio em três passos.",
-      "headingHighlight": "três",
-      "step1Title": "Crie seu link",
-      "step1Desc": "Escolha seu nome de usuário e cadastre-se em segundos.",
-      "step2Title": "Adicione seu conteúdo",
-      "step2Desc": "Links, ícones sociais, escolha seu tema.",
-      "step3Title": "Compartilhe no Instagram, TikTok e mais",
-      "step3Desc": "Coloque seu link em toda bio e perfil."
-    },
-    "featuresBento": {
-      "eyebrow": "Recursos",
-      "heading": "Tudo o que você precisa.",
-      "headingHighlight": "precisa.",
-      "customization": {
-        "eyebrow": "Personalização",
-        "heading": "Deixe com a sua cara.",
-        "headingHighlight": "sua cara.",
-        "description": "12 temas incríveis, cores ilimitadas, 10 fontes, fundos gradientes, estilos de botão. Sua página de links é sua tela.",
-        "themes": "12 Temas",
-        "colors": "Cores personalizadas",
-        "fonts": "10 Fontes",
-        "gradients": "Gradientes"
+      "title": "Quatro passos. <italic>Um</italic> link.",
+      "lede": "Configure seu Viopage em menos de um minuto — sem designer, sem código, sem assinatura mensal só para experimentar.",
+      "claim": {
+        "title": "Crie seu nome",
+        "body": "Escolha um nome de usuário e sua página fica no ar em viopage.com/você. Só isso — sem configuração."
       },
-      "sharing": {
-        "eyebrow": "Compartilhamento",
-        "heading": "Um link. Todas as plataformas.",
-        "headingHighlight": "Todas"
+      "links": {
+        "title": "Adicione seus links",
+        "body": "Instagram, TikTok, Spotify, loja, agenda — arraste, solte, reorganize. Detectamos os ícones automaticamente."
       },
-      "analytics": {
-        "eyebrow": "Análises",
-        "heading": "Conheça seu público.",
-        "headingHighlight": "público."
+      "theme": {
+        "title": "Escolha o visual",
+        "body": "Doze temas desenhados à mão. Troque fontes, cores e formatos de botão até ficar a sua cara."
+      },
+      "share": {
+        "title": "Compartilhe em qualquer lugar",
+        "body": "Um link para cada bio. Acompanhe cliques, países e o que realmente está funcionando."
       }
     },
-    "marquee": {
-      "label": "Junte-se aos criadores no"
-    },
-    "stats": {
-      "creators": "Criadores",
-      "links": "Links criados",
-      "uptime": "Disponibilidade"
+    "statsMarquee": {
+      "statCreators": "+24.000 criadores",
+      "statLive": "No ar em 60 segundos",
+      "statThemes": "12 temas premium",
+      "statAnalytics": "Analytics incluído",
+      "statDomains": "Domínio próprio",
+      "statPayments": "Pagamentos Stripe",
+      "statQr": "QR codes inclusos",
+      "statLanguages": "English · Português"
     },
     "testimonials": {
-      "heading": "Amado por 60K+",
-      "headingHighlight": "criadores",
-      "headingAfter": "do mundo todo",
-      "quote1": "O Viopage transformou minha lista caótica de links em um portfólio digital de alto nível. A taxa de conversão da minha loja aumentou 30% na primeira semana.",
-      "role1": "Influenciadora de Lifestyle",
-      "quote2": "Os temas são incomparáveis. Já testei todas as outras ferramentas, mas o Viopage é a única que parece intencional e premium.",
-      "role2": "Artista Visual",
-      "quote3": "Finalmente, uma ferramenta de link-in-bio que trata minha marca com respeito. As análises são claras e a personalização é infinita.",
-      "role3": "Podcaster de Tecnologia",
-      "photoAlt": "Foto de {name}",
-      "featuredIn": "Funciona com suas plataformas favoritas"
+      "eyebrow": "Amado por criadores",
+      "title": "O tipo de coisa que as pessoas <italic>dão print</italic>.",
+      "rating": "4.9 de mais de 2.400 criadores",
+      "lea": {
+        "quote": "Finalmente um link na bio que parece meu portfólio, não um formulário.",
+        "name": "Léa Dubois",
+        "role": "Fotógrafa · Paris"
+      },
+      "marcus": {
+        "quote": "Cadastro em 40 segundos. Fechei meu primeiro trabalho na mesma semana.",
+        "name": "Marcus Thorne",
+        "role": "Produtor musical · Londres"
+      },
+      "elena": {
+        "quote": "O analytics realmente me mostra qual link está funcionando. Não volto pro antigo.",
+        "name": "Elena Rodriguez",
+        "role": "Criadora · Cidade do México"
+      }
     },
     "midCta": {
-      "heading": "Pronto para criar o seu?",
-      "button": "Comece gratis",
-      "trustLine": "Teste gratis de 7 dias · Sem cartao para comecar · Cancele quando quiser"
-    },
-    "comparison": {
-      "title": "Por que criadores escolhem o Viopage",
-      "feature": "Recurso",
-      "viopage": "Viopage Pro",
-      "linktreeFree": "Linktree Free",
-      "linktreePro": "Linktree Pro",
-      "premiumThemes": "Temas premium",
-      "premiumThemesViopage": "12 inclusos",
-      "premiumThemesLtFree": "0",
-      "premiumThemesLtPro": "Limitado",
-      "analytics": "Analises avancadas",
-      "customDomain": "Dominio personalizado",
-      "removeBranding": "Remover marca",
-      "dragAndDrop": "Editor arrasta-e-solta",
-      "freeTrial": "Teste gratis",
-      "freeTrialViopage": "7 dias acesso completo",
-      "freeTrialLtFree": "N/A",
-      "freeTrialLtPro": "Nao",
-      "price": "Preco",
-      "priceViopage": "A partir de R$18/mes",
-      "priceLtFree": "Gratis",
-      "priceLtPro": "R$50/mes"
-    },
-    "pricingPreview": {
-      "eyebrow": "PREÇOS",
-      "heading": "Preços do link na bio.",
-      "headingHighlight": "link na bio.",
-      "headingAfter": "Comece seu teste grátis.",
-      "monthly": "Mensal",
-      "yearly": "Anual",
-      "savePercent": "Economize 22%",
-      "proName": "Pro",
-      "proBadge": "Teste grátis de 7 dias",
-      "proMonthlyPrice": "R$25",
-      "proYearlyPrice": "R$18",
-      "proPeriod": "/mês",
-      "proBilledYearly": "Cobrado anualmente (R$219/ano)",
-      "proDesc": "Tudo que você precisa para crescer seu público. Comece com um teste grátis de 7 dias.",
-      "proFeature1": "Links e ícones sociais ilimitados",
-      "proFeature2": "Todos os 12 temas premium",
-      "proFeature3": "Remover marca Viopage",
-      "proFeature4": "Análises e insights avançados",
-      "proFeature5": "Suporte a domínio personalizado",
-      "proFeature6": "Suporte prioritário",
-      "proButton": "Iniciar teste gratis",
-      "cancelGuarantee": "Cancele quando quiser. Sem perguntas."
-    },
-    "cta": {
-      "heading": "Seu público está",
-      "headingHighlight": "esperando.",
-      "subtitle": "Junte-se a mais de 60.000 criadores que confiam no Viopage para fortalecer sua presença online. Configure em menos de 5 minutos.",
-      "button": "Iniciar teste grátis",
-      "trustLine": "Teste grátis de 7 dias · Configure em 60 segundos"
-    },
-    "pricingNew": {
-      "eyebrow": "Preços",
-      "heading": "Preços simples e transparentes.",
-      "headingHighlight": "transparentes.",
-      "monthly": "Mensal",
-      "yearly": "Anual",
-      "discount": "-22%",
-      "billedYearly": "cobrado anualmente"
+      "imageAlt": "Criadores usando Viopage — colagem",
+      "title": "Uma página para <italic>tudo</italic> o que você faz.",
+      "body": "Grátis para sempre. Sem cartão de crédito. Garanta seu nome antes que alguém pegue.",
+      "ctaPrimary": "Começar grátis →",
+      "ctaSecondary": "Ver exemplos"
     },
     "footer": {
+      "brandLine": "Cada link, cada você.",
+      "tagline": "O link-in-bio que os criadores realmente querem compartilhar. Feito para humanos, com preço justo.",
       "product": "Produto",
       "company": "Empresa",
+      "resources": "Recursos",
       "legal": "Jurídico",
-      "features": "Recursos",
+      "features": "Funcionalidades",
+      "themes": "Temas",
       "pricing": "Preços",
+      "analytics": "Analytics",
       "about": "Sobre",
       "blog": "Blog",
       "contact": "Contato",
+      "help": "Central de ajuda",
+      "status": "Status",
       "privacy": "Privacidade",
       "terms": "Termos",
-      "copyright": "© {year} Viopage. Todos os direitos reservados.",
-      "tagline": "Um link para tudo que você cria.",
-      "ctaFooter": "Comece gratis"
+      "copyright": "© {year} Viopage · Feito com carinho na Europa",
+      "ctaFooter": "Começar grátis"
     },
     "nav": {
       "login": "Entrar",
@@ -309,29 +249,43 @@
       "blog": "Blog"
     },
     "faq": {
-      "eyebrow": "Perguntas Frequentes",
-      "heading": "Perguntas frequentes",
-      "headingHighlight": "frequentes",
-      "q1": "O que é uma ferramenta de link na bio?",
-      "a1": "Uma ferramenta de link na bio é uma micro-landing page hospedada em uma única URL que reúne todos os seus links mais importantes. Como Instagram e TikTok só permitem um link clicável no perfil, ela permite que seu público acesse seu conteúdo, produtos e canais com um único toque.",
-      "q2": "Como o Viopage é diferente do Linktree?",
-      "a2": "O Viopage oferece 12 temas premium, análises avançadas, suporte a domínio personalizado e um editor arrasta-e-solta — tudo incluído em um plano. Diferente do Linktree, todos os recursos estão disponíveis desde o primeiro dia no teste grátis de 7 dias.",
-      "q3": "Posso usar um domínio personalizado no meu link na bio?",
-      "a3": "Sim. Membros Pro podem conectar seu próprio domínio ao Viopage. Em vez de viopage.com/seunome, seu público vê seunome.com — uma página de links muito mais profissional.",
-      "q4": "Vocês oferecem análises do link na bio?",
-      "a4": "Sim. O Viopage inclui análises avançadas que rastreiam visualizações, cliques, dados geográficos e dispositivos. Descubra quais links funcionam melhor e otimize sua estratégia de conteúdo.",
-      "q5": "Tem teste grátis?",
-      "a5": "Sim, o Viopage oferece um teste grátis de 7 dias com acesso completo a todos os recursos Pro. Sem limitações — teste todos os temas, use o painel de análises e personalize sua página de links completamente.",
-      "q6": "O Viopage é gratuito?",
-      "a6": "Sim. O Viopage tem um plano gratuito com links ilimitados, ícones sociais e temas básicos — não é preciso cartão de crédito para se cadastrar. O Pro libera temas premium, análises avançadas, domínio personalizado e todo o sistema de design por R$25/mês (ou R$219/ano).",
-      "q7": "Quanto tempo leva para criar meu Viopage?",
-      "a7": "A maioria dos criadores fica no ar em menos de 60 segundos. Escolha um nome de usuário, adicione seus primeiros links, selecione um tema — e sua página já está pública em viopage.com/seunome. Dá para refinar o design depois, no painel.",
-      "q8": "O Viopage funciona em português?",
-      "a8": "Sim. O Viopage é totalmente localizado em português (Brasil), com preços em reais (R$25/mês ou R$219/ano) e meios de pagamento locais via Stripe.",
-      "q9": "Consigo acompanhar cliques e dados do público?",
-      "a9": "Sim. Membros Pro têm um painel completo de análises: visualizações, taxa de cliques por link, referenciadores, países, dispositivos e tendências ao longo do tempo. Cada evento é registrado via beacon assíncrono, então não afeta a velocidade da página.",
-      "q10": "Como cancelo minha assinatura?",
-      "a10": "Você pode cancelar a qualquer momento pelo painel — Configurações > Faturamento > Gerenciar assinatura. Os recursos Pro continuam ativos até o fim do período atual, e sua página pública continua funcionando no plano gratuito depois disso."
+      "eyebrow": "Perguntas",
+      "title": "O que as pessoas <italic>realmente</italic> perguntam.",
+      "free": {
+        "q": "O Viopage é realmente grátis?",
+        "a": "Sim. O plano Grátis é grátis para sempre — links ilimitados, temas essenciais, analytics básico. Sem relógio de teste, sem cartão de crédito."
+      },
+      "domain": {
+        "q": "Posso usar meu próprio domínio?",
+        "a": "No plano Pro. Aponte seu domínio (seudominio.com) para o Viopage e cuidamos do SSL e do roteamento."
+      },
+      "cut": {
+        "q": "Vocês ficam com uma parte das minhas vendas?",
+        "a": "Nunca. O Viopage não processa pagamentos — seu Stripe, seu dinheiro. Só cobramos a assinatura."
+      },
+      "diff": {
+        "q": "Como isso é diferente do Linktree?",
+        "a": "Mais rápido para configurar, temas de verdade bonitos, analytics incluído, e a metade do preço no Pro. Além disso, tratamos você como um ser humano."
+      },
+      "switch": {
+        "q": "Posso trocar de tema depois?",
+        "a": "Quando quiser. Seu conteúdo fica separado do tema — troque em um clique, sem remontar nada."
+      },
+      "app": {
+        "q": "Vocês têm app para iOS / Android?",
+        "a": "Sua página já é mobile-first. Não precisa instalar — compartilhe viopage.com/você e abra em qualquer lugar."
+      }
+    },
+    "finalCta": {
+      "eyebrow": "Pronto?",
+      "title": "Sua bio, <italic>pronta</italic> em 60 segundos.",
+      "body": "Garanta seu nome. Adicione seus links. Compartilhe. Grátis para sempre — sem cartão, sem pegadinha.",
+      "placeholder": "seunome",
+      "cta": "Criar →",
+      "trust1": "Grátis para sempre",
+      "trust2": "Sem cartão de crédito",
+      "trust3": "No ar em 60s",
+      "imageAlt": "Flatlay Viopage — ferramentas e acessórios de criador"
     }
   },
   "auth": {

@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
 import { ContactDialog } from "@/components/dashboard/contact-dialog";
+import { LANDING, SANS_FONT, SERIF_FONT } from "./_primitives";
 
 type FooterLink =
   | { label: string; href: string }
@@ -24,8 +24,9 @@ export function Footer() {
     {
       heading: t("product"),
       links: [
-        { label: t("features"), href: "/#features" },
+        { label: t("themes"), href: "/#themes" },
         { label: t("pricing"), href: "/#pricing" },
+        { label: t("analytics"), href: "/#how" },
       ],
     },
     {
@@ -37,6 +38,13 @@ export function Footer() {
       ],
     },
     {
+      heading: t("resources"),
+      links: [
+        { label: t("help"), action: "openContact" },
+        { label: t("status"), href: "/status" },
+      ],
+    },
+    {
       heading: t("legal"),
       links: [
         { label: t("privacy"), href: "/privacy" },
@@ -45,71 +53,127 @@ export function Footer() {
     },
   ];
 
-  const linkClass =
-    "text-[14px] text-[#888] hover:text-[#111113] transition-colors duration-150";
-
   return (
-    <footer className="bg-white border-t border-black/[0.06]">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 pt-16 pb-10">
-        {/* Top row: brand + columns */}
-        <div className="grid grid-cols-2 gap-10 md:grid-cols-4 mb-14">
-          {/* Brand */}
-          <div className="col-span-2 md:col-span-1 flex flex-col gap-4">
-            <Link href="/" className="flex items-center" aria-label="Viopage home">
-              <Image
-                src="/images/landing/logo-viopage.png"
-                alt="viopage"
-                width={160}
-                height={40}
-                className="h-10 w-auto object-contain"
-                style={{ width: "auto" }}
-              />
-            </Link>
-            <p className="text-[14px] text-[#999] leading-relaxed max-w-[200px]">
+    <footer
+      style={{
+        background: LANDING.ink,
+        color: "#fff",
+        padding: "80px 0 40px",
+        fontFamily: SANS_FONT,
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1280,
+          margin: "0 auto",
+          padding: "0 clamp(24px, 5vw, 48px)",
+        }}
+      >
+        <div
+          className="footer-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-[2fr_repeat(4,1fr)] gap-x-8 gap-y-10 mb-16"
+        >
+          <div>
+            <div
+              style={{
+                fontFamily: SERIF_FONT,
+                fontStyle: "italic",
+                fontSize: 36,
+                color: "#fff",
+                lineHeight: 1,
+                maxWidth: 320,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              {t("brandLine")}
+            </div>
+            <p
+              style={{
+                marginTop: 16,
+                fontSize: 14,
+                lineHeight: 1.6,
+                color: "rgba(255,255,255,.55)",
+                maxWidth: 320,
+              }}
+            >
               {t("tagline")}
             </p>
           </div>
-
-          {/* Link columns */}
           {columns.map((col) => (
-            <div key={col.heading} className="flex flex-col gap-4">
-              <h3 className="text-[11px] font-semibold uppercase tracking-[0.09em] text-[#bbb]">
+            <div key={col.heading}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: ".16em",
+                  textTransform: "uppercase",
+                  color: "rgba(255,255,255,.5)",
+                  marginBottom: 16,
+                }}
+              >
                 {col.heading}
-              </h3>
-              <ul className="flex flex-col gap-3">
-                {col.links.map((link) => (
-                  <li key={"href" in link ? link.href : link.action}>
-                    {"action" in link ? (
-                      <button
-                        type="button"
-                        onClick={() => setContactOpen(true)}
-                        className={`${linkClass} text-left cursor-pointer bg-transparent p-0 border-0`}
-                      >
-                        {link.label}
-                      </button>
-                    ) : (
-                      <Link href={link.href} className={linkClass}>
-                        {link.label}
-                      </Link>
-                    )}
-                  </li>
-                ))}
+              </div>
+              <ul
+                style={{
+                  listStyle: "none",
+                  padding: 0,
+                  margin: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                }}
+              >
+                {col.links.map((link) => {
+                  const common = {
+                    color: "rgba(255,255,255,.8)",
+                    fontSize: 14,
+                    textDecoration: "none",
+                    background: "transparent",
+                    border: 0,
+                    padding: 0,
+                    textAlign: "left" as const,
+                    cursor: "pointer",
+                  };
+                  return (
+                    <li key={"href" in link ? link.href : link.action}>
+                      {"action" in link ? (
+                        <button
+                          type="button"
+                          onClick={() => setContactOpen(true)}
+                          style={common}
+                        >
+                          {link.label}
+                        </button>
+                      ) : (
+                        <Link href={link.href} style={common}>
+                          {link.label}
+                        </Link>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
         </div>
-
-        {/* Bottom bar */}
-        <div className="border-t border-black/[0.06] pt-7 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-[13px] text-[#bbb]">
-            {t("copyright", { year: currentYear })}
-          </p>
-          <Link
-            href="/register"
-            className="text-[13px] font-semibold text-[#FF6B35] hover:text-[#e85a24] transition-colors duration-150"
-          >
-            {`${t("ctaFooter")} →`}
-          </Link>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 16,
+            paddingTop: 28,
+            borderTop: "1px solid rgba(255,255,255,.1)",
+            fontSize: 12,
+            color: "rgba(255,255,255,.5)",
+          }}
+        >
+          <div>{t("copyright", { year: currentYear })}</div>
+          <div style={{ display: "flex", gap: 16 }}>
+            <span>English</span>
+            <span>·</span>
+            <span>Português</span>
+          </div>
         </div>
       </div>
 

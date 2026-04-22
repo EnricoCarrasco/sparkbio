@@ -1,377 +1,289 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { CheckIcon, XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { EASE } from "@/lib/motion-variants";
-import { useGeoPricing } from "@/hooks/use-geo-pricing";
+import {
+  DotCheck,
+  Eyebrow,
+  Italic,
+  LANDING,
+  Lede,
+  SectionTitle,
+  SANS_FONT,
+  SERIF_FONT,
+  innerWrap,
+  primaryBtn,
+  primaryBtnGhost,
+  sectionWrap,
+  useReveal,
+} from "./_primitives";
 
-gsap.registerPlugin(useGSAP, ScrollTrigger);
+const FREE_FEATURES = [
+  "freeUnlimited",
+  "freeThemes",
+  "freeAnalytics",
+  "freeAvatar",
+  "freeQr",
+] as const;
 
-// ── Sub-components ────────────────────────────────────────────────────────────
-
-function CheckItem({ children }: { children: React.ReactNode }) {
-  return (
-    <li className="pricing-feature flex items-center gap-2.5">
-      <CheckIcon
-        className="h-4 w-4 shrink-0 text-[#FF6B35]"
-        strokeWidth={2.5}
-        aria-hidden="true"
-      />
-      <span className="text-[14px] text-[#555]">{children}</span>
-    </li>
-  );
-}
-
-function ComparisonCheck() {
-  return (
-    <CheckIcon
-      className="mx-auto h-4 w-4 text-[#22c55e]"
-      strokeWidth={2.5}
-      aria-hidden="true"
-    />
-  );
-}
-
-function ComparisonX() {
-  return (
-    <XIcon
-      className="mx-auto h-4 w-4 text-[#ccc]"
-      strokeWidth={2}
-      aria-hidden="true"
-    />
-  );
-}
-
-// ── Main export ───────────────────────────────────────────────────────────────
+const PRO_FEATURES = [
+  "proEverything",
+  "proThemes",
+  "proAnalytics",
+  "proDomain",
+  "proBranding",
+  "proSupport",
+] as const;
 
 export function PricingPreview() {
-  const t = useTranslations("landing.pricingPreview");
-  const tc = useTranslations("landing.comparison");
-  const geo = useGeoPricing();
-  const sectionRef = useRef<HTMLElement>(null);
-  const proCardRef = useRef<HTMLDivElement>(null);
-  const [isYearly, setIsYearly] = useState(false);
+  const t = useTranslations("landing.pricing");
+  const [yearly, setYearly] = useState(false);
+  const ref = useReveal();
 
-  const PRO_FEATURES = [
-    t("proFeature1"),
-    t("proFeature2"),
-    t("proFeature3"),
-    t("proFeature4"),
-    t("proFeature5"),
-    t("proFeature6"),
-  ] as const;
-
-  const COMPARISON_ROWS = [
-    {
-      label: tc("premiumThemes"),
-      viopage: tc("premiumThemesViopage"),
-      ltFree: tc("premiumThemesLtFree"),
-      ltPro: tc("premiumThemesLtPro"),
-    },
-    { label: tc("analytics"), viopage: "check", ltFree: "x", ltPro: "check" },
-    { label: tc("customDomain"), viopage: "check", ltFree: "x", ltPro: "check" },
-    { label: tc("removeBranding"), viopage: "check", ltFree: "x", ltPro: "check" },
-    { label: tc("dragAndDrop"), viopage: "check", ltFree: "check", ltPro: "check" },
-    {
-      label: tc("freeTrial"),
-      viopage: tc("freeTrialViopage"),
-      ltFree: tc("freeTrialLtFree"),
-      ltPro: tc("freeTrialLtPro"),
-    },
-    {
-      label: tc("price"),
-      viopage: `${geo.yearlyPerMonth}/${geo.isBR ? "mês" : "mo"}`,
-      ltFree: tc("priceLtFree"),
-      ltPro: tc("priceLtPro"),
-    },
-  ] as const;
-
-  function renderCell(value: string) {
-    if (value === "check") return <ComparisonCheck />;
-    if (value === "x") return <ComparisonX />;
-    return <span className="text-[13px] text-[#555]">{value}</span>;
-  }
-
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        // Header stagger
-        gsap.from(".pricing-header > *", {
-          opacity: 0,
-          y: 30,
-          duration: 0.7,
-          stagger: 0.1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 80%",
-            toggleActions: "play none none reverse",
-          },
-        });
-
-        // Pro card: pop in with scale + slight rotate
-        if (proCardRef.current) {
-          gsap.from(proCardRef.current, {
-            opacity: 0,
-            y: 40,
-            scale: 0.94,
-            duration: 0.9,
-            ease: "back.out(1.4)",
-            scrollTrigger: {
-              trigger: proCardRef.current,
-              start: "top 80%",
-              toggleActions: "play none none reverse",
-            },
-          });
-
-          // Continuous subtle lift on the popular card (premium feel)
-          gsap.to(proCardRef.current, {
-            y: -6,
-            duration: 3,
-            ease: "sine.inOut",
-            repeat: -1,
-            yoyo: true,
-            delay: 1,
-          });
-        }
-
-        // Feature list stagger after card reveal
-        const features = sectionRef.current?.querySelectorAll(".pricing-feature");
-        if (features) {
-          gsap.from(features, {
-            opacity: 0,
-            x: -12,
-            duration: 0.45,
-            stagger: 0.07,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: proCardRef.current,
-              start: "top 75%",
-              toggleActions: "play none none reverse",
-            },
-          });
-        }
-
-        // Comparison table rows
-        const rows = sectionRef.current?.querySelectorAll(".comparison-row");
-        if (rows) {
-          gsap.from(rows, {
-            opacity: 0,
-            y: 14,
-            duration: 0.5,
-            stagger: 0.05,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: rows[0],
-              start: "top 85%",
-              toggleActions: "play none none reverse",
-            },
-          });
-        }
-      });
-
-      mm.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.set(
-          sectionRef.current?.querySelectorAll(
-            ".pricing-header > *, .pricing-feature, .comparison-row",
-          ) ?? [],
-          { clearProps: "all", opacity: 1 },
-        );
-        if (proCardRef.current) gsap.set(proCardRef.current, { clearProps: "all", opacity: 1 });
-      });
-
-      return () => mm.revert();
-    },
-    { scope: sectionRef },
-  );
+  const cardBase = {
+    borderRadius: 24,
+    padding: 32,
+    display: "flex",
+    flexDirection: "column",
+    gap: 24,
+  } as const;
 
   return (
-    <section
-      ref={sectionRef}
-      id="pricing"
-      className="bg-white py-20 md:py-28"
-      aria-label="Pricing"
-    >
-      <div className="mx-auto max-w-4xl px-6 lg:px-8">
-        <div className="flex flex-col items-center">
-          {/* ── Header ── */}
-          <div className="pricing-header flex flex-col items-center">
-            <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#FF6B35]">
-              {t("eyebrow")}
-            </span>
+    <section id="pricing" ref={ref} style={sectionWrap}>
+      <div style={innerWrap}>
+        <div
+          style={{
+            textAlign: "center",
+            marginBottom: 56,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 14,
+          }}
+        >
+          <Eyebrow>{t("eyebrow")}</Eyebrow>
+          <SectionTitle align="center">
+            {t.rich("title", {
+              italic: (chunks) => <Italic>{chunks}</Italic>,
+            })}
+          </SectionTitle>
+          <Lede align="center">{t("lede")}</Lede>
+          <div
+            className="reveal"
+            style={{
+              marginTop: 8,
+              display: "inline-flex",
+              background: "#fff",
+              border: `1px solid ${LANDING.line}`,
+              borderRadius: 999,
+              padding: 4,
+            }}
+          >
+            {[
+              { label: t("toggleMonthly"), val: false },
+              { label: t("toggleYearly"), val: true },
+            ].map(({ label, val }) => {
+              const active = yearly === val;
+              return (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => setYearly(val)}
+                  style={{
+                    padding: "8px 18px",
+                    borderRadius: 999,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    background: active ? LANDING.ink : "transparent",
+                    color: active ? "#fff" : LANDING.muted,
+                    transition: "all .25s",
+                    border: 0,
+                    cursor: "pointer",
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-            <h2
-              className="mt-4 text-center text-[34px] md:text-[46px] leading-[1.1] tracking-[-0.025em] text-[#1b1b1d]"
-              style={{ fontFamily: "var(--font-sans), 'Poppins', sans-serif" }}
-            >
-              {t("heading")}{" "}
-              <em
+        <div
+          className="pricing-grid grid grid-cols-1 md:grid-cols-2 gap-6 mx-auto"
+          style={{ maxWidth: 960 }}
+        >
+          {/* Free */}
+          <div
+            className="reveal"
+            style={{
+              ...cardBase,
+              background: "#fff",
+              border: `1px solid ${LANDING.line}`,
+              color: LANDING.ink,
+            }}
+          >
+            <div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                <span style={{ fontWeight: 700, fontSize: 17 }}>
+                  {t("freeName")}
+                </span>
+                <span style={{ fontSize: 12, color: LANDING.muted }}>
+                  {t("freeForever")}
+                </span>
+              </div>
+              <div
                 style={{
-                  fontFamily:
-                    "var(--font-display), 'Instrument Serif', Georgia, serif",
+                  fontFamily: SERIF_FONT,
                   fontStyle: "italic",
+                  fontSize: 64,
+                  lineHeight: 1,
+                  margin: "14px 0 6px",
+                  color: LANDING.ink,
                 }}
               >
-                {t("headingHighlight")}
-              </em>{" "}
-              {t("headingAfter")}
-            </h2>
-
-            {/* Monthly / Yearly toggle */}
-            <div className="mt-8">
-              <div
-                className="inline-flex items-center rounded-full p-1"
-                style={{ backgroundColor: "#F0EDF0" }}
-                role="group"
-                aria-label="Billing frequency"
-              >
-                <button
-                  type="button"
-                  onClick={() => setIsYearly(false)}
-                  className={`rounded-full px-5 py-2 text-[14px] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-1 ${
-                    !isYearly
-                      ? "bg-white font-semibold text-[#1b1b1d] shadow-sm"
-                      : "font-medium text-[#594139]"
-                  }`}
-                  aria-pressed={!isYearly}
-                >
-                  {t("monthly")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsYearly(true)}
-                  className={`flex items-center gap-2 rounded-full px-5 py-2 text-[14px] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-1 ${
-                    isYearly
-                      ? "bg-white font-semibold text-[#1b1b1d] shadow-sm"
-                      : "font-medium text-[#594139]"
-                  }`}
-                  aria-pressed={isYearly}
-                >
-                  {t("yearly")}
-                  <span className="rounded-full bg-[#FF6B35]/10 px-2 py-0.5 text-[11px] font-semibold text-[#FF6B35]">
-                    {t("savePercent")}
-                  </span>
-                </button>
+                $0
+              </div>
+              <div style={{ fontSize: 13, color: LANDING.muted }}>
+                {t("freeTagline")}
               </div>
             </div>
-          </div>
-
-          {/* ── Pricing card ── */}
-          <div className="mt-10 w-full max-w-md mx-auto">
-            <div ref={proCardRef} className="relative will-change-transform">
-              <div className="flex h-full flex-col rounded-2xl border-2 border-[#FF6B35] bg-[#FFF8F5] p-8">
-                <span className="absolute right-5 top-5 rounded-full bg-[#FF6B35] px-3 py-1 text-[12px] font-semibold text-white">
-                  {t("proBadge")}
-                </span>
-
-                <p className="text-[17px] font-semibold text-[#1b1b1d]">{t("proName")}</p>
-
-                {/* Price with smooth swap (framer AnimatePresence handles the toggle) */}
-                <div className="mt-3 flex items-baseline gap-1.5">
-                  <span className="relative overflow-hidden text-5xl font-bold leading-none text-[#1b1b1d] tabular-nums">
-                    <AnimatePresence mode="wait">
-                      <motion.span
-                        key={isYearly ? "yearly" : "monthly"}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2, ease: EASE }}
-                        className="block"
-                      >
-                        {isYearly ? geo.yearlyPerMonth : geo.monthlyDisplay}
-                      </motion.span>
-                    </AnimatePresence>
-                  </span>
-                  <span className="text-[14px] text-[#999]">
-                    {geo.isBR ? "/mês" : t("proPeriod")}
-                  </span>
-                </div>
-
-                <AnimatePresence>
-                  {isYearly && (
-                    <motion.p
-                      initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                      animate={{ opacity: 1, height: "auto", marginTop: 4 }}
-                      exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                      transition={{ duration: 0.2, ease: EASE }}
-                      className="overflow-hidden text-[13px] text-[#999]"
-                    >
-                      {geo.yearlyDisplay}
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-
-                <p className="mt-3 text-[14px] leading-relaxed text-[#777]">{t("proDesc")}</p>
-
-                <hr className="my-6 border-[#FF6B35]/15" />
-
-                <ul className="flex flex-1 flex-col gap-3">
-                  {PRO_FEATURES.map((feature) => (
-                    <CheckItem key={feature}>{feature}</CheckItem>
-                  ))}
-                </ul>
-
-                <Link
-                  href="/register"
-                  className="mt-8 block w-full rounded-full bg-[#FF6B35] py-3 text-center text-[14px] font-semibold text-white transition-all duration-150 hover:bg-[#e85a24] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] focus-visible:ring-offset-2"
-                >
-                  {t("proButton")}
-                </Link>
-
-                <p className="mt-3 text-center text-[13px] text-[#999]">{t("cancelGuarantee")}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* ── Comparison table ── */}
-          <div className="mt-16 w-full">
-            <h3
-              className="pricing-header text-center text-[22px] md:text-[28px] font-bold tracking-[-0.02em] text-[#1b1b1d] mb-8"
-              style={{ fontFamily: "var(--font-sans), 'Poppins', sans-serif" }}
+            <ul
+              style={{
+                listStyle: "none",
+                margin: 0,
+                padding: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+                flex: 1,
+              }}
             >
-              {tc("title")}
-            </h3>
+              {FREE_FEATURES.map((k) => (
+                <li
+                  key={k}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    fontSize: 14,
+                    color: LANDING.ink,
+                  }}
+                >
+                  <DotCheck />
+                  {t(k)}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/register"
+              style={{ ...primaryBtnGhost, textAlign: "center" }}
+            >
+              {t("freeCta")}
+            </Link>
+          </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-[#eee]">
-                    <th className="py-3 pr-4 text-[13px] font-semibold text-[#999] uppercase tracking-[0.1em]">
-                      {tc("feature")}
-                    </th>
-                    <th className="py-3 px-4 text-center text-[13px] font-bold text-[#FF6B35] uppercase tracking-[0.1em]">
-                      {tc("viopage")}
-                    </th>
-                    <th className="py-3 px-4 text-center text-[13px] font-semibold text-[#999] uppercase tracking-[0.1em]">
-                      {tc("linktreeFree")}
-                    </th>
-                    <th className="py-3 pl-4 text-center text-[13px] font-semibold text-[#999] uppercase tracking-[0.1em]">
-                      {tc("linktreePro")}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {COMPARISON_ROWS.map((row) => (
-                    <tr key={row.label} className="comparison-row border-b border-[#f5f5f5]">
-                      <td className="py-3.5 pr-4 text-[14px] font-medium text-[#333]">
-                        {row.label}
-                      </td>
-                      <td className="py-3.5 px-4 text-center">{renderCell(row.viopage)}</td>
-                      <td className="py-3.5 px-4 text-center">{renderCell(row.ltFree)}</td>
-                      <td className="py-3.5 pl-4 text-center">{renderCell(row.ltPro)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {/* Pro */}
+          <div
+            className="reveal"
+            style={{
+              ...cardBase,
+              background: LANDING.ink,
+              color: "#fff",
+              border: `1px solid ${LANDING.ink}`,
+              boxShadow: "0 30px 60px rgba(17,17,19,.2)",
+              position: "relative",
+            }}
+          >
+            <span
+              style={{
+                position: "absolute",
+                top: -16,
+                right: 24,
+                background: LANDING.orange,
+                color: "#fff",
+                padding: "6px 14px",
+                borderRadius: 999,
+                fontSize: 15,
+                fontFamily: SERIF_FONT,
+                fontStyle: "italic",
+                boxShadow: "0 8px 16px rgba(255,107,53,.3)",
+              }}
+            >
+              {t("popular")}
+            </span>
+            <div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                <span style={{ fontWeight: 700, fontSize: 17 }}>
+                  {t("proName")}
+                </span>
+                <span style={{ fontSize: 12, opacity: 0.6 }}>
+                  {t("proTagline")}
+                </span>
+              </div>
+              <div
+                style={{
+                  fontFamily: SERIF_FONT,
+                  fontStyle: "italic",
+                  fontSize: 64,
+                  lineHeight: 1,
+                  margin: "14px 0 6px",
+                }}
+              >
+                €{yearly ? "7" : "9"}
+                <span
+                  style={{
+                    fontSize: 18,
+                    fontStyle: "normal",
+                    fontFamily: SANS_FONT,
+                    fontWeight: 500,
+                    opacity: 0.6,
+                    marginLeft: 6,
+                  }}
+                >
+                  {t("perMonth")}
+                </span>
+              </div>
+              <div style={{ fontSize: 13, opacity: 0.65 }}>
+                {yearly ? t("proYearlyNote") : t("proMonthlyNote")}
+              </div>
             </div>
+            <ul
+              style={{
+                listStyle: "none",
+                margin: 0,
+                padding: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+                flex: 1,
+              }}
+            >
+              {PRO_FEATURES.map((k) => (
+                <li
+                  key={k}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    fontSize: 14,
+                  }}
+                >
+                  <DotCheck light />
+                  {t(k)}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/register?plan=pro"
+              style={{
+                ...primaryBtn,
+                background: LANDING.orange,
+                textAlign: "center",
+              }}
+            >
+              {t("proCta")}
+            </Link>
           </div>
         </div>
       </div>

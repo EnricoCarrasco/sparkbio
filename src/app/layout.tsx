@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Inter, Poppins, Instrument_Serif } from "next/font/google";
+import { Inter, Poppins, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Toaster } from "@/components/ui/sonner";
@@ -33,6 +33,12 @@ const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
   style: ["normal", "italic"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains",
+  subsets: ["latin"],
+  weight: ["400", "500"],
 });
 
 export const viewport: Viewport = {
@@ -108,7 +114,7 @@ export default async function RootLayout({
   const websiteJsonLd = generateWebSiteJsonLd();
 
   return (
-    <html lang={locale} suppressHydrationWarning className={`${inter.variable} ${poppins.variable} ${instrumentSerif.variable} h-full antialiased`}>
+    <html lang={locale} suppressHydrationWarning className={`${inter.variable} ${poppins.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} h-full antialiased`}>
       <head>
         <script
           type="application/ld+json"
