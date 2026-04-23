@@ -8,6 +8,7 @@ import {
   Trash2,
   Pencil,
   Share2,
+  Gift,
   ExternalLink,
   Circle,
   RectangleHorizontal,
@@ -975,6 +976,7 @@ export function ContentTab() {
 
 function ContentTabInner() {
   const tOnboarding = useTranslations("onboarding");
+  const tDesign = useTranslations("dashboard.design");
   const { step, setStep, dismiss } = useOnboarding();
   const profile = useProfileStore((s) => s.profile);
   const updateProfile = useProfileStore((s) => s.updateProfile);
@@ -1078,6 +1080,18 @@ function ContentTabInner() {
           >
             <Eye size={14} />
             Preview
+          </a>
+          <a
+            href="/earn"
+            className="dash-btn-ghost"
+            style={{
+              background: "var(--dash-orange-tint)",
+              borderColor: "rgba(255,107,53,.35)",
+              color: "var(--dash-orange-deep)",
+            }}
+          >
+            <Gift size={14} />
+            {tDesign("earnTab")}
           </a>
           <button
             type="button"

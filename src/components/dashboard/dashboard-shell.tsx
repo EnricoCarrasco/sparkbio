@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Menu } from "lucide-react";
+import { Menu, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -158,6 +158,28 @@ export function DashboardShell({
           <span style={{ fontWeight: 600, fontSize: 15, letterSpacing: "-0.01em", color: "#111113" }}>
             {tabTitle}
           </span>
+          <div style={{ flex: 1 }} />
+          <a
+            href="/earn"
+            aria-label="Earn with Viopage"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "7px 12px",
+              borderRadius: 999,
+              background: "#FFE8DC",
+              border: "1px solid rgba(255,107,53,.35)",
+              color: "#E8551F",
+              fontSize: 12.5,
+              fontWeight: 600,
+              letterSpacing: "-0.01em",
+              textDecoration: "none",
+            }}
+          >
+            <Gift className="size-4" />
+            Earn
+          </a>
         </header>
 
         {activeTab === "content" && <ContentTab />}
