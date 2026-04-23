@@ -78,8 +78,9 @@ export function Sidebar({ onNavigate, variant = "desktop" }: SidebarProps) {
   const isMobile = variant === "mobile";
 
   useEffect(() => {
-    fetch("/api/admin/stats")
-      .then((r) => setIsAdmin(r.ok))
+    fetch("/api/admin/check")
+      .then((r) => r.json())
+      .then((data) => setIsAdmin(Boolean(data?.isAdmin)))
       .catch(() => {});
   }, []);
 

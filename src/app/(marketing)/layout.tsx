@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Navbar } from "@/components/landing/navbar";
 import { Footer } from "@/components/landing/footer";
 import { ReferralCapture } from "@/components/marketing/referral-capture";
+import { MarketingScripts } from "@/components/marketing-scripts";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function MarketingLayout({
@@ -23,6 +24,7 @@ export default async function MarketingLayout({
       <Navbar isAuthenticated={isAuthenticated} />
       <main className="flex-1">{children}</main>
       <Footer />
+      <MarketingScripts />
     </div>
   );
 }

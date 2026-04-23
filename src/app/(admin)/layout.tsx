@@ -38,27 +38,37 @@ export default function AdminLayout({
   const [pendingCount, setPendingCount] = useState<number | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
 
-  // Auth check: call /api/admin/stats — if 401, bounce to /dashboard
+  // Auth check: lightweight /api/admin/check gates the layout. If admin,
+  // the heavy /api/admin/stats fetches in the background just for the
+  // pending-payouts badge so it doesn't block the UI.
   useEffect(() => {
-    async function checkAdmin() {
+    async function init() {
       try {
-        const res = await fetch("/api/admin/stats");
-        if (res.status === 401 || res.status === 403) {
+        const checkRes = await fetch("/api/admin/check");
+        if (!checkRes.ok) {
           router.replace("/dashboard");
           return;
         }
-        // Pull the pending payout count from the response payload
-        if (res.ok) {
-          const data = await res.json();
-          setPendingCount(data?.pendingPayouts?.count ?? null);
+        const { isAdmin } = await checkRes.json();
+        if (!isAdmin) {
+          router.replace("/dashboard");
+          return;
         }
+        setAuthChecked(true);
+
+        fetch("/api/admin/stats")
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data) => {
+            if (data?.pendingPayouts?.count != null) {
+              setPendingCount(data.pendingPayouts.count);
+            }
+          })
+          .catch(() => {});
       } catch {
         router.replace("/dashboard");
-        return;
       }
-      setAuthChecked(true);
     }
-    checkAdmin();
+    init();
   }, [router]);
 
   const NAV_ITEMS: NavItem[] = [

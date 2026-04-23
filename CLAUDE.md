@@ -23,7 +23,7 @@ No test framework is set up yet.
 - **shadcn/ui** with `@base-ui/react` (not Radix — components use Base UI API)
 - **Supabase** (PostgreSQL, Auth, Storage) — project ID: `lbouculyhpqcnmvyrofo`
 - **Zustand** for client state (6 stores)
-- **LemonSqueezy** for payments (Merchant of Record — handles chargebacks, tax)
+- **Stripe** for payments (Checkout + subscriptions; migrated from LemonSqueezy — see migrations 017/018)
 - **next-intl** for i18n translations only (EN + PT-BR). Locale routing via custom `proxy.ts` rewrite — NOT next-intl middleware
 - **Framer Motion** for animations
 - **Recharts** for analytics charts
@@ -105,16 +105,33 @@ NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
 NEXT_PUBLIC_SITE_URL
-LEMONSQUEEZY_API_KEY
-LEMONSQUEEZY_STORE_ID
-LEMONSQUEEZY_WEBHOOK_SECRET
-LEMONSQUEEZY_MONTHLY_VARIANT_ID
-LEMONSQUEEZY_YEARLY_VARIANT_ID
+STRIPE_SECRET_KEY
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+STRIPE_WEBHOOK_SECRET
+STRIPE_PRICE_MONTHLY_EUR
+STRIPE_PRICE_YEARLY_EUR
+STRIPE_PRICE_MONTHLY_BRL
+STRIPE_PRICE_YEARLY_BRL
+ADMIN_EMAILS                       # comma-separated admin emails (gates /admin)
+CRON_SECRET                        # protects /api/cron/*
+NEXT_PUBLIC_META_PIXEL_ID          # marketing routes only (see src/components/marketing-scripts.tsx)
+NEXT_PUBLIC_GA_MEASUREMENT_ID      # marketing routes only
+NEXT_PUBLIC_SENTRY_DSN
+SENTRY_ORG
+SENTRY_PROJECT
+SENTRY_AUTH_TOKEN                  # source-map upload at build
+REPLICATE_API_TOKEN                # business-card AI image generation
 ```
 
 ## Database
 
-6 tables: `profiles`, `links`, `themes`, `social_icons`, `analytics_events`, `subscriptions`. Migrations in `supabase/migrations/`. The `themes` table has both legacy fields (`button_style`, `bg_color`) and v2 design fields (`button_style_v2`, `button_corner`, `button_shadow`, `wallpaper_style`, etc.). The `subscriptions` table stores LemonSqueezy subscription state (one per user, service_role write only).
+6 tables: `profiles`, `links`, `themes`, `social_icons`, `analytics_events`, `subscriptions`. Migrations in `supabase/migrations/`. The `themes` table has both legacy fields (`button_style`, `bg_color`) and v2 design fields (`button_style_v2`, `button_corner`, `button_shadow`, `wallpaper_style`, etc.). The `subscriptions` table stores Stripe subscription state (one per user, service_role write only). Historical LemonSqueezy columns were dropped in migration 018.
+
+## Deployment
+
+- **Vercel** — project `viopage` (team: `enricos-projects-f0cc286f`)
+- **Function region**: `dub1` (Dublin) — pinned via `vercel.json` to co-locate with Supabase `eu-west-1`. Changing this without moving Supabase re-adds ~200ms transatlantic RTT to every server render.
+- **Supabase region**: `eu-west-1` (Dublin)
 
 ## Tools
 

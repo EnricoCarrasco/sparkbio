@@ -35,11 +35,24 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
+  // Helper: NextResponse.redirect() returns a fresh response that doesn't
+  // carry the Set-Cookie headers Supabase queued on supabaseResponse during
+  // a token refresh. If we don't copy them, the browser follows the redirect
+  // with stale cookies, the refresh token gets consumed twice, and the user
+  // ends up bounced to /login. Always route redirects through this helper.
+  const redirectTo = (path: string) => {
+    const url = request.nextUrl.clone();
+    url.pathname = path;
+    const redirectResponse = NextResponse.redirect(url);
+    for (const cookie of supabaseResponse.cookies.getAll()) {
+      redirectResponse.cookies.set(cookie);
+    }
+    return redirectResponse;
+  };
+
   // Protect dashboard routes
   if (pathname.startsWith("/dashboard") && !user) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
+    return redirectTo("/login");
   }
 
   // Redirect authenticated users away from auth pages and marketing homepage
@@ -50,9 +63,7 @@ export async function updateSession(request: NextRequest) {
       pathname === "/pt-BR") &&
     user
   ) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
-    return NextResponse.redirect(url);
+    return redirectTo("/dashboard");
   }
 
   return supabaseResponse;
