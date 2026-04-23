@@ -250,13 +250,13 @@ export default function EarnLayout({
         {/* Scrollable page content */}
         <main
           data-dashboard-main
-          className="dash-main-col"
           style={{
             flex: 1,
+            minHeight: 0,
             overflowY: "auto",
             overflowX: "hidden",
             background: "var(--dash-cream)",
-            paddingBottom: "env(safe-area-inset-bottom, 0px)",
+            paddingBottom: "calc(64px + env(safe-area-inset-bottom, 0px))",
           }}
         >
           {children}

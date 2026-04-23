@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { DollarSign, CreditCard, QrCode, Check, Loader2 } from "lucide-react";
+import { DollarSign, CreditCard, QrCode, Check, Loader2, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -100,6 +101,12 @@ export default function EarnPage() {
             Earn with <Italic>Viopage</Italic>.
           </h1>
           <p className="dash-page-sub">{t("pageSubtitle")}</p>
+        </div>
+        <div className="head-actions" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <Link href="/dashboard" className="dash-btn-ghost">
+            <ArrowLeft size={14} />
+            {t("backToDashboard")}
+          </Link>
         </div>
       </div>
 
