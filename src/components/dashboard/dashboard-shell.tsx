@@ -24,7 +24,7 @@ import { useDashboardStore } from "@/lib/stores/dashboard-store";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChooseUsernameDialog } from "@/components/auth/choose-username-dialog";
-import { trackRegistration } from "@/lib/meta-pixel";
+import { trackPurchase, trackRegistration } from "@/lib/meta-pixel";
 import type { Profile, Link, Theme, SocialIcon, Subscription } from "@/types";
 
 const BusinessCardTab = lazy(() => import("@/components/dashboard/business-card/business-card-tab").then((m) => ({ default: m.BusinessCardTab })));
@@ -94,11 +94,26 @@ export function DashboardShell({
   // Handle redirect back from Stripe embedded checkout
   const searchParams = useSearchParams();
   useEffect(() => {
-    if (searchParams.get("upgraded") === "1") {
-      toast.success("Welcome to Viopage Pro!");
-      fetchSubscription();
-      window.history.replaceState({}, "", "/dashboard");
+    if (searchParams.get("upgraded") !== "1") return;
+
+    toast.success("Welcome to Viopage Pro!");
+    fetchSubscription();
+
+    // Fire Meta Pixel Purchase. Amount + currency were set by the checkout
+    // API on the return_url; validate them before trusting (the URL is
+    // user-controlled, so bogus params just cause us to skip the event).
+    const amountRaw = searchParams.get("amount");
+    const currencyRaw = searchParams.get("currency");
+    const amount = amountRaw ? Number(amountRaw) : NaN;
+    if (
+      Number.isFinite(amount) &&
+      amount > 0 &&
+      (currencyRaw === "EUR" || currencyRaw === "BRL")
+    ) {
+      trackPurchase(amount, currencyRaw);
     }
+
+    window.history.replaceState({}, "", "/dashboard");
   }, [searchParams, fetchSubscription]);
 
   // Fire CompleteRegistration for brand-new sign-ups

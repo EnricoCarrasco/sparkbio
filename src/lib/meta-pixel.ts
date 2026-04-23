@@ -1,5 +1,6 @@
 // Meta (Facebook) Pixel utility — direct fbq calls, no GTM.
-// The base Pixel code is loaded in src/app/layout.tsx.
+// The base Pixel loader lives in src/components/marketing-scripts.tsx as
+// `MetaPixelScript` and is mounted on marketing + dashboard layouts.
 
 type FbqFn = (command: string, eventName: string, params?: Record<string, unknown>) => void;
 
@@ -36,4 +37,14 @@ export function trackViewContent(contentId: string) {
 /** Fire Lead event (placeholder for future marketing forms). */
 export function trackLead() {
   fbq("track", "Lead");
+}
+
+/** Fire InitiateCheckout when the user opens Stripe checkout. */
+export function trackInitiateCheckout(value: number, currency: "EUR" | "BRL") {
+  fbq("track", "InitiateCheckout", { value, currency });
+}
+
+/** Fire Purchase when the user returns from a successful Stripe payment. */
+export function trackPurchase(value: number, currency: "EUR" | "BRL") {
+  fbq("track", "Purchase", { value, currency });
 }

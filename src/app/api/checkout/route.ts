@@ -14,6 +14,14 @@ function isValidInterval(value: unknown): value is BillingInterval {
   return value === "monthly" || value === "yearly";
 }
 
+// Advertised amounts per (region, interval). Kept in sync with
+// src/hooks/use-geo-pricing.ts — the hook owns what's shown to users, this
+// map mirrors it for the Meta Pixel Purchase event fired on return.
+const PRICE_AMOUNTS = {
+  default: { monthly: 9, yearly: 84 },
+  BR: { monthly: 25, yearly: 219 },
+} as const;
+
 export async function POST(request: NextRequest): Promise<NextResponse> {
   // --- Authentication ---
   const supabase = await createClient();
@@ -125,7 +133,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       // After embedded checkout completes, Stripe redirects the iframe to this URL.
       // We use the ?session_id={CHECKOUT_SESSION_ID} template so the dashboard
       // shell can pick up the session ID if we ever need it.
-      return_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}&upgraded=1`,
+      // amount + currency are passed through so the shell can fire the Meta
+      // Pixel Purchase event without waiting for the webhook to write.
+      return_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}&upgraded=1&amount=${PRICE_AMOUNTS[region][interval]}&currency=${region === "BR" ? "BRL" : "EUR"}`,
       allow_promotion_codes: true,
       automatic_tax: { enabled: false },
     });

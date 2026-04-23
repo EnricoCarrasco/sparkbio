@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { trackInitiateCheckout } from "@/lib/meta-pixel";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -99,6 +100,14 @@ export function UpgradeDialog({ open, onOpenChange }: UpgradeDialogProps) {
   // Start checkout: fetch clientSecret, switch to embedded mode
   const handleUpgrade = async () => {
     setIsLoading(true);
+
+    // Fire Meta Pixel InitiateCheckout before the fetch so the funnel step
+    // is recorded even if /api/checkout errors out. fbq no-ops if the pixel
+    // isn't loaded yet, so no error risk.
+    const value = interval === "yearly" ? geo.yearlyTotal : geo.monthlyPrice;
+    const currency: "EUR" | "BRL" = geo.isBR ? "BRL" : "EUR";
+    trackInitiateCheckout(value, currency);
+
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",

@@ -2,6 +2,7 @@ import React from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { MetaPixelScript } from "@/components/marketing-scripts";
 import { isSubscriptionActive } from "@/lib/constants";
 
 export default async function DashboardLayout({
@@ -26,15 +27,18 @@ export default async function DashboardLayout({
   ]);
 
   return (
-    <DashboardShell
-      initialProfile={profileRes.data}
-      initialLinks={linksRes.data || []}
-      initialTheme={themeRes.data}
-      initialSocialIcons={socialRes.data || []}
-      initialSubscription={subRes.data}
-      initialIsPro={isSubscriptionActive(subRes.data, profileRes.data)}
-    >
-      {children}
-    </DashboardShell>
+    <>
+      <MetaPixelScript />
+      <DashboardShell
+        initialProfile={profileRes.data}
+        initialLinks={linksRes.data || []}
+        initialTheme={themeRes.data}
+        initialSocialIcons={socialRes.data || []}
+        initialSubscription={subRes.data}
+        initialIsPro={isSubscriptionActive(subRes.data, profileRes.data)}
+      >
+        {children}
+      </DashboardShell>
+    </>
   );
 }
