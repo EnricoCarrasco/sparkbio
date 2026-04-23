@@ -53,10 +53,17 @@ export function SpotlightOverlay({
 
   useEffect(() => {
     if (!visible) return;
-    measure();
 
     const el = targetRef.current;
     if (!el) return;
+
+    // Scroll the target into view so the user sees what's being highlighted.
+    // Use "center" so the tooltip below the button also fits on screen.
+    el.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+
+    // Measure once the scroll settles; smooth scrolls can take ~300ms.
+    const initialTimer = window.setTimeout(measure, 350);
+    measure();
 
     const ro = new ResizeObserver(measure);
     ro.observe(el);
@@ -64,6 +71,7 @@ export function SpotlightOverlay({
     window.addEventListener("resize", measure);
 
     return () => {
+      window.clearTimeout(initialTimer);
       ro.disconnect();
       window.removeEventListener("scroll", measure, true);
       window.removeEventListener("resize", measure);

@@ -25,11 +25,10 @@ export function MidCTA() {
           className="reveal"
           style={{
             position: "relative",
-            borderRadius: 32,
+            borderRadius: "clamp(20px, 3vw, 32px)",
             overflow: "hidden",
             background: LANDING.ink,
-            aspectRatio: "16 / 9",
-            minHeight: 420,
+            minHeight: "clamp(380px, 42vw, 520px)",
             boxShadow: "0 30px 60px rgba(17,17,19,.24)",
           }}
         >
@@ -46,7 +45,7 @@ export function MidCTA() {
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(90deg, rgba(17,17,19,.88) 0%, rgba(17,17,19,.55) 55%, transparent 100%)",
+                "linear-gradient(180deg, rgba(17,17,19,.82) 0%, rgba(17,17,19,.72) 55%, rgba(17,17,19,.55) 100%), linear-gradient(90deg, rgba(17,17,19,.88) 0%, rgba(17,17,19,.45) 60%, transparent 100%)",
               zIndex: 2,
             }}
           />
@@ -58,7 +57,7 @@ export function MidCTA() {
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
-              padding: "48px clamp(24px, 5vw, 72px)",
+              padding: "clamp(28px, 5vw, 48px) clamp(20px, 5vw, 72px)",
               maxWidth: 680,
               color: "#fff",
             }}
@@ -67,7 +66,7 @@ export function MidCTA() {
               style={{
                 fontFamily: SANS_FONT,
                 fontWeight: 700,
-                fontSize: "clamp(32px, 4vw, 56px)",
+                fontSize: "clamp(26px, 4.2vw, 56px)",
                 lineHeight: 1.05,
                 letterSpacing: "-0.03em",
                 margin: 0,
@@ -91,15 +90,15 @@ export function MidCTA() {
             <p
               style={{
                 marginTop: 16,
-                fontSize: 17,
+                fontSize: "clamp(14px, 1.4vw, 17px)",
                 lineHeight: 1.5,
-                color: "rgba(255,255,255,.78)",
+                color: "rgba(255,255,255,.82)",
                 maxWidth: 460,
               }}
             >
               {t("body")}
             </p>
-            <div style={{ marginTop: 28, display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ marginTop: "clamp(20px, 3vw, 28px)", display: "flex", gap: 10, flexWrap: "wrap" }}>
               <Link href="/register" style={primaryBtn}>
                 {t("ctaPrimary")}
               </Link>
