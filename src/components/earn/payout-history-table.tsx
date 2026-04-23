@@ -4,6 +4,7 @@ import { CreditCard, QrCode, ReceiptText } from "lucide-react"
 import { motion } from "framer-motion"
 import { useTranslations } from "next-intl"
 import type { ReferralPayout, ReferralPayoutStatus, PayoutMethod } from "@/types/database"
+import { DASH, Eyebrow, Pill } from "@/components/dashboard/_dash-primitives"
 
 interface PayoutHistoryTableProps {
   payouts: ReferralPayout[]
@@ -21,11 +22,11 @@ function formatDate(dateString: string): string {
   })
 }
 
-const statusStyles: Record<ReferralPayoutStatus, string> = {
-  requested: "bg-amber-50 text-amber-700 border-amber-200",
-  processing: "bg-orange-50 text-orange-700 border-orange-200",
-  completed: "bg-green-50 text-green-700 border-green-200",
-  failed: "bg-red-50 text-red-700 border-red-200",
+const statusTone: Record<ReferralPayoutStatus, "orange" | "cream" | "green" | "red"> = {
+  requested: "orange",
+  processing: "cream",
+  completed: "green",
+  failed: "red",
 }
 
 const statusI18nKeys: Record<ReferralPayoutStatus, string> = {
@@ -35,33 +36,29 @@ const statusI18nKeys: Record<ReferralPayoutStatus, string> = {
   failed: "statusFailed",
 }
 
-const methodConfig: Record<
-  PayoutMethod,
-  { label: string; icon: React.ElementType }
-> = {
+const methodConfig: Record<PayoutMethod, { label: string; icon: React.ElementType }> = {
   paypal: { label: "PayPal", icon: CreditCard },
   pix: { label: "Pix", icon: QrCode },
 }
 
 function StatusBadge({ status, t }: { status: ReferralPayoutStatus; t: (key: string) => string }) {
-  return (
-    <span
-      className={[
-        "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium",
-        statusStyles[status],
-      ].join(" ")}
-    >
-      {t(statusI18nKeys[status])}
-    </span>
-  )
+  return <Pill tone={statusTone[status]}>{t(statusI18nKeys[status])}</Pill>
 }
 
 function MethodCell({ method }: { method: PayoutMethod }) {
   const config = methodConfig[method]
   const Icon = config.icon
   return (
-    <span className="inline-flex items-center gap-1.5 text-sm text-gray-600">
-      <Icon className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 6,
+        fontSize: 13,
+        color: DASH.muted,
+      }}
+    >
+      <Icon className="h-3.5 w-3.5 shrink-0" />
       {config.label}
     </span>
   )
@@ -70,75 +67,91 @@ function MethodCell({ method }: { method: PayoutMethod }) {
 export function PayoutHistoryTable({ payouts }: PayoutHistoryTableProps) {
   const t = useTranslations("referral")
   return (
-    <div className="rounded-xl bg-white border border-gray-100 shadow-sm overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center gap-2.5 border-b border-gray-100 px-6 py-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-50">
-          <ReceiptText className="h-4 w-4 text-purple-500" />
-        </div>
-        <h2
-          className="text-base font-semibold text-gray-900"
-          style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+    <div className="dash-panel" style={{ padding: 0, marginBottom: 16 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          padding: "18px 22px",
+          borderBottom: `1px solid ${DASH.line}`,
+        }}
+      >
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 28,
+            height: 28,
+            borderRadius: 10,
+            background: DASH.orangeTint,
+            color: DASH.orangeDeep,
+          }}
         >
-          {t("payoutHistory")}
-        </h2>
+          <ReceiptText className="h-4 w-4" />
+        </span>
+        <Eyebrow>{t("payoutHistory")}</Eyebrow>
       </div>
 
       {payouts.length === 0 ? (
-        /* Empty state */
-        <div className="flex flex-col items-center justify-center gap-3 px-6 py-14">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-100">
-            <ReceiptText className="h-5 w-5 text-gray-400" />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 12,
+            padding: "42px 24px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 48,
+              height: 48,
+              borderRadius: 16,
+              background: DASH.cream,
+            }}
+          >
+            <ReceiptText className="h-5 w-5" style={{ color: DASH.muted }} />
           </div>
-          <div className="text-center">
-            <p className="text-sm font-medium text-gray-600">{t("noPayouts")}</p>
-          </div>
+          <p style={{ fontSize: 13, fontWeight: 500, color: DASH.muted }}>
+            {t("noPayouts")}
+          </p>
         </div>
       ) : (
         <>
           {/* Desktop table */}
-          <div className="hidden sm:block overflow-x-auto">
-            <table className="w-full">
+          <div className="hidden sm:block" style={{ overflowX: "auto" }}>
+            <table className="dash-table">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50/60">
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400">
-                    Amount
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400">
-                    Method
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400">
-                    Status
-                  </th>
+                <tr>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Method</th>
+                  <th>Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody>
                 {payouts.map((payout, index) => (
                   <motion.tr
                     key={payout.id}
                     initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.25, delay: index * 0.05 }}
-                    className="hover:bg-gray-50/50 transition-colors"
                   >
-                    <td className="whitespace-nowrap px-6 py-3.5 text-sm text-gray-500">
+                    <td className="td-muted" style={{ whiteSpace: "nowrap" }}>
                       {formatDate(payout.created_at)}
                     </td>
-                    <td className="whitespace-nowrap px-6 py-3.5">
-                      <span
-                        className="text-sm font-semibold text-gray-900 tabular-nums"
-                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                      >
-                        {formatCents(payout.amount_cents)}
-                      </span>
+                    <td className="td-num" style={{ whiteSpace: "nowrap" }}>
+                      {formatCents(payout.amount_cents)}
                     </td>
-                    <td className="whitespace-nowrap px-6 py-3.5">
+                    <td style={{ whiteSpace: "nowrap" }}>
                       <MethodCell method={payout.payout_method} />
                     </td>
-                    <td className="whitespace-nowrap px-6 py-3.5">
+                    <td style={{ whiteSpace: "nowrap" }}>
                       <StatusBadge status={payout.status} t={t} />
                     </td>
                   </motion.tr>
@@ -147,26 +160,36 @@ export function PayoutHistoryTable({ payouts }: PayoutHistoryTableProps) {
             </table>
           </div>
 
-          {/* Mobile card list */}
-          <div className="flex flex-col divide-y divide-gray-100 sm:hidden">
+          {/* Mobile list */}
+          <div className="flex flex-col sm:hidden">
             {payouts.map((payout, index) => (
               <motion.div
                 key={payout.id}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, delay: index * 0.05 }}
-                className="flex items-center justify-between px-5 py-4"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "14px 20px",
+                  borderTop: `1px solid ${DASH.line}`,
+                }}
               >
-                <div className="flex flex-col gap-1">
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   <span
-                    className="text-sm font-semibold text-gray-900 tabular-nums"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: DASH.ink,
+                      fontVariantNumeric: "tabular-nums",
+                    }}
                   >
                     {formatCents(payout.amount_cents)}
                   </span>
-                  <div className="flex items-center gap-2">
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <MethodCell method={payout.payout_method} />
-                    <span className="text-xs text-gray-400">
+                    <span style={{ fontSize: 11, color: DASH.muted }}>
                       {formatDate(payout.created_at)}
                     </span>
                   </div>

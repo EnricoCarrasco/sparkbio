@@ -6,7 +6,6 @@ import {
   Crown,
   TrendingUp,
   AlertCircle,
-  Loader2,
 } from "lucide-react";
 import {
   LineChart,
@@ -16,11 +15,13 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { cn } from "@/lib/utils";
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+import {
+  DASH,
+  DASH_SERIF,
+  Eyebrow,
+  Italic,
+  Pill,
+} from "@/components/dashboard/_dash-primitives";
 
 interface AdminStats {
   totalUsers: number;
@@ -44,10 +45,6 @@ interface AdminStats {
   monthlyConversions: { month: string; count: number }[];
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 function formatCents(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
 }
@@ -67,13 +64,9 @@ function getInitial(username: string): string {
   return username.charAt(0).toUpperCase();
 }
 
-// ---------------------------------------------------------------------------
-// Sub-components
-// ---------------------------------------------------------------------------
-
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-5 animate-pulse">
+    <div className="dash-stat-card animate-pulse">
       <div className="h-3 w-20 bg-gray-100 rounded mb-3" />
       <div className="h-7 w-28 bg-gray-100 rounded mb-2" />
       <div className="h-3 w-16 bg-gray-100 rounded" />
@@ -86,37 +79,65 @@ interface KpiCardProps {
   value: string;
   sub?: string;
   icon: React.ElementType;
-  accentClass: string;
-  iconBgClass: string;
+  feature?: boolean;
 }
 
-function KpiCard({
-  label,
-  value,
-  sub,
-  icon: Icon,
-  accentClass,
-  iconBgClass,
-}: KpiCardProps) {
+function KpiCard({ label, value, sub, icon: Icon, feature }: KpiCardProps) {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-5 flex items-start gap-4 shadow-sm">
-      <div className={cn("flex items-center justify-center rounded-xl size-11 shrink-0", iconBgClass)}>
-        <Icon className={cn("size-5", accentClass)} strokeWidth={2} />
+    <div className={`dash-stat-card ${feature ? "dash-stat-feature" : ""}`}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8,
+        }}
+      >
+        <Eyebrow color={feature ? "rgba(255,255,255,.7)" : DASH.orangeDeep}>
+          {label}
+        </Eyebrow>
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 28,
+            height: 28,
+            borderRadius: 9,
+            background: feature ? "rgba(255,255,255,.1)" : DASH.orangeTint,
+            color: feature ? "#fff" : DASH.orangeDeep,
+          }}
+        >
+          <Icon className="h-4 w-4" />
+        </span>
       </div>
-      <div className="min-w-0">
-        <p className="text-xs font-medium text-gray-400 tracking-wide">{label}</p>
-        <p className="text-2xl font-semibold text-[#1E1E2E] tracking-tight mt-0.5">
-          {value}
-        </p>
-        {sub && (
-          <p className="text-xs text-gray-400 mt-0.5">{sub}</p>
-        )}
+      <div
+        style={{
+          fontSize: "clamp(24px, 3.6vw, 30px)",
+          fontWeight: 700,
+          letterSpacing: "-0.03em",
+          marginTop: 8,
+          lineHeight: 1,
+          color: feature ? "#fff" : DASH.ink,
+        }}
+      >
+        {value}
       </div>
+      {sub && (
+        <div
+          style={{
+            fontSize: 12,
+            color: feature ? "rgba(255,255,255,.7)" : DASH.muted,
+            marginTop: 6,
+          }}
+        >
+          {sub}
+        </div>
+      )}
     </div>
   );
 }
 
-// Custom Recharts tooltip
 interface TooltipProps {
   active?: boolean;
   payload?: { value: number }[];
@@ -126,16 +147,23 @@ interface TooltipProps {
 function ChartTooltip({ active, payload, label }: TooltipProps) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-gray-100 rounded-lg px-3 py-2 shadow-sm text-xs">
-      <p className="text-gray-500">{label}</p>
-      <p className="font-semibold text-[#FF6B35]">{payload[0].value} conversions</p>
+    <div
+      style={{
+        background: DASH.panel,
+        border: `1px solid ${DASH.line}`,
+        borderRadius: 10,
+        padding: "8px 12px",
+        fontSize: 12,
+        boxShadow: "0 4px 12px rgba(17,17,19,.08)",
+      }}
+    >
+      <p style={{ color: DASH.muted, margin: 0 }}>{label}</p>
+      <p style={{ color: DASH.orangeDeep, fontWeight: 700, margin: 0 }}>
+        {payload[0].value} conversions
+      </p>
     </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
 
 export default function AdminOverviewPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -158,27 +186,25 @@ export default function AdminOverviewPage() {
     fetchStats();
   }, []);
 
-  // ── Loading skeleton ──────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
-        <div className="h-7 w-44 bg-gray-100 rounded animate-pulse" />
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)}
+      <div className="dash-tab-pad">
+        <div className="h-7 w-44 bg-gray-100 rounded animate-pulse mb-6" />
+        <div className="dash-stats-strip">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl border border-gray-100 p-5 h-72 animate-pulse" />
-          <div className="bg-white rounded-xl border border-gray-100 p-5 h-72 animate-pulse" />
-        </div>
-        <div className="bg-white rounded-xl border border-gray-100 p-5 h-52 animate-pulse" />
       </div>
     );
   }
 
   if (error || !stats) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <p className="text-sm text-gray-500">Failed to load stats. Refresh to try again.</p>
+      <div className="dash-tab-pad">
+        <p style={{ fontSize: 13, color: DASH.muted }}>
+          Failed to load stats. Refresh to try again.
+        </p>
       </div>
     );
   }
@@ -188,152 +214,169 @@ export default function AdminOverviewPage() {
       ? ((stats.proSubscribers / stats.totalUsers) * 100).toFixed(1)
       : "0.0";
 
-  // ── Main render ────────────────────────────────────────────────────────────
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
-
-      {/* Page heading */}
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight text-[#1E1E2E]">
-          Overview
-        </h1>
-        <p className="text-sm text-gray-400 mt-0.5">
-          Platform health at a glance
-        </p>
+    <div className="dash-tab-pad">
+      <div className="dash-tab-head">
+        <div>
+          <Eyebrow>Admin</Eyebrow>
+          <h1 className="dash-page-title">
+            Platform <Italic>overview</Italic>.
+          </h1>
+          <p className="dash-page-sub">Platform health at a glance.</p>
+        </div>
       </div>
 
-      {/* ── ROW 1: KPI Cards ─────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="dash-stats-strip" style={{ marginBottom: 16 }}>
         <KpiCard
-          label="Total Users"
+          label="Total users"
           value={stats.totalUsers.toLocaleString()}
           icon={Users}
-          accentClass="text-gray-500"
-          iconBgClass="bg-gray-50"
         />
         <KpiCard
-          label="Pro Subscribers"
+          label="Pro subscribers"
           value={stats.proSubscribers.toLocaleString()}
           sub={`${conversionRate}% conversion`}
           icon={Crown}
-          accentClass="text-blue-500"
-          iconBgClass="bg-blue-50"
         />
         <KpiCard
-          label="Monthly Revenue"
+          label="Monthly revenue"
           value={formatCents(stats.monthlyRevenue)}
           icon={TrendingUp}
-          accentClass="text-green-500"
-          iconBgClass="bg-green-50"
+          feature
         />
         <KpiCard
-          label="Pending Payouts"
+          label="Pending payouts"
           value={formatCents(stats.pendingPayouts.amount)}
           sub={`${stats.pendingPayouts.count} request${stats.pendingPayouts.count === 1 ? "" : "s"}`}
           icon={AlertCircle}
-          accentClass="text-[#FF6B35]"
-          iconBgClass="bg-orange-50"
         />
       </div>
 
-      {/* ── ROW 2: Referral Health + Recent Activity ──────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        {/* Referral program health */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex flex-col gap-5">
-          <h2 className="text-sm font-semibold text-[#1E1E2E] tracking-tight">
-            Referral Program Health
-          </h2>
-
-          {/* 4 mini-stats */}
-          <div className="grid grid-cols-2 gap-3">
+      <div className="dash-two-col">
+        {/* Referral health */}
+        <div className="dash-panel">
+          <Eyebrow>Referral program health</Eyebrow>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 10,
+              marginTop: 14,
+            }}
+          >
             {[
-              {
-                label: "Liability",
-                value: formatCents(stats.referralHealth.liability),
-              },
-              {
-                label: "Active Referrers",
-                value: stats.referralHealth.activeReferrers.toLocaleString(),
-              },
-              {
-                label: "Conv. Rate",
-                value: `${stats.referralHealth.convRate.toFixed(1)}%`,
-              },
-              {
-                label: "Avg. Earnings",
-                value: formatCents(stats.referralHealth.avgEarnings),
-              },
+              { label: "Liability", value: formatCents(stats.referralHealth.liability) },
+              { label: "Active referrers", value: stats.referralHealth.activeReferrers.toLocaleString() },
+              { label: "Conv. rate", value: `${stats.referralHealth.convRate.toFixed(1)}%` },
+              { label: "Avg. earnings", value: formatCents(stats.referralHealth.avgEarnings) },
             ].map(({ label, value }) => (
               <div
                 key={label}
-                className="rounded-lg bg-gray-50 px-3 py-2.5"
+                style={{
+                  borderRadius: 12,
+                  background: DASH.cream,
+                  border: `1px solid ${DASH.line}`,
+                  padding: "10px 12px",
+                }}
               >
-                <p className="text-[10px] font-medium text-gray-400 tracking-wide">
-                  {label}
-                </p>
-                <p className="text-base font-semibold text-[#1E1E2E] mt-0.5">
+                <Eyebrow color={DASH.muted}>{label}</Eyebrow>
+                <div
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 700,
+                    color: DASH.ink,
+                    marginTop: 4,
+                    letterSpacing: "-0.01em",
+                  }}
+                >
                   {value}
-                </p>
+                </div>
               </div>
             ))}
           </div>
 
-          {/* Monthly conversions chart */}
-          <div className="flex-1 min-h-[120px]">
-            <p className="text-[10px] font-medium text-gray-400 tracking-wide mb-2">
-              Monthly Conversions
-            </p>
-            <ResponsiveContainer width="100%" height={120}>
-              <LineChart
-                data={stats.monthlyConversions}
-                margin={{ top: 4, right: 4, left: -28, bottom: 0 }}
-              >
-                <XAxis
-                  dataKey="month"
-                  tick={{ fontSize: 10, fill: "#9CA3AF" }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis hide />
-                <Tooltip content={<ChartTooltip />} />
-                <Line
-                  type="monotone"
-                  dataKey="count"
-                  stroke="#FF6B35"
-                  strokeWidth={2}
-                  dot={false}
-                  activeDot={{ r: 4, fill: "#FF6B35", strokeWidth: 0 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+          <div style={{ marginTop: 16 }}>
+            <Eyebrow color={DASH.muted}>Monthly conversions</Eyebrow>
+            <div style={{ height: 130, marginTop: 8 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={stats.monthlyConversions}
+                  margin={{ top: 4, right: 4, left: -28, bottom: 0 }}
+                >
+                  <XAxis
+                    dataKey="month"
+                    tick={{ fontSize: 10, fill: DASH.muted }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis hide />
+                  <Tooltip content={<ChartTooltip />} />
+                  <Line
+                    type="monotone"
+                    dataKey="count"
+                    stroke={DASH.orange}
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 4, fill: DASH.orange, strokeWidth: 0 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
 
         {/* Recent activity */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex flex-col gap-4">
-          <h2 className="text-sm font-semibold text-[#1E1E2E] tracking-tight">
-            Recent Activity
-          </h2>
-          <ul className="flex flex-col gap-3">
+        <div className="dash-panel">
+          <Eyebrow>Recent activity</Eyebrow>
+          <ul
+            style={{
+              listStyle: "none",
+              padding: 0,
+              margin: "14px 0 0",
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+            }}
+          >
             {stats.recentActivity.slice(0, 5).map((item, i) => (
-              <li key={i} className="flex items-start gap-3">
-                {/* Avatar circle */}
-                <div className="size-8 rounded-full bg-orange-50 text-[#FF6B35] flex items-center justify-center text-xs font-semibold shrink-0 mt-0.5">
+              <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 999,
+                    background: DASH.orangeTint,
+                    color: DASH.orangeDeep,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    flexShrink: 0,
+                    marginTop: 1,
+                  }}
+                >
                   {item.type.charAt(0).toUpperCase()}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-[#1E1E2E] leading-snug">
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 13.5, color: DASH.ink, margin: 0, lineHeight: 1.4 }}>
                     {item.description}
                   </p>
-                  <p className="text-[11px] text-gray-400 mt-0.5">
+                  <p style={{ fontSize: 11, color: DASH.muted, margin: "2px 0 0" }}>
                     {formatRelativeTime(item.timestamp)}
                   </p>
                 </div>
               </li>
             ))}
             {stats.recentActivity.length === 0 && (
-              <li className="text-sm text-gray-400 py-4 text-center">
+              <li
+                style={{
+                  fontSize: 13,
+                  color: DASH.muted,
+                  padding: "16px 0",
+                  textAlign: "center",
+                }}
+              >
                 No recent activity
               </li>
             )}
@@ -341,69 +384,95 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
-      {/* ── ROW 3: Top Referrers table ───────────────────────────────────── */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-        <h2 className="text-sm font-semibold text-[#1E1E2E] tracking-tight mb-4">
-          Top Referrers
-        </h2>
-        <div className="overflow-x-auto -mx-5 px-5">
-          <table className="w-full text-sm min-w-[480px]">
+      {/* Top referrers */}
+      <div className="dash-table-wrap" style={{ marginTop: 16 }}>
+        <div
+          style={{
+            padding: "18px 22px",
+            borderBottom: `1px solid ${DASH.line}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Eyebrow>Top referrers</Eyebrow>
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table className="dash-table">
             <thead>
-              <tr className="border-b border-gray-100">
-                {["User", "Clicks", "Signups", "Conversions", "Earnings"].map(
-                  (h) => (
-                    <th
-                      key={h}
-                      className="pb-3 text-left text-[11px] font-semibold text-gray-400 tracking-wide"
-                    >
-                      {h}
-                    </th>
-                  )
-                )}
+              <tr>
+                <th>Rank</th>
+                <th>User</th>
+                <th className="td-right">Clicks</th>
+                <th className="td-right">Signups</th>
+                <th className="td-right">Conversions</th>
+                <th className="td-right">Earnings</th>
               </tr>
             </thead>
             <tbody>
               {stats.topReferrers.slice(0, 5).map((row, i) => (
-                <tr
-                  key={row.username}
-                  className="border-b border-gray-50 last:border-0"
-                >
-                  <td className="py-3 pr-4">
-                    <div className="flex items-center gap-2.5">
-                      <div className="size-7 rounded-full bg-purple-50 text-[#8B5CF6] flex items-center justify-center text-xs font-semibold shrink-0">
-                        {getInitial(row.username)}
-                      </div>
-                      <span className="font-medium text-[#1E1E2E]">
-                        {row.username}
-                      </span>
-                      {i === 0 && (
-                        <span className="text-[10px] font-semibold text-[#FF6B35] bg-orange-50 px-1.5 py-0.5 rounded-full">
-                          #1
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="py-3 pr-4 text-gray-600">
-                    {row.clicks.toLocaleString()}
-                  </td>
-                  <td className="py-3 pr-4 text-gray-600">
-                    {row.signups.toLocaleString()}
-                  </td>
-                  <td className="py-3 pr-4">
-                    <span className="font-medium text-[#1E1E2E]">
-                      {row.conversions.toLocaleString()}
+                <tr key={row.username}>
+                  <td>
+                    <span
+                      style={{
+                        fontFamily: DASH_SERIF,
+                        fontStyle: "italic",
+                        fontSize: 20,
+                        color: DASH.muted,
+                      }}
+                    >
+                      {i + 1}
                     </span>
                   </td>
-                  <td className="py-3 font-semibold text-green-600">
-                    {formatCents(row.earnings)}
+                  <td>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div
+                        style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: 999,
+                          background: "#8B5CF6",
+                          color: "#fff",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 11,
+                          fontWeight: 700,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {getInitial(row.username)}
+                      </div>
+                      <span style={{ fontWeight: 600, color: DASH.ink }}>
+                        {row.username}
+                      </span>
+                      {i === 0 && <Pill tone="orange">#1</Pill>}
+                    </div>
+                  </td>
+                  <td className="td-right td-num td-muted">
+                    {row.clicks.toLocaleString()}
+                  </td>
+                  <td className="td-right td-num td-muted">
+                    {row.signups.toLocaleString()}
+                  </td>
+                  <td className="td-right td-num">
+                    {row.conversions.toLocaleString()}
+                  </td>
+                  <td className="td-right">
+                    <Pill tone="green">{formatCents(row.earnings)}</Pill>
                   </td>
                 </tr>
               ))}
               {stats.topReferrers.length === 0 && (
                 <tr>
                   <td
-                    colSpan={5}
-                    className="py-8 text-center text-sm text-gray-400"
+                    colSpan={6}
+                    style={{
+                      textAlign: "center",
+                      padding: "32px 0",
+                      fontSize: 13,
+                      color: DASH.muted,
+                    }}
                   >
                     No referral data yet
                   </td>

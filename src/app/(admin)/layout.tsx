@@ -10,11 +10,12 @@ import {
   ChevronLeft,
   Loader2,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+import {
+  DASH,
+  DASH_MONO,
+  DASH_SERIF,
+  Pill,
+} from "@/components/dashboard/_dash-primitives";
 
 interface NavItem {
   label: string;
@@ -24,9 +25,29 @@ interface NavItem {
   badge?: number | null;
 }
 
-// ---------------------------------------------------------------------------
-// Admin layout
-// ---------------------------------------------------------------------------
+function LogoMark({ size = 30 }: { size?: number }) {
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        borderRadius: 10,
+        background: DASH.ink,
+        color: DASH.orange,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: DASH_SERIF,
+        fontSize: Math.round(size * 0.65),
+        fontStyle: "italic",
+        fontWeight: 400,
+        lineHeight: 1,
+      }}
+    >
+      v
+    </div>
+  );
+}
 
 export default function AdminLayout({
   children,
@@ -38,9 +59,6 @@ export default function AdminLayout({
   const [pendingCount, setPendingCount] = useState<number | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
 
-  // Auth check: lightweight /api/admin/check gates the layout. If admin,
-  // the heavy /api/admin/stats fetches in the background just for the
-  // pending-payouts badge so it doesn't block the UI.
   useEffect(() => {
     async function init() {
       try {
@@ -96,37 +114,90 @@ export default function AdminLayout({
     return pathname.startsWith(item.href);
   }
 
-  // Show spinner while auth is resolving
   if (!authChecked) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
-        <Loader2 className="size-6 animate-spin text-[#FF6B35]" />
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: DASH.cream,
+        }}
+      >
+        <Loader2 className="size-6 animate-spin" style={{ color: DASH.orange }} />
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#FAFAFA] font-[family-name:var(--font-sans)]">
-      {/* ── Desktop sidebar ─────────────────────────────────────────── */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-60 lg:shrink-0 border-r border-gray-200 bg-white">
-        {/* Logo */}
-        <div className="flex items-center gap-2 px-5 h-16 border-b border-gray-200 shrink-0">
-          <img
-            src="/images/landing/logo-viopage.png"
-            alt="Viopage"
-            className="h-8 w-auto select-none object-contain"
-          />
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        overflow: "hidden",
+        background: DASH.cream,
+        fontFamily: "var(--font-poppins), var(--font-sans), system-ui, sans-serif",
+      }}
+    >
+      {/* Desktop sidebar */}
+      <aside
+        className="hidden lg:flex lg:flex-col lg:w-[240px] lg:shrink-0"
+        style={{
+          background: DASH.panel,
+          borderRight: `1px solid ${DASH.line}`,
+        }}
+      >
+        {/* Logo + Admin label */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            padding: "0 20px",
+            height: 64,
+            borderBottom: `1px solid ${DASH.line}`,
+            flexShrink: 0,
+          }}
+        >
+          <LogoMark />
+          <div>
+            <div
+              style={{
+                fontWeight: 700,
+                fontSize: 15,
+                color: DASH.ink,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.1,
+              }}
+            >
+              Viopage
+            </div>
+            <div
+              style={{
+                fontFamily: DASH_MONO,
+                fontSize: 9.5,
+                color: DASH.orangeDeep,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                fontWeight: 600,
+                marginTop: 1,
+              }}
+            >
+              Admin
+            </div>
+          </div>
         </div>
 
-        {/* Admin label */}
-        <div className="px-5 pt-4 pb-1">
-          <span className="text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
-            Admin
-          </span>
-        </div>
-
-        {/* Nav items */}
-        <nav className="flex flex-col gap-0.5 px-3 flex-1">
+        <nav
+          style={{
+            padding: "16px 12px",
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const active = isActive(item);
@@ -134,70 +205,124 @@ export default function AdminLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border-l-2",
-                  active
-                    ? "border-l-[#FF6B35] bg-orange-50 text-orange-600"
-                    : "border-l-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-800"
-                )}
+                className={`dash-sidebtn dash-sidebtn-row ${active ? "active" : ""}`}
+                style={{ textDecoration: "none" }}
               >
-                <Icon
-                  className="size-4 shrink-0"
-                  strokeWidth={active ? 2 : 1.5}
-                />
-                <span className="flex-1">{item.label}</span>
+                <Icon className="size-4 shrink-0" strokeWidth={active ? 2 : 1.5} />
+                <span style={{ flex: 1 }}>{item.label}</span>
                 {item.badge != null && item.badge > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 rounded-full bg-[#FF6B35] text-white text-[10px] font-bold px-1.5">
-                    {item.badge}
-                  </span>
+                  <Pill tone="orange">{item.badge}</Pill>
                 )}
               </Link>
             );
           })}
         </nav>
 
-        {/* Divider + back */}
-        <div className="px-3 py-4 border-t border-gray-200">
+        <div
+          style={{
+            padding: "12px 12px 16px",
+            borderTop: `1px solid ${DASH.line}`,
+          }}
+        >
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors"
+            className="dash-sidebtn dash-sidebtn-row"
+            style={{ textDecoration: "none", fontSize: 12.5 }}
           >
-            <ChevronLeft className="size-4 shrink-0" strokeWidth={1.5} />
-            Back to App
+            <ChevronLeft className="size-4" strokeWidth={1.5} />
+            <span>Back to App</span>
           </Link>
         </div>
       </aside>
 
-      {/* ── Main content column ──────────────────────────────────────── */}
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+      {/* Main */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          minWidth: 0,
+          overflow: "hidden",
+        }}
+      >
         {/* Mobile top header */}
-        <header className="flex lg:hidden items-center justify-between gap-3 px-4 h-14 border-b border-gray-200 bg-white shrink-0">
-          <div className="flex items-center gap-2">
-            <img
-              src="/images/landing/logo-viopage.png"
-              alt="Viopage"
-              className="h-7 w-auto select-none object-contain"
-            />
-            <span className="text-xs font-semibold text-gray-400 tracking-wider uppercase">
+        <header
+          className="flex lg:hidden"
+          style={{
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            padding: "0 14px",
+            height: 56,
+            background: "rgba(247,242,234,0.85)",
+            backdropFilter: "blur(12px)",
+            borderBottom: `1px solid ${DASH.line}`,
+            flexShrink: 0,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <LogoMark size={26} />
+            <span
+              style={{
+                fontFamily: DASH_MONO,
+                fontSize: 10,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                fontWeight: 600,
+                color: DASH.orangeDeep,
+              }}
+            >
               Admin
             </span>
           </div>
           <Link
             href="/dashboard"
-            className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800 transition-colors"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              fontSize: 12,
+              color: DASH.muted,
+              textDecoration: "none",
+            }}
           >
             <ChevronLeft className="size-3.5" strokeWidth={1.5} />
             App
           </Link>
         </header>
 
-        {/* Scrollable page content */}
-        <main data-dashboard-main className="flex-1 overflow-y-auto lg:pb-0">
+        <main
+          data-dashboard-main
+          className="dash-main-col"
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            overflowX: "hidden",
+            background: DASH.cream,
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          }}
+        >
           {children}
         </main>
 
-        {/* Mobile bottom navigation */}
-        <nav className="flex lg:hidden items-center justify-around h-16 border-t border-gray-200 bg-white shrink-0 fixed bottom-0 left-0 right-0 z-20 pb-safe">
+        {/* Mobile bottom nav */}
+        <nav
+          className="flex lg:hidden"
+          style={{
+            alignItems: "center",
+            justifyContent: "space-around",
+            height: 64,
+            background: "rgba(255,253,248,0.92)",
+            backdropFilter: "blur(12px)",
+            borderTop: `1px solid ${DASH.line}`,
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 20,
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          }}
+        >
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const active = isActive(item);
@@ -205,20 +330,43 @@ export default function AdminLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className={cn(
-                  "relative flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg transition-colors",
-                  active ? "text-[#FF6B35]" : "text-gray-400 hover:text-gray-700"
-                )}
+                style={{
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 2,
+                  padding: "6px 12px",
+                  borderRadius: 10,
+                  color: active ? DASH.orangeDeep : DASH.muted,
+                  textDecoration: "none",
+                  fontWeight: active ? 600 : 500,
+                  transition: "color .15s",
+                }}
               >
-                <Icon
-                  className="size-5"
-                  strokeWidth={active ? 2 : 1.5}
-                />
-                <span className="text-[10px] font-medium leading-tight">
+                <Icon className="size-5" strokeWidth={active ? 2 : 1.5} />
+                <span style={{ fontSize: 10.5, lineHeight: 1 }}>
                   {item.label}
                 </span>
                 {item.badge != null && item.badge > 0 && (
-                  <span className="absolute -top-0.5 right-1 inline-flex items-center justify-center min-w-[16px] h-4 rounded-full bg-[#FF6B35] text-white text-[9px] font-bold px-1">
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: -2,
+                      right: 4,
+                      minWidth: 16,
+                      height: 16,
+                      borderRadius: 999,
+                      background: DASH.orange,
+                      color: "#fff",
+                      fontSize: 9,
+                      fontWeight: 700,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "0 4px",
+                    }}
+                  >
                     {item.badge}
                   </span>
                 )}

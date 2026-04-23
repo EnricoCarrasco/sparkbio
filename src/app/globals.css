@@ -785,3 +785,53 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Editorial table (admin leaderboards, earn payout history) */
+.dash-table-wrap {
+  background: var(--dash-panel);
+  border: 1px solid var(--dash-line);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.dash-table thead th {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dash-orange-deep);
+  text-align: left;
+  padding: 14px 18px;
+  background: var(--dash-panel-2);
+  border-bottom: 1px solid var(--dash-line);
+}
+.dash-table tbody td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--dash-line);
+  color: var(--dash-ink);
+  vertical-align: middle;
+}
+.dash-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.dash-table tbody tr {
+  transition: background 0.12s;
+}
+.dash-table tbody tr:hover {
+  background: rgba(255, 107, 53, 0.04);
+}
+.dash-table .td-muted {
+  color: var(--dash-muted);
+}
+.dash-table .td-right {
+  text-align: right;
+}
+.dash-table .td-num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}

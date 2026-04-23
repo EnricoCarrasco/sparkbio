@@ -4,6 +4,7 @@ import { ArrowRight, ArrowDown, MousePointer2, UserPlus, Zap } from "lucide-reac
 import { motion } from "framer-motion"
 import { useTranslations } from "next-intl"
 import type { ReferralStats } from "@/types/database"
+import { DASH, Eyebrow } from "@/components/dashboard/_dash-primitives"
 
 interface ConversionFunnelProps {
   stats: ReferralStats | null
@@ -18,11 +19,6 @@ interface FunnelStep {
   label: string
   count: number
   icon: React.ElementType
-  iconBg: string
-  iconColor: string
-  valueBg: string
-  valueColor: string
-  barColor: string
 }
 
 export function ConversionFunnel({ stats }: ConversionFunnelProps) {
@@ -33,106 +29,117 @@ export function ConversionFunnel({ stats }: ConversionFunnelProps) {
   const maxCount = Math.max(clicks, 1)
 
   const steps: FunnelStep[] = [
-    {
-      label: t("clicks"),
-      count: clicks,
-      icon: MousePointer2,
-      iconBg: "bg-gray-100",
-      iconColor: "text-gray-500",
-      valueBg: "bg-gray-50",
-      valueColor: "text-gray-700",
-      barColor: "bg-gray-300",
-    },
-    {
-      label: t("signups"),
-      count: signups,
-      icon: UserPlus,
-      iconBg: "bg-orange-50",
-      iconColor: "text-orange-500",
-      valueBg: "bg-orange-50",
-      valueColor: "text-orange-700",
-      barColor: "bg-orange-400",
-    },
-    {
-      label: t("conversions"),
-      count: conversions,
-      icon: Zap,
-      iconBg: "bg-green-50",
-      iconColor: "text-green-500",
-      valueBg: "bg-green-50",
-      valueColor: "text-green-700",
-      barColor: "bg-green-400",
-    },
+    { label: t("clicks"), count: clicks, icon: MousePointer2 },
+    { label: t("signups"), count: signups, icon: UserPlus },
+    { label: t("conversions"), count: conversions, icon: Zap },
   ]
 
-  const rates = [
-    safeRate(signups, clicks),
-    safeRate(conversions, signups),
-  ]
+  const rates = [safeRate(signups, clicks), safeRate(conversions, signups)]
 
   return (
-    <div className="rounded-xl bg-white border border-gray-100 p-6 shadow-sm">
-      {/* Header */}
-      <h2
-        className="mb-5 text-base font-semibold text-gray-900"
-        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-      >
-        {t("funnel")}
-      </h2>
+    <div className="dash-panel" style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 16 }}>
+        <Eyebrow>{t("funnel")}</Eyebrow>
+      </div>
 
-      {/* Desktop: horizontal row; mobile: vertical stack */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-2">
+      <div
+        className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-2"
+      >
         {steps.map((step, index) => {
           const Icon = step.icon
           const barWidth = `${Math.round((step.count / maxCount) * 100)}%`
 
           return (
-            <div key={step.label} className="flex flex-1 flex-col sm:flex-row sm:items-center sm:gap-2">
-              {/* Step card */}
+            <div
+              key={step.label}
+              style={{ flex: 1 }}
+              className="flex flex-col sm:flex-row sm:items-center sm:gap-2"
+            >
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="flex-1 rounded-xl border border-gray-100 bg-gray-50 p-4"
+                style={{
+                  flex: 1,
+                  borderRadius: 14,
+                  background: DASH.cream,
+                  border: `1px solid ${DASH.line}`,
+                  padding: 16,
+                }}
               >
-                {/* Icon + label */}
-                <div className="mb-3 flex items-center gap-2">
-                  <div
-                    className={`inline-flex h-7 w-7 items-center justify-center rounded-lg ${step.iconBg}`}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    marginBottom: 10,
+                  }}
+                >
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 26,
+                      height: 26,
+                      borderRadius: 8,
+                      background: DASH.orangeTint,
+                      color: DASH.orangeDeep,
+                    }}
                   >
-                    <Icon className={`h-3.5 w-3.5 ${step.iconColor}`} />
-                  </div>
-                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                    {step.label}
+                    <Icon className="h-3.5 w-3.5" />
                   </span>
+                  <Eyebrow color={DASH.muted}>{step.label}</Eyebrow>
                 </div>
 
-                {/* Count */}
-                <p
-                  className="text-2xl font-bold text-gray-900 tabular-nums"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                <div
+                  style={{
+                    fontSize: 26,
+                    fontWeight: 700,
+                    letterSpacing: "-0.02em",
+                    color: DASH.ink,
+                    fontVariantNumeric: "tabular-nums",
+                  }}
                 >
                   {step.count.toLocaleString()}
-                </p>
+                </div>
 
-                {/* Mini bar */}
-                <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
+                <div className="dash-bar-bg" style={{ marginTop: 12 }}>
                   <motion.div
-                    className={`h-full rounded-full ${step.barColor}`}
+                    className="dash-bar-fill"
                     initial={{ width: 0 }}
                     animate={{ width: barWidth }}
-                    transition={{ duration: 0.6, delay: 0.2 + index * 0.1, ease: "easeOut" }}
+                    transition={{
+                      duration: 0.6,
+                      delay: 0.2 + index * 0.1,
+                      ease: "easeOut",
+                    }}
                   />
                 </div>
               </motion.div>
 
-              {/* Arrow + rate connector (not after last step) */}
               {index < steps.length - 1 && (
-                <div className="flex flex-row items-center justify-center gap-1 py-1 sm:flex-col sm:py-0">
-                  {/* Mobile: arrow down; Desktop: arrow right */}
-                  <ArrowDown className="h-3.5 w-3.5 text-gray-300 sm:hidden" />
-                  <ArrowRight className="hidden h-3.5 w-3.5 text-gray-300 sm:block" />
-                  <span className="text-[10px] font-semibold text-gray-400 tabular-nums">
+                <div
+                  style={{ gap: 4 }}
+                  className="flex items-center justify-center py-1.5 sm:flex-col sm:py-0"
+                >
+                  <ArrowDown
+                    className="h-3.5 w-3.5 sm:hidden"
+                    style={{ color: DASH.muted, opacity: 0.6 }}
+                  />
+                  <ArrowRight
+                    className="hidden h-3.5 w-3.5 sm:block"
+                    style={{ color: DASH.muted, opacity: 0.6 }}
+                  />
+                  <span
+                    style={{
+                      fontSize: 10.5,
+                      fontWeight: 600,
+                      color: DASH.muted,
+                      fontVariantNumeric: "tabular-nums",
+                      letterSpacing: "0.02em",
+                    }}
+                  >
                     {rates[index]}
                   </span>
                 </div>

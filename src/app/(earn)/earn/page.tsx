@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { DollarSign, CreditCard, QrCode, Settings2, Check, Loader2 } from "lucide-react";
+import { DollarSign, CreditCard, QrCode, Check, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 import { useReferralStore } from "@/lib/stores/referral-store";
 import { REFERRAL_MIN_PAYOUT_CENTS } from "@/lib/constants";
 import { ReferralLinkSection } from "@/components/earn/referral-link-section";
@@ -13,36 +12,29 @@ import { EarnOverviewCards } from "@/components/earn/earn-overview-cards";
 import { ConversionFunnel } from "@/components/earn/conversion-funnel";
 import { PayoutHistoryTable } from "@/components/earn/payout-history-table";
 import type { PayoutMethod } from "@/types/database";
+import {
+  DASH,
+  Eyebrow,
+  Italic,
+} from "@/components/dashboard/_dash-primitives";
 
 function EarnPageSkeleton() {
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-      {/* Page title */}
-      <div className="space-y-2">
-        <Skeleton className="h-8 w-56" />
-        <Skeleton className="h-4 w-80" />
+    <div className="dash-tab-pad">
+      <div className="dash-tab-head">
+        <div>
+          <Skeleton className="h-5 w-28" />
+          <Skeleton className="h-10 w-80 mt-3" />
+          <Skeleton className="h-4 w-96 mt-3" />
+        </div>
       </div>
-
-      {/* Referral link section */}
-      <Skeleton className="h-24 w-full rounded-xl" />
-
-      {/* Overview cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <Skeleton className="h-28 w-full rounded-xl mb-4" />
+      <div className="dash-stats-strip" style={{ marginBottom: 16 }}>
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-28 rounded-xl" />
+          <Skeleton key={i} className="h-32 rounded-xl" />
         ))}
       </div>
-
-      {/* Conversion funnel */}
-      <Skeleton className="h-48 w-full rounded-xl" />
-
-      {/* Payout */}
-      <div className="flex items-center justify-between">
-        <Skeleton className="h-6 w-40" />
-        <Skeleton className="h-9 w-32 rounded-lg" />
-      </div>
-
-      {/* Payout history */}
+      <Skeleton className="h-48 w-full rounded-xl mb-4" />
       <Skeleton className="h-48 w-full rounded-xl" />
     </div>
   );
@@ -67,7 +59,9 @@ export default function EarnPage() {
 
   const minPayoutFormatted = `$${(REFERRAL_MIN_PAYOUT_CENTS / 100).toFixed(2)}`;
   const hasPayoutSettings = !!payoutMethod && !!payoutDestination;
-  const canRequestPayout = hasPayoutSettings && (stats?.availableCents ?? 0) >= REFERRAL_MIN_PAYOUT_CENTS;
+  const canRequestPayout =
+    hasPayoutSettings &&
+    (stats?.availableCents ?? 0) >= REFERRAL_MIN_PAYOUT_CENTS;
 
   async function handleSaveSettings() {
     if (!destination.trim()) return;
@@ -98,152 +92,191 @@ export default function EarnPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-      {/* Page header */}
-      <div>
-        <h1 className="text-2xl font-semibold text-[#1E1E2E] tracking-[-0.02em]">
-          {t("pageTitle")}
-        </h1>
-        <p className="mt-1.5 text-sm text-[#6b7280] leading-relaxed">
-          {t("pageSubtitle")}
-        </p>
+    <div className="dash-tab-pad">
+      <div className="dash-tab-head">
+        <div>
+          <Eyebrow>{t("pageTitle")}</Eyebrow>
+          <h1 className="dash-page-title">
+            Earn with <Italic>Viopage</Italic>.
+          </h1>
+          <p className="dash-page-sub">{t("pageSubtitle")}</p>
+        </div>
       </div>
 
-      {/* Referral link */}
       <ReferralLinkSection referralCode={referralCode} />
 
-      {/* Earnings cards */}
       <EarnOverviewCards stats={stats} />
 
-      {/* Funnel */}
       <ConversionFunnel stats={stats} />
 
-      {/* Payment Settings */}
-      <section className="rounded-xl bg-white border border-gray-100 p-6 shadow-sm">
-        <div className="flex items-center gap-2.5 mb-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
-            <Settings2 className="h-4 w-4 text-blue-500" />
-          </div>
-          <h2 className="text-base font-semibold text-gray-900">
-            {t("payoutSettings")}
-          </h2>
-        </div>
-
-        {hasPayoutSettings && !editingPayout ? (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {payoutMethod === "paypal" ? (
-                <CreditCard className="h-5 w-5 text-gray-400" />
-              ) : (
-                <QrCode className="h-5 w-5 text-gray-400" />
-              )}
-              <div>
-                <p className="text-sm font-medium text-gray-900">
-                  {payoutMethod === "paypal" ? "PayPal" : "Pix"}
-                </p>
-                <p className="text-sm text-gray-500">
-                  {payoutDestination!.slice(0, 3)}***{payoutDestination!.slice(-4)}
-                </p>
-              </div>
-              <Check className="h-4 w-4 text-green-500" />
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
+      {/* Payout settings */}
+      <section className="dash-panel" style={{ marginBottom: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
+          <Eyebrow>{t("payoutSettings")}</Eyebrow>
+          {hasPayoutSettings && !editingPayout ? (
+            <button
+              type="button"
               onClick={() => {
                 setMethod(payoutMethod!);
                 setDestination(payoutDestination!);
                 setEditingPayout(true);
               }}
+              className="dash-btn-ghost"
             >
               {t("editSettings")}
-            </Button>
+            </button>
+          ) : null}
+        </div>
+
+        {hasPayoutSettings && !editingPayout ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            {payoutMethod === "paypal" ? (
+              <CreditCard className="h-5 w-5" style={{ color: DASH.muted }} />
+            ) : (
+              <QrCode className="h-5 w-5" style={{ color: DASH.muted }} />
+            )}
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 14, fontWeight: 600, color: DASH.ink, margin: 0 }}>
+                {payoutMethod === "paypal" ? "PayPal" : "Pix"}
+              </p>
+              <p style={{ fontSize: 13, color: DASH.muted, margin: 0 }}>
+                {payoutDestination!.slice(0, 3)}***{payoutDestination!.slice(-4)}
+              </p>
+            </div>
+            <Check className="h-4 w-4" style={{ color: "#16a34a" }} />
           </div>
         ) : (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-2">
-              {(["paypal", "pix"] as const).map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => setMethod(m)}
-                  className={`flex items-center gap-2 rounded-xl border-2 p-3 text-left transition-all ${
-                    method === m
-                      ? "border-orange-400 bg-orange-50"
-                      : "border-gray-200 bg-white hover:border-gray-300"
-                  }`}
-                >
-                  {m === "paypal" ? (
-                    <CreditCard className={`h-4 w-4 ${method === m ? "text-orange-500" : "text-gray-400"}`} />
-                  ) : (
-                    <QrCode className={`h-4 w-4 ${method === m ? "text-orange-500" : "text-gray-400"}`} />
-                  )}
-                  <span className={`text-sm font-medium ${method === m ? "text-orange-700" : "text-gray-700"}`}>
-                    {m === "paypal" ? "PayPal" : "Pix"}
-                  </span>
-                </button>
-              ))}
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              {(["paypal", "pix"] as const).map((m) => {
+                const selected = method === m;
+                const Icon = m === "paypal" ? CreditCard : QrCode;
+                return (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => setMethod(m)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      borderRadius: 14,
+                      border: selected ? `2px solid ${DASH.orange}` : `1px solid ${DASH.line}`,
+                      padding: 12,
+                      textAlign: "left",
+                      background: selected ? DASH.orangeTint : DASH.cream,
+                      cursor: "pointer",
+                      transition: "all .15s",
+                    }}
+                  >
+                    <Icon className="h-4 w-4" style={{ color: selected ? DASH.orangeDeep : DASH.muted }} />
+                    <span style={{ fontSize: 13, fontWeight: 600, color: selected ? DASH.orangeDeep : DASH.ink }}>
+                      {m === "paypal" ? "PayPal" : "Pix"}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                {method === "paypal" ? t("paypalEmail") : t("pixKey")}
-              </label>
-              <input
-                type={method === "paypal" ? "email" : "text"}
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-                placeholder={method === "paypal" ? "your@email.com" : "CPF, e-mail, phone, or random key"}
-                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-orange-300 focus:bg-white focus:ring-2 focus:ring-orange-100"
-              />
+              <div style={{ marginBottom: 6 }}>
+                <Eyebrow color={DASH.muted}>
+                  {method === "paypal" ? t("paypalEmail") : t("pixKey")}
+                </Eyebrow>
+              </div>
+              <div className="dash-field-input">
+                <input
+                  type={method === "paypal" ? "email" : "text"}
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                  placeholder={
+                    method === "paypal"
+                      ? "your@email.com"
+                      : "CPF, e-mail, phone, or random key"
+                  }
+                />
+              </div>
             </div>
-            <div className="flex gap-2">
+            <div style={{ display: "flex", gap: 10 }}>
               {hasPayoutSettings && (
-                <Button variant="outline" size="sm" onClick={() => setEditingPayout(false)}>
+                <button
+                  type="button"
+                  className="dash-btn-ghost"
+                  onClick={() => setEditingPayout(false)}
+                >
                   {t("cancel")}
-                </Button>
+                </button>
               )}
-              <Button
-                size="sm"
+              <button
+                type="button"
+                className="dash-btn-primary"
                 disabled={!destination.trim() || savingSettings}
                 onClick={handleSaveSettings}
-                className="bg-[#FF6B35] hover:bg-[#e55a25] text-white"
+                style={{
+                  background: DASH.orange,
+                  opacity: !destination.trim() || savingSettings ? 0.6 : 1,
+                }}
               >
-                {savingSettings ? <Loader2 className="h-4 w-4 animate-spin" /> : t("saveSettings")}
-              </Button>
+                {savingSettings ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  t("saveSettings")
+                )}
+              </button>
             </div>
           </div>
         )}
       </section>
 
-      {/* Payout section */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-foreground">
-            {t("payoutHistory")}
-          </h2>
-
-          <Button
+      {/* Payout request + history */}
+      <section>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            flexWrap: "wrap",
+            marginBottom: 14,
+          }}
+        >
+          <Eyebrow>{t("payoutHistory")}</Eyebrow>
+          <button
+            type="button"
             onClick={handleRequestPayout}
             disabled={!canRequestPayout || requestingPayout}
-            className="gap-2 bg-[#FF6B35] hover:bg-[#e55a25] text-white"
-            size="sm"
+            className="dash-btn-primary"
+            style={{
+              background: DASH.orange,
+              opacity: !canRequestPayout || requestingPayout ? 0.5 : 1,
+              cursor: !canRequestPayout ? "not-allowed" : "pointer",
+            }}
           >
             {requestingPayout ? (
-              <Loader2 className="size-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <DollarSign className="size-4" strokeWidth={2} />
+              <DollarSign className="h-4 w-4" />
             )}
             {t("requestPayout")}
-          </Button>
+          </button>
         </div>
 
         {!hasPayoutSettings && (
-          <p className="text-sm text-amber-600 bg-amber-50 rounded-lg px-4 py-2.5 border border-amber-100">
+          <div
+            style={{
+              fontSize: 13,
+              color: "#b45309",
+              background: "#fff7ed",
+              borderRadius: 12,
+              padding: "10px 14px",
+              border: "1px solid #fed7aa",
+              marginBottom: 12,
+            }}
+          >
             {t("setupPayoutFirst")}
-          </p>
+          </div>
         )}
 
-        <p className="text-xs text-gray-400">
+        <p style={{ fontSize: 11.5, color: DASH.muted, margin: "0 0 12px" }}>
           {t("minimumPayout", { amount: minPayoutFormatted })}
         </p>
 

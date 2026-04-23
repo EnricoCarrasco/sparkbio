@@ -5,6 +5,7 @@ import { ClipboardCopy, Check, Link2 } from "lucide-react"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import { motion, AnimatePresence } from "framer-motion"
+import { DASH, DASH_MONO, Eyebrow } from "@/components/dashboard/_dash-primitives"
 
 interface ReferralLinkSectionProps {
   referralCode: string | null
@@ -31,25 +32,44 @@ export function ReferralLinkSection({ referralCode }: ReferralLinkSectionProps) 
   }
 
   return (
-    <div className="rounded-xl bg-white border border-gray-100 p-6 shadow-sm">
-      {/* Header */}
-      <div className="flex items-center gap-2.5 mb-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50">
-          <Link2 className="h-4 w-4 text-orange-500" />
-        </div>
-        <h2
-          className="text-base font-semibold text-gray-900"
-          style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+    <div className="dash-panel" style={{ marginBottom: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 28,
+            height: 28,
+            borderRadius: 10,
+            background: DASH.orangeTint,
+            color: DASH.orangeDeep,
+          }}
         >
-          {t("yourLink")}
-        </h2>
+          <Link2 className="h-4 w-4" />
+        </span>
+        <Eyebrow>{t("yourLink")}</Eyebrow>
       </div>
 
-      {/* URL row */}
       {referralUrl ? (
-        <div className="flex items-center gap-2">
-          <div className="flex-1 min-w-0 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5">
-            <p className="truncate text-sm font-mono text-gray-600 select-all">
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <div
+            className="dash-field-input"
+            style={{ flex: 1, minWidth: 200, padding: "10px 14px" }}
+          >
+            <p
+              style={{
+                margin: 0,
+                fontFamily: DASH_MONO,
+                fontSize: 13,
+                color: DASH.ink,
+                userSelect: "all",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                width: "100%",
+              }}
+            >
               {referralUrl}
             </p>
           </div>
@@ -57,14 +77,12 @@ export function ReferralLinkSection({ referralCode }: ReferralLinkSectionProps) 
           <motion.button
             onClick={handleCopy}
             whileTap={{ scale: 0.96 }}
-            className="relative flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+            className="dash-btn-primary"
+            aria-label="Copy referral link"
             style={{
-              background: copied
-                ? "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)"
-                : "linear-gradient(135deg, #FF6B35 0%, #f95f00 100%)",
+              background: copied ? "#16a34a" : DASH.ink,
               transition: "background 0.3s ease",
             }}
-            aria-label="Copy referral link"
           >
             <AnimatePresence mode="wait" initial={false}>
               {copied ? (
@@ -74,7 +92,7 @@ export function ReferralLinkSection({ referralCode }: ReferralLinkSectionProps) 
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.6 }}
                   transition={{ duration: 0.15 }}
-                  className="flex items-center gap-1.5"
+                  style={{ display: "flex", alignItems: "center", gap: 6 }}
                 >
                   <Check className="h-3.5 w-3.5" />
                   {t("linkCopied")}
@@ -86,7 +104,7 @@ export function ReferralLinkSection({ referralCode }: ReferralLinkSectionProps) 
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.6 }}
                   transition={{ duration: 0.15 }}
-                  className="flex items-center gap-1.5"
+                  style={{ display: "flex", alignItems: "center", gap: 6 }}
                 >
                   <ClipboardCopy className="h-3.5 w-3.5" />
                   {t("copyLink")}
@@ -96,15 +114,22 @@ export function ReferralLinkSection({ referralCode }: ReferralLinkSectionProps) 
           </motion.button>
         </div>
       ) : (
-        <div className="rounded-lg border border-dashed border-gray-200 bg-gray-50 px-3 py-2.5">
-          <p className="text-sm text-gray-400 italic">
-            {t("loading")}
-          </p>
+        <div
+          style={{
+            borderRadius: 12,
+            border: `1px dashed ${DASH.lineStrong}`,
+            background: DASH.cream,
+            padding: "12px 14px",
+            color: DASH.muted,
+            fontStyle: "italic",
+            fontSize: 13,
+          }}
+        >
+          {t("loading")}
         </div>
       )}
 
-      {/* Subtitle */}
-      <p className="mt-3 text-sm text-gray-500 leading-relaxed">
+      <p style={{ marginTop: 12, fontSize: 13, color: DASH.muted, lineHeight: 1.5 }}>
         {t("shareNote")}
       </p>
     </div>

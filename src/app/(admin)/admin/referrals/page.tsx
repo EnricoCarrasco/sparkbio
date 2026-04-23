@@ -11,10 +11,13 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+import {
+  DASH,
+  DASH_SERIF,
+  Eyebrow,
+  Italic,
+  Pill,
+} from "@/components/dashboard/_dash-primitives";
 
 interface ReferralLeaderboardRow {
   username: string;
@@ -30,21 +33,14 @@ interface EarningsMonth {
 }
 
 interface AdminReferralsData {
-  // API returns { clicks, signups, conversions } (not prefixed with "total")
   funnel: {
     clicks: number;
     signups: number;
     conversions: number;
   };
-  // API returns "referrers", not "leaderboard"
   referrers: ReferralLeaderboardRow[];
-  // API returns "monthlyEarnings" with { month, amount }
   monthlyEarnings: EarningsMonth[];
 }
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 function formatCents(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
@@ -59,10 +55,6 @@ function conversionRate(num: number, denom: number): string {
   return `${((num / denom) * 100).toFixed(1)}%`;
 }
 
-// ---------------------------------------------------------------------------
-// Recharts custom tooltip
-// ---------------------------------------------------------------------------
-
 interface TooltipProps {
   active?: boolean;
   payload?: { value: number }[];
@@ -72,16 +64,23 @@ interface TooltipProps {
 function EarningsTooltip({ active, payload, label }: TooltipProps) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-gray-100 rounded-lg px-3 py-2 shadow-sm text-xs">
-      <p className="text-gray-500">{label}</p>
-      <p className="font-semibold text-[#8B5CF6]">{formatCents(payload[0].value)}</p>
+    <div
+      style={{
+        background: DASH.panel,
+        border: `1px solid ${DASH.line}`,
+        borderRadius: 10,
+        padding: "8px 12px",
+        fontSize: 12,
+        boxShadow: "0 4px 12px rgba(17,17,19,.08)",
+      }}
+    >
+      <p style={{ color: DASH.muted, margin: 0 }}>{label}</p>
+      <p style={{ color: DASH.orangeDeep, fontWeight: 700, margin: 0 }}>
+        {formatCents(payload[0].value)}
+      </p>
     </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
 
 export default function AdminReferralsPage() {
   const [data, setData] = useState<AdminReferralsData | null>(null);
@@ -104,161 +103,145 @@ export default function AdminReferralsPage() {
     fetchData();
   }, []);
 
-  // ── Loading skeleton ──────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
-        <div className="h-7 w-44 bg-gray-100 rounded animate-pulse" />
-        <div className="flex gap-4">
+      <div className="dash-tab-pad">
+        <div className="h-7 w-44 bg-gray-100 rounded animate-pulse mb-6" />
+        <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex-1 h-28 bg-white rounded-xl border border-gray-100 animate-pulse" />
+            <div key={i} className="dash-panel animate-pulse" style={{ flex: 1, height: 120 }} />
           ))}
         </div>
-        <div className="bg-white rounded-xl border border-gray-100 h-64 animate-pulse" />
-        <div className="bg-white rounded-xl border border-gray-100 h-64 animate-pulse" />
+        <div className="dash-panel animate-pulse" style={{ height: 260 }} />
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <p className="text-sm text-gray-400">Failed to load referral data. Refresh to try again.</p>
+      <div className="dash-tab-pad">
+        <p style={{ fontSize: 13, color: DASH.muted }}>
+          Failed to load referral data. Refresh to try again.
+        </p>
       </div>
     );
   }
 
-  const { funnel, referrers: leaderboard, monthlyEarnings: earningsTimeline } = data;
+  const {
+    funnel,
+    referrers: leaderboard,
+    monthlyEarnings: earningsTimeline,
+  } = data;
 
-  // ── Main render ────────────────────────────────────────────────────────────
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
-
-      {/* Page heading */}
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight text-[#1E1E2E]">
-          Referrals
-        </h1>
-        <p className="text-sm text-gray-400 mt-0.5">
-          Full referral funnel and leaderboard
-        </p>
+    <div className="dash-tab-pad">
+      <div className="dash-tab-head">
+        <div>
+          <Eyebrow>Referrals</Eyebrow>
+          <h1 className="dash-page-title">
+            Program <Italic>health</Italic>.
+          </h1>
+          <p className="dash-page-sub">
+            Full referral funnel and leaderboard.
+          </p>
+        </div>
       </div>
 
-      {/* ── Section 1: Funnel ────────────────────────────────────────────── */}
-      <section>
-        <h2 className="text-sm font-semibold text-[#1E1E2E] mb-4 tracking-tight">
-          Conversion Funnel
-        </h2>
-        <div className="flex flex-col sm:flex-row items-stretch gap-0">
-          {/* Clicks */}
-          <div className="flex-1 bg-white rounded-xl sm:rounded-r-none border border-gray-100 shadow-sm p-5 text-center">
-            <p className="text-[11px] font-semibold tracking-wider text-gray-400 uppercase mb-1">
-              Clicks
-            </p>
-            <p className="text-3xl font-semibold text-[#1E1E2E]">
-              {funnel.clicks.toLocaleString()}
-            </p>
-          </div>
-
-          {/* Arrow */}
-          <div className="hidden sm:flex items-center justify-center px-1 text-gray-300 bg-white border-t border-b border-gray-100 shadow-sm">
-            <ArrowRight className="size-4" strokeWidth={1.5} />
-          </div>
-          <div className="flex sm:hidden items-center justify-center h-6 text-gray-300">
-            <ArrowRight className="size-4 rotate-90" strokeWidth={1.5} />
-          </div>
-
-          {/* Signups */}
-          <div className="flex-1 bg-white sm:rounded-none border sm:border-x-0 border-gray-100 shadow-sm p-5 text-center">
-            <p className="text-[11px] font-semibold tracking-wider text-gray-400 uppercase mb-1">
-              Signups
-            </p>
-            <p className="text-3xl font-semibold text-[#1E1E2E]">
-              {funnel.signups.toLocaleString()}
-            </p>
-            <p className="text-xs text-gray-400 mt-1">
-              {conversionRate(funnel.signups, funnel.clicks)} of clicks
-            </p>
-          </div>
-
-          {/* Arrow */}
-          <div className="hidden sm:flex items-center justify-center px-1 text-gray-300 bg-white border-t border-b border-gray-100 shadow-sm">
-            <ArrowRight className="size-4" strokeWidth={1.5} />
-          </div>
-          <div className="flex sm:hidden items-center justify-center h-6 text-gray-300">
-            <ArrowRight className="size-4 rotate-90" strokeWidth={1.5} />
-          </div>
-
-          {/* Conversions */}
-          <div className="flex-1 bg-white rounded-xl sm:rounded-l-none border border-gray-100 shadow-sm p-5 text-center">
-            <p className="text-[11px] font-semibold tracking-wider text-gray-400 uppercase mb-1">
-              Conversions
-            </p>
-            <p className="text-3xl font-semibold text-[#FF6B35]">
-              {funnel.conversions.toLocaleString()}
-            </p>
-            <p className="text-xs text-gray-400 mt-1">
-              {conversionRate(funnel.conversions, funnel.signups)} of signups
-            </p>
-          </div>
+      {/* Funnel */}
+      <section style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: 14 }}>
+          <Eyebrow>Conversion funnel</Eyebrow>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+          <FunnelBox label="Clicks" value={funnel.clicks.toLocaleString()} />
+          <FunnelArrow />
+          <FunnelBox
+            label="Signups"
+            value={funnel.signups.toLocaleString()}
+            sub={`${conversionRate(funnel.signups, funnel.clicks)} of clicks`}
+          />
+          <FunnelArrow />
+          <FunnelBox
+            label="Conversions"
+            value={funnel.conversions.toLocaleString()}
+            sub={`${conversionRate(funnel.conversions, funnel.signups)} of signups`}
+            accent
+          />
         </div>
       </section>
 
-      {/* ── Section 2: Full leaderboard ──────────────────────────────────── */}
-      <section>
-        <h2 className="text-sm font-semibold text-[#1E1E2E] mb-4 tracking-tight">
-          All Referrers
-        </h2>
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[520px]">
+      {/* Leaderboard */}
+      <section style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: 14 }}>
+          <Eyebrow>All referrers</Eyebrow>
+        </div>
+        <div className="dash-table-wrap">
+          <div style={{ overflowX: "auto" }}>
+            <table className="dash-table">
               <thead>
-                <tr className="border-b border-gray-100">
-                  {["Rank", "User", "Clicks", "Signups", "Conversions", "Conv. Rate", "Earnings"].map(
-                    (h) => (
-                      <th
-                        key={h}
-                        className="px-4 py-3 text-left text-[11px] font-semibold text-gray-400 tracking-wide first:pl-5 last:pr-5"
-                      >
-                        {h}
-                      </th>
-                    )
-                  )}
+                <tr>
+                  <th>Rank</th>
+                  <th>User</th>
+                  <th className="td-right">Clicks</th>
+                  <th className="td-right">Signups</th>
+                  <th className="td-right">Conversions</th>
+                  <th className="td-right">Conv. rate</th>
+                  <th className="td-right">Earnings</th>
                 </tr>
               </thead>
               <tbody>
                 {leaderboard.map((row, i) => (
-                  <tr
-                    key={row.username}
-                    className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition-colors"
-                  >
-                    <td className="px-4 py-3 pl-5 text-xs font-semibold text-gray-400">
-                      #{i + 1}
+                  <tr key={row.username}>
+                    <td>
+                      <span
+                        style={{
+                          fontFamily: DASH_SERIF,
+                          fontStyle: "italic",
+                          fontSize: 20,
+                          color: DASH.muted,
+                        }}
+                      >
+                        {i + 1}
+                      </span>
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2.5">
-                        <div className="size-7 rounded-full bg-purple-50 text-[#8B5CF6] flex items-center justify-center text-xs font-semibold shrink-0">
+                    <td>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: 999,
+                            background: "#8B5CF6",
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 11,
+                            fontWeight: 700,
+                            flexShrink: 0,
+                          }}
+                        >
                           {getInitial(row.username)}
                         </div>
-                        <span className="font-medium text-[#1E1E2E]">
+                        <span style={{ fontWeight: 600, color: DASH.ink }}>
                           {row.username}
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="td-right td-num td-muted">
                       {row.clicks.toLocaleString()}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="td-right td-num td-muted">
                       {row.signups.toLocaleString()}
                     </td>
-                    <td className="px-4 py-3 font-medium text-[#1E1E2E]">
+                    <td className="td-right td-num">
                       {row.conversions.toLocaleString()}
                     </td>
-                    <td className="px-4 py-3 text-gray-500 text-xs">
+                    <td className="td-right td-muted" style={{ fontSize: 12.5 }}>
                       {conversionRate(row.conversions, row.clicks)}
                     </td>
-                    <td className="px-4 py-3 pr-5 font-semibold text-green-600">
-                      {formatCents(row.earnings)}
+                    <td className="td-right">
+                      <Pill tone="green">{formatCents(row.earnings)}</Pill>
                     </td>
                   </tr>
                 ))}
@@ -266,7 +249,12 @@ export default function AdminReferralsPage() {
                   <tr>
                     <td
                       colSpan={7}
-                      className="py-12 text-center text-sm text-gray-400"
+                      style={{
+                        textAlign: "center",
+                        padding: "48px 0",
+                        fontSize: 13,
+                        color: DASH.muted,
+                      }}
                     >
                       No referrers yet
                     </td>
@@ -278,29 +266,40 @@ export default function AdminReferralsPage() {
         </div>
       </section>
 
-      {/* ── Section 3: Earnings timeline ─────────────────────────────────── */}
+      {/* Earnings timeline */}
       <section>
-        <h2 className="text-sm font-semibold text-[#1E1E2E] mb-4 tracking-tight">
-          Earnings Timeline
-          <span className="ml-2 text-[11px] font-normal text-gray-400">
-            (last 6 months — total commission paid out)
+        <div style={{ marginBottom: 14 }}>
+          <Eyebrow>Earnings timeline</Eyebrow>
+          <span
+            style={{
+              marginLeft: 8,
+              fontSize: 11,
+              color: DASH.muted,
+              fontWeight: 500,
+            }}
+          >
+            (last 6 months · total commission paid)
           </span>
-        </h2>
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+        </div>
+        <div className="dash-panel">
           <ResponsiveContainer width="100%" height={200}>
             <LineChart
               data={earningsTimeline}
               margin={{ top: 4, right: 4, left: -10, bottom: 0 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" vertical={false} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke={DASH.line}
+                vertical={false}
+              />
               <XAxis
                 dataKey="month"
-                tick={{ fontSize: 11, fill: "#9CA3AF" }}
+                tick={{ fontSize: 11, fill: DASH.muted }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fontSize: 11, fill: "#9CA3AF" }}
+                tick={{ fontSize: 11, fill: DASH.muted }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(v) => `$${(v / 100).toFixed(0)}`}
@@ -309,15 +308,82 @@ export default function AdminReferralsPage() {
               <Line
                 type="monotone"
                 dataKey="amount"
-                stroke="#8B5CF6"
+                stroke={DASH.orange}
                 strokeWidth={2}
                 dot={false}
-                activeDot={{ r: 4, fill: "#8B5CF6", strokeWidth: 0 }}
+                activeDot={{ r: 4, fill: DASH.orange, strokeWidth: 0 }}
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
       </section>
+    </div>
+  );
+}
+
+function FunnelBox({
+  label,
+  value,
+  sub,
+  accent,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  accent?: boolean;
+}) {
+  return (
+    <div
+      className="dash-panel"
+      style={{
+        flex: 1,
+        textAlign: "center",
+        margin: 0,
+        padding: "20px 16px",
+      }}
+    >
+      <Eyebrow color={DASH.muted}>{label}</Eyebrow>
+      <div
+        style={{
+          fontSize: 32,
+          fontWeight: 700,
+          letterSpacing: "-0.03em",
+          color: accent ? DASH.orange : DASH.ink,
+          marginTop: 8,
+          fontVariantNumeric: "tabular-nums",
+        }}
+      >
+        {value}
+      </div>
+      {sub && (
+        <p style={{ fontSize: 11.5, color: DASH.muted, marginTop: 4 }}>
+          {sub}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function FunnelArrow() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "0 4px",
+        color: DASH.muted,
+        opacity: 0.6,
+      }}
+    >
+      <ArrowRight
+        className="size-4 hidden sm:block"
+        strokeWidth={1.5}
+      />
+      <ArrowRight
+        className="size-4 sm:hidden rotate-90"
+        strokeWidth={1.5}
+      />
     </div>
   );
 }

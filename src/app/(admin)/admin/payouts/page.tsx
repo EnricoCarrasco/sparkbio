@@ -2,11 +2,13 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { CheckCircle, Clock, XCircle, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+import {
+  DASH,
+  DASH_MONO,
+  Eyebrow,
+  Italic,
+  Pill,
+} from "@/components/dashboard/_dash-primitives";
 
 type PayoutStatus = "requested" | "processing" | "completed" | "failed";
 type TabKey = "requested" | "processing" | "completed" | "failed";
@@ -14,7 +16,6 @@ type TabKey = "requested" | "processing" | "completed" | "failed";
 interface AdminPayout {
   id: string;
   referrer_id: string;
-  // API returns "referrer_username" from the joined profiles query
   referrer_username: string | null;
   amount_cents: number;
   payout_method: "paypal" | "pix";
@@ -23,10 +24,6 @@ interface AdminPayout {
   created_at: string;
   admin_notes?: string | null;
 }
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 function formatCents(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
@@ -42,20 +39,11 @@ function formatDate(iso: string): string {
   });
 }
 
-/**
- * Masks an email or PIX key:
- *   first 3 chars + *** + last 4 chars
- *   e.g. "someone@example.com" → "som***.com"
- */
 function maskDestination(dest: string | null): string {
   if (!dest) return "—";
   if (dest.length <= 7) return dest.slice(0, 2) + "***";
   return dest.slice(0, 3) + "***" + dest.slice(-4);
 }
-
-// ---------------------------------------------------------------------------
-// Tab config
-// ---------------------------------------------------------------------------
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: "requested", label: "Pending" },
@@ -63,10 +51,6 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "completed", label: "Completed" },
   { key: "failed", label: "Rejected" },
 ];
-
-// ---------------------------------------------------------------------------
-// Payout card
-// ---------------------------------------------------------------------------
 
 interface PayoutCardProps {
   payout: AdminPayout;
@@ -79,62 +63,129 @@ function PayoutCard({ payout, tab, onAction, actionLoading }: PayoutCardProps) {
   const isLoading = actionLoading === payout.id;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-      {/* Header row */}
-      <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="size-8 rounded-full bg-purple-50 text-[#8B5CF6] flex items-center justify-center text-xs font-semibold shrink-0">
-              {(payout.referrer_username ?? payout.referrer_id).charAt(0).toUpperCase()}
-            </div>
-            <span className="font-semibold text-[#1E1E2E]">
-              {payout.referrer_username ?? payout.referrer_id.slice(0, 8)}
-            </span>
+    <div className="dash-panel" style={{ marginBottom: 12 }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          gap: 12,
+          marginBottom: 12,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 999,
+              background: "#8B5CF6",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 14,
+              fontWeight: 700,
+              flexShrink: 0,
+            }}
+          >
+            {(payout.referrer_username ?? payout.referrer_id).charAt(0).toUpperCase()}
           </div>
-          <p className="text-sm text-gray-500 mt-1.5 ml-10">
-            Requested{" "}
-            <span className="font-semibold text-[#1E1E2E]">
-              {formatCents(payout.amount_cents)}
-            </span>{" "}
-            via{" "}
-            <span className="capitalize font-medium">
-              {payout.payout_method}
-            </span>
-          </p>
+          <div>
+            <div
+              style={{
+                fontWeight: 700,
+                fontSize: 15,
+                color: DASH.ink,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              {payout.referrer_username ?? payout.referrer_id.slice(0, 8)}
+            </div>
+            <div
+              style={{
+                fontSize: 12.5,
+                color: DASH.muted,
+                marginTop: 2,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                flexWrap: "wrap",
+              }}
+            >
+              <span>
+                Requested{" "}
+                <b style={{ color: DASH.ink }}>{formatCents(payout.amount_cents)}</b>
+              </span>
+              <Pill tone="orange">
+                {payout.payout_method === "paypal" ? "PayPal" : "Pix"}
+              </Pill>
+            </div>
+          </div>
         </div>
-        <span className="text-[11px] text-gray-400 mt-1 shrink-0">
+        <span
+          style={{
+            fontSize: 11,
+            color: DASH.muted,
+            marginTop: 2,
+            flexShrink: 0,
+          }}
+        >
           {formatDate(payout.created_at)}
         </span>
       </div>
 
-      {/* Destination */}
-      <div className="ml-10 text-xs text-gray-400">
-        <span className="font-medium text-gray-500">
-          {payout.payout_method === "paypal" ? "PayPal:" : "PIX Key:"}
-        </span>{" "}
-        <span className="font-mono">
-          {maskDestination(payout.payout_destination)}
+      <div
+        style={{
+          paddingLeft: 48,
+          fontSize: 12,
+          color: DASH.muted,
+          fontFamily: DASH_MONO,
+        }}
+      >
+        <span style={{ fontWeight: 500 }}>
+          {payout.payout_method === "paypal" ? "PayPal: " : "PIX key: "}
         </span>
+        {maskDestination(payout.payout_destination)}
       </div>
 
-      {/* Admin notes */}
       {payout.admin_notes && (
-        <p className="ml-10 mt-2 text-xs text-gray-400 italic">
+        <p
+          style={{
+            marginLeft: 48,
+            marginTop: 6,
+            fontSize: 12,
+            color: DASH.muted,
+            fontStyle: "italic",
+          }}
+        >
           Note: {payout.admin_notes}
         </p>
       )}
 
-      {/* Action buttons */}
       {(tab === "requested" || tab === "processing") && (
-        <div className="flex flex-wrap gap-2 mt-4 ml-10">
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 8,
+            marginTop: 14,
+            marginLeft: 48,
+          }}
+        >
           {tab === "requested" && (
             <button
+              type="button"
               onClick={() => onAction(payout.id, "processing")}
               disabled={isLoading}
-              className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors",
-                "bg-green-500 hover:bg-green-600 text-white disabled:opacity-60"
-              )}
+              className="dash-btn-primary"
+              style={{
+                background: "#16a34a",
+                fontSize: 12.5,
+                padding: "8px 14px",
+                opacity: isLoading ? 0.6 : 1,
+              }}
             >
               {isLoading ? (
                 <Loader2 className="size-3.5 animate-spin" />
@@ -147,12 +198,16 @@ function PayoutCard({ payout, tab, onAction, actionLoading }: PayoutCardProps) {
 
           {tab === "processing" && (
             <button
+              type="button"
               onClick={() => onAction(payout.id, "completed")}
               disabled={isLoading}
-              className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors",
-                "bg-blue-500 hover:bg-blue-600 text-white disabled:opacity-60"
-              )}
+              className="dash-btn-primary"
+              style={{
+                background: "#2563eb",
+                fontSize: 12.5,
+                padding: "8px 14px",
+                opacity: isLoading ? 0.6 : 1,
+              }}
             >
               {isLoading ? (
                 <Loader2 className="size-3.5 animate-spin" />
@@ -164,12 +219,17 @@ function PayoutCard({ payout, tab, onAction, actionLoading }: PayoutCardProps) {
           )}
 
           <button
+            type="button"
             onClick={() => onAction(payout.id, "failed")}
             disabled={isLoading}
-            className={cn(
-              "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors",
-              "border border-red-200 text-red-500 hover:bg-red-50 disabled:opacity-60"
-            )}
+            className="dash-btn-ghost"
+            style={{
+              color: "#b91c1c",
+              borderColor: "#fecaca",
+              fontSize: 12.5,
+              padding: "8px 14px",
+              opacity: isLoading ? 0.6 : 1,
+            }}
           >
             {isLoading ? (
               <Loader2 className="size-3.5 animate-spin" />
@@ -183,10 +243,6 @@ function PayoutCard({ payout, tab, onAction, actionLoading }: PayoutCardProps) {
     </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
 
 export default function AdminPayoutsPage() {
   const [activeTab, setActiveTab] = useState<TabKey>("requested");
@@ -210,7 +266,6 @@ export default function AdminPayoutsPage() {
     }
   }, []);
 
-  // Re-fetch whenever the active tab changes
   useEffect(() => {
     fetchPayouts(activeTab);
   }, [activeTab, fetchPayouts]);
@@ -224,7 +279,6 @@ export default function AdminPayoutsPage() {
         body: JSON.stringify({ status }),
       });
       if (!res.ok) throw new Error("action failed");
-      // Remove the updated payout from the current list (it moved to another tab)
       setPayouts((prev) => prev.filter((p) => p.id !== id));
     } catch {
       // Silently fail — user can retry
@@ -234,63 +288,57 @@ export default function AdminPayoutsPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-      {/* Page heading */}
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight text-[#1E1E2E]">
-          Payouts
-        </h1>
-        <p className="text-sm text-gray-400 mt-0.5">
-          Review and process referral payout requests
-        </p>
+    <div className="dash-tab-pad">
+      <div className="dash-tab-head">
+        <div>
+          <Eyebrow>Payouts</Eyebrow>
+          <h1 className="dash-page-title">
+            Approve <Italic>requests</Italic>.
+          </h1>
+          <p className="dash-page-sub">
+            Review and process referral payout requests.
+          </p>
+        </div>
       </div>
 
       {/* Tab bar */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
+      <div className="dash-seg" style={{ marginBottom: 20 }}>
         {TABS.map(({ key, label }) => (
           <button
             key={key}
+            type="button"
             onClick={() => setActiveTab(key)}
-            className={cn(
-              "px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors",
-              activeTab === key
-                ? "bg-white text-[#1E1E2E] shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
-            )}
+            className={`dash-seg-btn ${activeTab === key ? "active" : ""}`}
           >
             {label}
           </button>
         ))}
       </div>
 
-      {/* Content */}
       {loading ? (
-        <div className="space-y-4">
+        <div>
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
-              className="bg-white rounded-xl border border-gray-100 p-5 h-28 animate-pulse"
+              className="dash-panel animate-pulse"
+              style={{ height: 120, marginBottom: 12 }}
             />
           ))}
         </div>
       ) : error ? (
-        <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
-          <p className="text-sm text-gray-400">
+        <div className="dash-panel" style={{ textAlign: "center", padding: "40px 20px" }}>
+          <p style={{ fontSize: 13, color: DASH.muted, margin: 0 }}>
             Failed to load payouts. Refresh to try again.
           </p>
         </div>
       ) : payouts.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
-          <p className="text-sm text-gray-400">
-            No{" "}
-            {activeTab === "requested"
-              ? "pending"
-              : activeTab}{" "}
-            payouts.
+        <div className="dash-panel" style={{ textAlign: "center", padding: "48px 20px" }}>
+          <p style={{ fontSize: 13, color: DASH.muted, margin: 0 }}>
+            No {activeTab === "requested" ? "pending" : activeTab} payouts.
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div>
           {payouts.map((payout) => (
             <PayoutCard
               key={payout.id}

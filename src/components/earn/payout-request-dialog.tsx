@@ -6,6 +6,11 @@ import { X, Loader2, CreditCard, QrCode, Wallet } from "lucide-react"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import type { PayoutMethod } from "@/types/database"
+import {
+  DASH,
+  DASH_SANS,
+  Eyebrow,
+} from "@/components/dashboard/_dash-primitives"
 
 interface PayoutRequestDialogProps {
   availableCents: number
@@ -59,102 +64,140 @@ export function PayoutRequestDialog({
     }
   }
 
-  const methodOptions: { value: PayoutMethod; label: string; sublabel: string; icon: React.ElementType }[] = [
-    {
-      value: "paypal",
-      label: "PayPal",
-      sublabel: "Fast & global",
-      icon: CreditCard,
-    },
-    {
-      value: "pix",
-      label: "Pix",
-      sublabel: "Brazil only",
-      icon: QrCode,
-    },
+  const methodOptions: {
+    value: PayoutMethod
+    label: string
+    sublabel: string
+    icon: React.ElementType
+  }[] = [
+    { value: "paypal", label: "PayPal", sublabel: "Fast & global", icon: CreditCard },
+    { value: "pix", label: "Pix", sublabel: "Brazil only", icon: QrCode },
   ]
 
   return (
     <>
-      {/* Trigger button */}
       <motion.button
         onClick={handleOpen}
         whileTap={{ scale: 0.97 }}
         disabled={!canRequest}
-        className="flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-        style={{
-          background: "linear-gradient(135deg, #FF6B35 0%, #f95f00 100%)",
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
-        }}
+        className="dash-btn-primary"
+        style={{ opacity: canRequest ? 1 : 0.4, cursor: canRequest ? "pointer" : "not-allowed" }}
       >
         <Wallet className="h-4 w-4" />
         {t("requestPayout")}
       </motion.button>
 
-      {/* Modal backdrop + card */}
       <AnimatePresence>
         {open && (
           <>
-            {/* Backdrop */}
             <motion.div
               key="backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+              className="fixed inset-0 z-40"
+              style={{
+                background: "rgba(17,17,19,0.4)",
+                backdropFilter: "blur(4px)",
+              }}
               onClick={handleClose}
             />
-
-            {/* Dialog card */}
             <motion.div
               key="dialog"
               initial={{ opacity: 0, scale: 0.95, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 8 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-xl ring-1 ring-gray-100"
+              className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2"
+              style={{
+                background: DASH.panel,
+                border: `1px solid ${DASH.line}`,
+                borderRadius: 20,
+                padding: 24,
+                boxShadow: "0 30px 60px rgba(17,17,19,.2)",
+                fontFamily: DASH_SANS,
+              }}
               role="dialog"
               aria-modal="true"
               aria-labelledby="payout-dialog-title"
             >
-              {/* Close button */}
               <button
                 onClick={handleClose}
                 disabled={loading}
-                className="absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 disabled:opacity-50"
                 aria-label="Close"
+                style={{
+                  position: "absolute",
+                  right: 14,
+                  top: 14,
+                  width: 28,
+                  height: 28,
+                  borderRadius: 999,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: DASH.muted,
+                  background: "transparent",
+                  border: 0,
+                  cursor: "pointer",
+                }}
               >
                 <X className="h-4 w-4" />
               </button>
 
-              {/* Title */}
               <h2
                 id="payout-dialog-title"
-                className="text-lg font-bold text-gray-900"
-                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                style={{
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: DASH.ink,
+                  letterSpacing: "-0.02em",
+                  margin: 0,
+                }}
               >
                 {t("requestPayout")}
               </h2>
 
-              {/* Available balance display */}
-              <div className="mt-3 mb-5 rounded-xl bg-orange-50 px-4 py-3 border border-orange-100">
-                <p className="text-xs text-orange-600 mb-0.5">{t("available")}</p>
-                <p
-                  className="text-2xl font-bold text-orange-700 tabular-nums"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+              <div
+                style={{
+                  marginTop: 14,
+                  marginBottom: 18,
+                  borderRadius: 14,
+                  background: DASH.orangeTint,
+                  border: "1px solid rgba(255,107,53,.18)",
+                  padding: "12px 16px",
+                }}
+              >
+                <div style={{ marginBottom: 2 }}>
+                  <Eyebrow>{t("available")}</Eyebrow>
+                </div>
+                <div
+                  style={{
+                    fontSize: 24,
+                    fontWeight: 700,
+                    color: DASH.orangeDeep,
+                    fontVariantNumeric: "tabular-nums",
+                  }}
                 >
                   {formattedAmount}
-                </p>
+                </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                {/* Method radio cards */}
+              <form
+                onSubmit={handleSubmit}
+                style={{ display: "flex", flexDirection: "column", gap: 16 }}
+              >
                 <div>
-                  <p className="mb-2 text-sm font-medium text-gray-700">
-                    {t("payoutMethod")}
-                  </p>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div style={{ marginBottom: 8 }}>
+                    <Eyebrow color={DASH.muted}>{t("payoutMethod")}</Eyebrow>
+                  </div>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: 8,
+                    }}
+                  >
                     {methodOptions.map((opt) => {
                       const Icon = opt.icon
                       const selected = method === opt.value
@@ -163,89 +206,100 @@ export function PayoutRequestDialog({
                           key={opt.value}
                           type="button"
                           onClick={() => setMethod(opt.value)}
-                          className={[
-                            "relative flex flex-col items-start gap-1 rounded-xl border-2 p-3 text-left transition-all",
-                            selected
-                              ? "border-orange-400 bg-orange-50"
-                              : "border-gray-200 bg-white hover:border-gray-300",
-                          ].join(" ")}
+                          style={{
+                            position: "relative",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "flex-start",
+                            gap: 4,
+                            borderRadius: 14,
+                            border: selected
+                              ? `2px solid ${DASH.orange}`
+                              : `1px solid ${DASH.line}`,
+                            padding: 12,
+                            textAlign: "left",
+                            background: selected ? DASH.orangeTint : DASH.cream,
+                            cursor: "pointer",
+                            transition: "all .15s",
+                          }}
                         >
-                          <div
-                            className={[
-                              "flex h-7 w-7 items-center justify-center rounded-lg",
-                              selected ? "bg-orange-100" : "bg-gray-100",
-                            ].join(" ")}
-                          >
-                            <Icon
-                              className={[
-                                "h-3.5 w-3.5",
-                                selected ? "text-orange-500" : "text-gray-400",
-                              ].join(" ")}
-                            />
-                          </div>
                           <span
-                            className={[
-                              "text-sm font-semibold",
-                              selected ? "text-orange-700" : "text-gray-700",
-                            ].join(" ")}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              width: 26,
+                              height: 26,
+                              borderRadius: 8,
+                              background: selected ? "#fff" : DASH.panel,
+                              color: selected ? DASH.orangeDeep : DASH.muted,
+                            }}
+                          >
+                            <Icon className="h-3.5 w-3.5" />
+                          </span>
+                          <span
+                            style={{
+                              fontSize: 13,
+                              fontWeight: 600,
+                              color: selected ? DASH.orangeDeep : DASH.ink,
+                            }}
                           >
                             {opt.label}
                           </span>
-                          <span className="text-[11px] text-gray-400">
+                          <span style={{ fontSize: 11, color: DASH.muted }}>
                             {opt.sublabel}
                           </span>
-                          {/* Selected indicator dot */}
-                          {selected && (
-                            <div className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-orange-400" />
-                          )}
                         </button>
                       )
                     })}
                   </div>
                 </div>
 
-                {/* Destination input */}
                 <div>
                   <label
                     htmlFor="payout-destination"
-                    className="mb-1.5 block text-sm font-medium text-gray-700"
+                    style={{ display: "block", marginBottom: 6 }}
                   >
-                    {method === "paypal" ? t("paypalEmail") : t("pixKey")}
+                    <Eyebrow color={DASH.muted}>
+                      {method === "paypal" ? t("paypalEmail") : t("pixKey")}
+                    </Eyebrow>
                   </label>
-                  <input
-                    id="payout-destination"
-                    type={method === "paypal" ? "email" : "text"}
-                    value={destination}
-                    onChange={(e) => setDestination(e.target.value)}
-                    placeholder={
-                      method === "paypal"
-                        ? "your@email.com"
-                        : "CPF, e-mail, phone, or random key"
-                    }
-                    required
-                    disabled={loading}
-                    className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition-colors focus:border-orange-300 focus:bg-white focus:ring-2 focus:ring-orange-100 disabled:opacity-60"
-                  />
+                  <div className="dash-field-input">
+                    <input
+                      id="payout-destination"
+                      type={method === "paypal" ? "email" : "text"}
+                      value={destination}
+                      onChange={(e) => setDestination(e.target.value)}
+                      placeholder={
+                        method === "paypal"
+                          ? "your@email.com"
+                          : "CPF, e-mail, phone, or random key"
+                      }
+                      required
+                      disabled={loading}
+                    />
+                  </div>
                 </div>
 
-                {/* Actions */}
-                <div className="flex gap-2 pt-1">
+                <div style={{ display: "flex", gap: 10, paddingTop: 4 }}>
                   <button
                     type="button"
                     onClick={handleClose}
                     disabled={loading}
-                    className="flex-1 rounded-lg border border-gray-200 bg-white py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-50"
+                    className="dash-btn-ghost"
+                    style={{ flex: 1, justifyContent: "center" }}
                   >
                     {t("cancel")}
                   </button>
-
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity disabled:opacity-70"
+                    className="dash-btn-primary"
                     style={{
-                      background: "linear-gradient(135deg, #FF6B35 0%, #f95f00 100%)",
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      flex: 1,
+                      justifyContent: "center",
+                      background: DASH.orange,
+                      opacity: loading ? 0.7 : 1,
                     }}
                   >
                     {loading ? (
