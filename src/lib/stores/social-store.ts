@@ -3,6 +3,7 @@ import type { SocialIcon, SocialPlatform, SocialDisplayMode } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { triggerRevalidation } from "@/lib/utils/revalidate";
 import { isSafeUrl } from "@/lib/validators/url";
+import { getInputType } from "@/lib/utils/platform-url";
 
 interface SocialState {
   socialIcons: SocialIcon[];
@@ -49,12 +50,14 @@ export const useSocialStore = create<SocialState>((set, get) => ({
   },
 
   addSocialIcon: async (platform, url, displayMode = "icon", displayTitle = null) => {
-    if (!isSafeUrl(url)) return;
+    if (getInputType(platform) !== "pix_key" && !isSafeUrl(url)) {
+      throw new Error("invalid_url");
+    }
     const supabase = createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) throw new Error("not_authenticated");
 
     const { socialIcons } = get();
     const position = socialIcons.length;
@@ -73,15 +76,22 @@ export const useSocialStore = create<SocialState>((set, get) => ({
       .select()
       .single();
 
-    if (data && !error) {
+    if (error) throw error;
+    if (data) {
       set({ socialIcons: [...socialIcons, data] });
       triggerRevalidation();
     }
   },
 
   updateSocialIcon: async (id, updates) => {
-    if (typeof updates.url === "string" && !isSafeUrl(updates.url)) return;
     const { socialIcons } = get();
+    const target = socialIcons.find((i) => i.id === id);
+    if (typeof updates.url === "string") {
+      const platform = (updates.platform as SocialPlatform) ?? target?.platform;
+      if (platform && getInputType(platform) !== "pix_key" && !isSafeUrl(updates.url)) {
+        return;
+      }
+    }
     const prevIcons = [...socialIcons];
 
     // Optimistic update
