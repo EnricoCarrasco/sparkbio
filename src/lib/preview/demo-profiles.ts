@@ -72,6 +72,7 @@ function demoProfile(
     has_chosen_username: true,
     has_completed_onboarding: true,
     is_complimentary_pro: true,
+    commission_bps_override: null,
     created_at: NOW,
     updated_at: NOW,
   };

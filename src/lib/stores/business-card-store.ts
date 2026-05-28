@@ -3,7 +3,14 @@ import { createClient } from "@/lib/supabase/client";
 import { createDebouncedSave } from "@/lib/utils/debounced-save";
 import type { CardTemplate } from "@/components/dashboard/business-card/card-templates";
 
-export type CardLayout = "split" | "centered" | "left-aligned";
+export type CardLayout =
+  | "split"
+  | "centered"
+  | "left-aligned"
+  | "logo-hero"
+  | "logo-only";
+
+export type LogoAspect = "cover" | "contain";
 
 interface BusinessCardSettings {
   brandName: string;
@@ -26,6 +33,7 @@ interface BusinessCardSettings {
   qrBgColor: string;
   logoSize: number;
   logoShape: "rounded" | "circle" | "square";
+  logoAspect: LogoAspect;
   nameFontSize: number;
   titleFontSize: number;
   contactFontSize: number;
@@ -90,6 +98,7 @@ const defaultSettings: BusinessCardSettings = {
   qrBgColor: "#FFFFFF",
   logoSize: 80,
   logoShape: "rounded",
+  logoAspect: "cover",
   nameFontSize: 30,
   titleFontSize: 14,
   contactFontSize: 12,

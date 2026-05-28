@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useTranslations } from "next-intl";
-import { useBusinessCardStore } from "@/lib/stores/business-card-store";
+import { useBusinessCardStore, type CardLayout, type LogoAspect } from "@/lib/stores/business-card-store";
 import {
   Palette,
   User,
@@ -186,16 +186,31 @@ export function CardEditor() {
   const t = useTranslations("dashboard.businessCard");
   const store = useBusinessCardStore();
 
-  const layouts: { key: "split" | "centered" | "left-aligned"; label: string }[] = [
+  const layouts: { key: CardLayout; label: string }[] = [
     { key: "split", label: t("layout_split") },
     { key: "centered", label: t("layout_centered") },
     { key: "left-aligned", label: t("layout_leftAligned") },
+    { key: "logo-hero", label: t("layout_logoHero") },
+    { key: "logo-only", label: t("layout_logoOnly") },
   ];
 
   const shapes: { key: "rounded" | "circle" | "square"; label: string }[] = [
     { key: "rounded", label: t("logoShape_rounded") },
     { key: "circle", label: t("logoShape_circle") },
     { key: "square", label: t("logoShape_square") },
+  ];
+
+  const aspects: { key: LogoAspect; label: string }[] = [
+    { key: "cover", label: t("logoAspect_cover") },
+    { key: "contain", label: t("logoAspect_contain") },
+  ];
+
+  // Size presets — quick chips above the slider for one-click sizing
+  const sizePresets: { key: string; label: string; value: number }[] = [
+    { key: "small", label: t("sizePreset_small"), value: 96 },
+    { key: "medium", label: t("sizePreset_medium"), value: 180 },
+    { key: "large", label: t("sizePreset_large"), value: 320 },
+    { key: "hero", label: t("sizePreset_hero"), value: 480 },
   ];
 
   return (
@@ -414,13 +429,72 @@ export function CardEditor() {
           label={t("logoStyle")}
         />
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {/* Size presets — quick chips */}
+          <div>
+            <label
+              style={{
+                fontSize: 12,
+                color: "var(--dash-muted)",
+                fontWeight: 500,
+                letterSpacing: "0.02em",
+                display: "block",
+                marginBottom: 6,
+              }}
+            >
+              {t("logoSizePreset")}
+            </label>
+            <div className="dash-seg">
+              {sizePresets.map(({ key, label, value }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => store.setField("logoSize", value)}
+                  className={`dash-seg-btn${store.logoSize === value ? " active" : ""}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Pixel-precise slider for those who want it */}
           <SliderField
             label={t("logoSize")}
             value={store.logoSize}
             min={48}
-            max={120}
+            max={480}
             onChange={(v) => store.setField("logoSize", v)}
           />
+
+          {/* Aspect mode: Cover (fills box, may crop) vs Contain (preserves aspect) */}
+          <div>
+            <label
+              style={{
+                fontSize: 12,
+                color: "var(--dash-muted)",
+                fontWeight: 500,
+                letterSpacing: "0.02em",
+                display: "block",
+                marginBottom: 6,
+              }}
+            >
+              {t("logoAspect")}
+            </label>
+            <div className="dash-seg">
+              {aspects.map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => store.setField("logoAspect", key)}
+                  className={`dash-seg-btn${store.logoAspect === key ? " active" : ""}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Shape (rounded / circle / square) */}
           <div>
             <label
               style={{

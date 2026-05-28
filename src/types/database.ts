@@ -50,6 +50,7 @@ export interface Profile {
   has_chosen_username: boolean;
   has_completed_onboarding: boolean;
   is_complimentary_pro: boolean;
+  commission_bps_override: number | null;
   created_at: string;
   updated_at: string;
 }

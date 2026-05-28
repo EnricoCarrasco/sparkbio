@@ -7,6 +7,8 @@ import {
   LayoutDashboard,
   Wallet,
   Users,
+  Ticket,
+  Star,
   ChevronLeft,
   Loader2,
 } from "lucide-react";
@@ -106,6 +108,16 @@ export default function AdminLayout({
       label: "Referrals",
       href: "/admin/referrals",
       icon: Users,
+    },
+    {
+      label: "Lifetime Codes",
+      href: "/admin/lifetime-codes",
+      icon: Ticket,
+    },
+    {
+      label: "Ambassadors",
+      href: "/admin/ambassadors",
+      icon: Star,
     },
   ];
 

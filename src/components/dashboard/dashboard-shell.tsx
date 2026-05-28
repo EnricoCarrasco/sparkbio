@@ -25,6 +25,7 @@ import { useSubscriptionStore } from "@/lib/stores/subscription-store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChooseUsernameDialog } from "@/components/auth/choose-username-dialog";
 import { trackPurchase, trackRegistration } from "@/lib/meta-pixel";
+import { LifetimeWelcome } from "@/components/dashboard/lifetime-welcome";
 import type { Profile, Link, Theme, SocialIcon, Subscription } from "@/types";
 
 const BusinessCardTab = lazy(() => import("@/components/dashboard/business-card/business-card-tab").then((m) => ({ default: m.BusinessCardTab })));
@@ -133,6 +134,9 @@ export function DashboardShell({
 
   return (
     <div className={`dash-shell ${hidePreview ? "no-preview" : ""}`} style={{ height: "100vh", overflow: "hidden" }}>
+      {/* Lifetime ambassador welcome (fires confetti + toast on first land after redeem) */}
+      <LifetimeWelcome />
+
       {/* Desktop sidebar */}
       <aside className="dash-sidebar-col" style={{ overflowY: "auto" }}>
         <Sidebar onNavigate={() => {}} />

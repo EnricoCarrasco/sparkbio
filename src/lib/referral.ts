@@ -58,6 +58,24 @@ export async function processReferralConversion(
       return;
     }
 
+    // 2b. Look up the referrer's profile (referral_code + commission rate).
+    //     `commission_bps_override` (basis points) lets ambassadors earn a
+    //     boosted rate (e.g. 3000 = 30%). NULL falls back to the default.
+    const { data: referrerProfileEarly, error: referrerEarlyError } = await supabase
+      .from("profiles")
+      .select("referral_code, commission_bps_override")
+      .eq("id", referrerId)
+      .single();
+
+    if (referrerEarlyError || !referrerProfileEarly) {
+      console.error("[referral] Failed to fetch referrer profile for referrerId:", referrerId, referrerEarlyError);
+      return;
+    }
+
+    // Effective rate in basis points (1bp = 0.01%). The default 20% becomes 2000.
+    const rateBps =
+      referrerProfileEarly.commission_bps_override ?? REFERRAL_COMMISSION_PERCENT * 100;
+
     // 3. Determine commission amount based on which Stripe price triggered the
     //    conversion. Identify both the interval (monthly / yearly) AND the
     //    currency (EUR / BRL) so a BRL subscriber generates a BRL-denominated
@@ -104,9 +122,8 @@ export async function processReferralConversion(
           : matched.interval === "yearly"
             ? PLANS.pro.yearlyTotal
             : PLANS.pro.monthlyPrice;
-      amountCents = Math.round(
-        (basePrice * 100 * REFERRAL_COMMISSION_PERCENT) / 100,
-      );
+      // basePrice * 100 = price in cents. rateBps / 10000 = rate as fraction.
+      amountCents = Math.round((basePrice * 100 * rateBps) / 10000);
       currency = matched.currency;
     } else {
       // Unknown price — fall back to monthly EUR commission as a safe default.
@@ -115,9 +132,7 @@ export async function processReferralConversion(
         priceId,
         "— falling back to monthly EUR commission.",
       );
-      amountCents = Math.round(
-        (PLANS.pro.monthlyPrice * 100 * REFERRAL_COMMISSION_PERCENT) / 100,
-      );
+      amountCents = Math.round((PLANS.pro.monthlyPrice * 100 * rateBps) / 10000);
       currency = "EUR";
     }
 
@@ -143,26 +158,14 @@ export async function processReferralConversion(
       return;
     }
 
-    // 6. Look up the referrer's referral_code so we can record it on the event.
-    const { data: referrerProfile, error: referrerError } = await supabase
-      .from("profiles")
-      .select("referral_code")
-      .eq("id", referrerId)
-      .single();
-
-    if (referrerError) {
-      console.error("[referral] Failed to fetch referrer profile for referrerId:", referrerId, referrerError);
-      // Not fatal — still record the event without the code.
-    }
-
-    // 7. Record the conversion event.
+    // 6. Record the conversion event (referral_code reused from step 2b's fetch).
     const { error: eventError } = await supabase
       .from("referral_events")
       .insert({
         referrer_id: referrerId,
         referred_id: userId,
         event_type: "conversion",
-        referral_code: referrerProfile?.referral_code ?? null,
+        referral_code: referrerProfileEarly.referral_code ?? null,
       });
 
     if (eventError) {

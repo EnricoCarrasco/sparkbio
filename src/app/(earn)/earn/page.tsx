@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useReferralStore } from "@/lib/stores/referral-store";
+import { useProfileStore } from "@/lib/stores/profile-store";
 import { REFERRAL_MIN_PAYOUT_CENTS } from "@/lib/constants";
 import { ReferralLinkSection } from "@/components/earn/referral-link-section";
 import { EarnOverviewCards } from "@/components/earn/earn-overview-cards";
@@ -48,6 +49,20 @@ export default function EarnPage() {
   const payoutMethod = useReferralStore((s) => s.payoutMethod);
   const payoutDestination = useReferralStore((s) => s.payoutDestination);
   const loading = useReferralStore((s) => s.loading);
+  const profile = useProfileStore((s) => s.profile);
+  const fetchProfile = useProfileStore((s) => s.fetchProfile);
+  const isAmbassador = !!profile?.is_complimentary_pro && profile.commission_bps_override != null;
+  const ambassadorRatePercent = profile?.commission_bps_override != null
+    ? profile.commission_bps_override / 100
+    : 20;
+
+  // /earn layout doesn't seed profile-store (it lives outside (dashboard) group).
+  // Fetch the profile on mount so the ambassador banner can decide whether to render.
+  React.useEffect(() => {
+    if (!profile) {
+      void fetchProfile();
+    }
+  }, [profile, fetchProfile]);
   const savePayoutSettings = useReferralStore((s) => s.savePayoutSettings);
   const requestPayout = useReferralStore((s) => s.requestPayout);
   const t = useTranslations("referral");
@@ -109,6 +124,57 @@ export default function EarnPage() {
           </Link>
         </div>
       </div>
+
+      {isAmbassador && (
+        <div
+          style={{
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+            padding: "14px 18px",
+            marginBottom: 16,
+            background: "linear-gradient(135deg, #FFE6D6 0%, #FFFDF8 100%)",
+            border: "1px solid #FFB995",
+            borderRadius: 16,
+            boxShadow: "0 4px 14px rgba(255,107,53,.10)",
+          }}
+        >
+          <div
+            style={{
+              flexShrink: 0,
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              background: "#111113",
+              color: "#FF6B35",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 18,
+              fontWeight: 700,
+            }}
+          >
+            ✦
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 10.5,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                fontWeight: 700,
+                color: "#E85A25",
+              }}
+            >
+              Viopage Ambassador
+            </div>
+            <div style={{ fontSize: 14, color: "#111113", marginTop: 2 }}>
+              You earn <strong style={{ fontWeight: 700 }}>{ambassadorRatePercent.toFixed(0)}% recurring</strong> commission on every Pro signup you refer.
+            </div>
+          </div>
+        </div>
+      )}
 
       <ReferralLinkSection referralCode={referralCode} />
 

@@ -33,6 +33,34 @@ export async function GET(request: Request) {
     if (!error) {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        // If the OAuth round-trip was initiated from /redeem/[code], a short-
+        // lived cookie carries the lifetime code so we can redeem it post-auth.
+        const pendingRedeemCode = cookieStore.get("pending_redeem_code")?.value;
+        if (pendingRedeemCode) {
+          try {
+            const { data: rpcData, error: rpcError } = await supabase.rpc(
+              "redeem_lifetime_code",
+              { p_code: pendingRedeemCode }
+            );
+            if (rpcError) {
+              console.error("[auth/callback] redeem RPC error:", rpcError);
+            } else {
+              const result = rpcData as { ok: boolean } | null;
+              if (result?.ok) {
+                console.log(`[auth/callback] redeemed lifetime code ${pendingRedeemCode} for user ${user.id}`);
+              }
+            }
+          } catch (e) {
+            console.error("[auth/callback] redemption error:", e);
+          }
+          // Clear the cookie so the user can't accidentally reuse a stale code.
+          cookieStore.set("pending_redeem_code", "", { maxAge: 0, path: "/" });
+          // Override the next URL so the user lands on the welcome celebration.
+          const welcomeUrl = new URL("/dashboard", origin);
+          welcomeUrl.searchParams.set("welcome", "lifetime");
+          return NextResponse.redirect(welcomeUrl);
+        }
+
         // Attribute referral if ref code is present
         const refCode = searchParams.get("ref") ?? cookieStore.get("viopage_ref")?.value;
         if (refCode) {

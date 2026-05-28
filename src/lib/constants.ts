@@ -41,6 +41,7 @@ export const RESERVED_USERNAMES = [
   "public",
   "en",
   "pt-br",
+  "redeem",
 ] as const;
 
 export const USERNAME_REGEX = /^[a-z0-9][a-z0-9-]{1,28}[a-z0-9]$/;

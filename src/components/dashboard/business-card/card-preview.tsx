@@ -31,11 +31,12 @@ type Store = {
   bgColor: string;
   bgGradient: string | null;
   secondaryTextColor: string;
-  cardLayout: "split" | "centered" | "left-aligned";
+  cardLayout: "split" | "centered" | "left-aligned" | "logo-hero" | "logo-only";
   qrFgColor: string;
   qrBgColor: string;
   logoSize: number;
   logoShape: "rounded" | "circle" | "square";
+  logoAspect: "cover" | "contain";
   nameFontSize: number;
   titleFontSize: number;
   contactFontSize: number;
@@ -67,6 +68,7 @@ const DEMO_DATA: Store = {
   qrBgColor: "#0a0a0a",
   logoSize: 80,
   logoShape: "rounded",
+  logoAspect: "cover",
   nameFontSize: 30,
   titleFontSize: 14,
   contactFontSize: 12,
@@ -90,22 +92,43 @@ interface CardPreviewProps {
 
 type Social = { id: string; platform: string; is_active: boolean };
 
-function LogoBlock({ store, isDark }: { store: Store; isDark: boolean }) {
+function LogoBlock({
+  store,
+  isDark,
+  sizeOverride,
+}: {
+  store: Store;
+  isDark: boolean;
+  // Allow layouts to constrain the rendered size (e.g. logo-only fits 70% of the card)
+  sizeOverride?: number;
+}) {
   const logoSrc = store.aiLogoUrl || store.logoUrl;
+  const size = sizeOverride ?? store.logoSize;
+  // Corner radius: circle = 50%, square keeps a tiny 6px softening, rounded uses
+  // a generous 22px so it reads as deliberately rounded instead of an awkward
+  // middle-ground 16px.
   const borderRadius =
-    store.logoShape === "circle" ? "50%" : store.logoShape === "square" ? 0 : 16;
+    store.logoShape === "circle" ? "50%" : store.logoShape === "square" ? 6 : 22;
 
   if (logoSrc) {
+    // For the "contain" aspect, the logo preserves its native aspect ratio inside
+    // the size box, which means it may letterbox on one axis. We render against
+    // a transparent container so the card background shows through cleanly.
+    const isContain = store.logoAspect === "contain";
     return (
       <img
         src={logoSrc}
         alt="Logo"
         style={{
-          width: store.logoSize,
-          height: store.logoSize,
+          width: size,
+          height: size,
           borderRadius,
+          objectFit: isContain ? "contain" : "cover",
+          // Soft colored drop shadow tinted by primaryColor — matches the
+          // fallback letter's glow so uploaded logos look just as polished.
+          // Inner 1px highlight ring separates the logo from busy backgrounds.
+          boxShadow: `0 6px 28px ${store.primaryColor}40, 0 0 0 1px rgba(255,255,255,0.08) inset`,
         }}
-        className="object-cover"
         crossOrigin="anonymous"
         onError={(e) => {
           (e.target as HTMLImageElement).style.display = "none";
@@ -118,10 +141,10 @@ function LogoBlock({ store, isDark }: { store: Store; isDark: boolean }) {
     <div
       className="flex items-center justify-center text-white font-black"
       style={{
-        width: store.logoSize,
-        height: store.logoSize,
+        width: size,
+        height: size,
         borderRadius,
-        fontSize: store.logoSize * 0.35,
+        fontSize: size * 0.35,
         background: `linear-gradient(135deg, ${store.primaryColor}, ${store.primaryColor}cc)`,
         boxShadow: `0 4px 24px ${store.primaryColor}40${isDark ? "" : ""}`,
       }}
@@ -437,6 +460,7 @@ export function CardPreview({ cardRef, demoMode = false }: CardPreviewProps) {
         qrBgColor: realStore.qrBgColor,
         logoSize: realStore.logoSize,
         logoShape: realStore.logoShape,
+        logoAspect: realStore.logoAspect,
         nameFontSize: realStore.nameFontSize,
         titleFontSize: realStore.titleFontSize,
         contactFontSize: realStore.contactFontSize,
@@ -588,6 +612,92 @@ export function CardPreview({ cardRef, demoMode = false }: CardPreviewProps) {
                 />
               </div>
             </div>
+          </div>
+        ) : store.cardLayout === "logo-hero" ? (
+          // Logo-Hero — logo dominates ~62% of the card, rest goes right
+          <div className="relative z-10 flex h-full">
+            {/* Left side: the giant logo */}
+            <div
+              className="flex items-center justify-center"
+              style={{ width: "62%", padding: "24px 16px 24px 32px", minWidth: 0 }}
+            >
+              <LogoBlock
+                store={store}
+                isDark={isDark}
+                // Clamp to whichever is smaller: the user's chosen size, or the
+                // available space inside the 62% × full-height column minus padding.
+                sizeOverride={Math.min(
+                  store.logoSize,
+                  CARD_WIDTH * 0.62 - 48,
+                  CARD_HEIGHT - 48,
+                )}
+              />
+            </div>
+
+            {/* Right side: compact column with brand / name / QR */}
+            <div
+              className="flex flex-col items-center justify-between"
+              style={{ width: "38%", padding: "28px 24px", minWidth: 0 }}
+            >
+              <div style={{ width: "100%", minWidth: 0 }}>
+                <BrandName store={store} align="center" />
+                <div style={{ marginTop: 12 }}>
+                  <NameBlock store={store} mutedText={mutedText} t={t} align="center" />
+                </div>
+              </div>
+              <QrBlock
+                store={store}
+                qrValue={qrValue}
+                maxSize={Math.min(110, CARD_WIDTH * 0.38 - 56)}
+                mutedText={mutedText}
+                isDark={isDark}
+                t={t}
+              />
+            </div>
+          </div>
+        ) : store.cardLayout === "logo-only" ? (
+          // Logo-Only — just the logo + a small QR corner. No name, no contacts, no phone.
+          <div className="relative z-10 h-full">
+            <div
+              className="flex items-center justify-center"
+              style={{ width: "100%", height: "100%", padding: 28 }}
+            >
+              <LogoBlock
+                store={store}
+                isDark={isDark}
+                // Fit the largest comfortable size: clamp to whichever is smaller
+                // between the card width minus padding, the card height minus padding,
+                // and the user's chosen logoSize.
+                sizeOverride={Math.min(
+                  store.logoSize,
+                  CARD_WIDTH - 64,
+                  CARD_HEIGHT - 64,
+                )}
+              />
+            </div>
+
+            {/* Small QR pinned to the bottom-right corner */}
+            {store.showQrCode && (
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 20,
+                  right: 20,
+                  zIndex: 20,
+                }}
+              >
+                <div style={{ backgroundColor: store.qrBgColor, borderRadius: 8, padding: 6 }}>
+                  <QRCodeCanvas
+                    value={qrValue}
+                    size={72}
+                    bgColor={store.qrBgColor}
+                    fgColor={store.qrFgColor}
+                    level="H"
+                    marginSize={1}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           // "split" — default two-column
