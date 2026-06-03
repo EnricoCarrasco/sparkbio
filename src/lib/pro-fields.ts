@@ -76,6 +76,9 @@ export function stripProFields(theme: Theme): Theme {
       : "solid",
     // Footer
     hide_footer: false,
+    // Layout — the hero banner layout + custom hero image are Pro-only.
+    profile_layout: theme.profile_layout === "hero" ? "classic" : theme.profile_layout,
+    hero_image_url: null,
   };
 
   // If a full premium preset was applied, also reset the palette (otherwise
@@ -142,7 +145,11 @@ export function countPreviewedProCategories(theme: Theme): {
   }
 
   // Layout
-  if (!FREE_LINK_GAPS.has(theme.link_gap) || theme.hide_footer) {
+  if (
+    !FREE_LINK_GAPS.has(theme.link_gap) ||
+    theme.hide_footer ||
+    theme.profile_layout === "hero"
+  ) {
     categories.push("layout");
   }
 
@@ -196,6 +203,8 @@ export const PRO_FIELDS_RESET: Partial<Theme> = {
   title_font: null,
   avatar_border: "solid",
   hide_footer: false,
+  profile_layout: "classic",
+  hero_image_url: null,
 };
 
 /** True when a subscription status indicates a past active state that has ended. */

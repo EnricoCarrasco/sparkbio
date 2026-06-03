@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
 import { stripe, PRICE_IDS, type BillingInterval, type Region } from "@/lib/stripe";
+import { isSubscriptionActive } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // Route: POST /api/checkout
@@ -74,9 +75,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // This blocks the "cancel-and-resubscribe to refresh the trial" loop.
   const { data: priorSubscription } = await supabase
     .from("subscriptions")
-    .select("id, stripe_customer_id")
+    .select("id, stripe_customer_id, status, current_period_end, trial_ends_at")
     .eq("user_id", user.id)
     .maybeSingle();
+
+  // Block creating a SECOND paid subscription while one is still active or in
+  // its grace window — a double-click / refresh would otherwise double-charge
+  // the user and orphan the first sub (the DB enforces one row per user).
+  if (priorSubscription && isSubscriptionActive(priorSubscription)) {
+    return NextResponse.json({ error: "already_subscribed" }, { status: 409 });
+  }
+
   const skipTrial = priorSubscription !== null;
 
   // --- Find or create Stripe customer ---

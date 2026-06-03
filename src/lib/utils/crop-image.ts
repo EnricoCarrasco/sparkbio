@@ -1,15 +1,33 @@
 /**
  * Crop an image using canvas given pixel coordinates from react-easy-crop.
- * Returns a Blob (image/png) of the cropped region.
+ *
+ * Downscales the crop to a bounded dimension and encodes it as a compressed
+ * format (WebP by default). A full-resolution lossless PNG of a detailed image
+ * easily exceeds the 2MB upload limit even when the *source* file was small,
+ * which previously surfaced as a generic "Failed to upload photo" error. By
+ * capping the dimension and using lossy WebP, the output stays well under the
+ * limit for both avatars and hero images.
  */
 export async function getCroppedBlob(
   imageSrc: string,
-  pixelCrop: { x: number; y: number; width: number; height: number }
+  pixelCrop: { x: number; y: number; width: number; height: number },
+  opts?: { maxDim?: number; mimeType?: string; quality?: number }
 ): Promise<Blob> {
+  const maxDim = opts?.maxDim ?? 1024;
+  const mimeType = opts?.mimeType ?? "image/webp";
+  const quality = opts?.quality ?? 0.85;
+
   const image = await loadImage(imageSrc);
+
+  // Scale the cropped region down so its longest side is <= maxDim.
+  const longest = Math.max(pixelCrop.width, pixelCrop.height);
+  const scale = longest > maxDim ? maxDim / longest : 1;
+  const outW = Math.max(1, Math.round(pixelCrop.width * scale));
+  const outH = Math.max(1, Math.round(pixelCrop.height * scale));
+
   const canvas = document.createElement("canvas");
-  canvas.width = pixelCrop.width;
-  canvas.height = pixelCrop.height;
+  canvas.width = outW;
+  canvas.height = outH;
   const ctx = canvas.getContext("2d")!;
 
   ctx.drawImage(
@@ -20,15 +38,19 @@ export async function getCroppedBlob(
     pixelCrop.height,
     0,
     0,
-    pixelCrop.width,
-    pixelCrop.height
+    outW,
+    outH
   );
 
   return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) resolve(blob);
-      else reject(new Error("Canvas toBlob failed"));
-    }, "image/png");
+    canvas.toBlob(
+      (blob) => {
+        if (blob) resolve(blob);
+        else reject(new Error("Canvas toBlob failed"));
+      },
+      mimeType,
+      quality
+    );
   });
 }
 

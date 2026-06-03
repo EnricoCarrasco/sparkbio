@@ -215,7 +215,7 @@ async function handleSubscription(
   const priceId = sub.items.data[0]?.price.id ?? null;
   const customerId = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
 
-  const { error: upsertError } = await supabase
+  const { data: upsertedSub, error: upsertError } = await supabase
     .from("subscriptions")
     .upsert(
       {
@@ -232,7 +232,9 @@ async function handleSubscription(
         stripe_updated_at: incomingAt,
       },
       { onConflict: "user_id" }
-    );
+    )
+    .select("id")
+    .single();
 
   if (upsertError) {
     console.error("[webhook] subscription upsert error:", upsertError.message);
@@ -243,14 +245,21 @@ async function handleSubscription(
     throw new Error(upsertError.message);
   }
 
+  // Referral accounting keys off our INTERNAL subscriptions.id (a UUID), not
+  // the Stripe subscription id (sub_...). Passing the Stripe string into the
+  // UUID FK column silently failed every insert, so affiliates were never
+  // credited. Use the upserted row's id.
+  const internalSubId = upsertedSub?.id ?? null;
+
   // Background work: referral accounting + premium perk reset
   after(async () => {
     try {
+      if (!internalSubId) return;
       if (mapped === "active" || mapped === "on_trial") {
-        await processReferralConversion(userId, sub.id, priceId ?? "");
+        await processReferralConversion(userId, internalSubId, priceId ?? "");
       }
       if (mapped === "cancelled" || mapped === "expired") {
-        await cancelPendingReferralEarnings(sub.id);
+        await cancelPendingReferralEarnings(internalSubId);
         const supa = createAdminClient();
         const { error: themeError } = await supa
           .from("themes")

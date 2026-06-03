@@ -58,8 +58,16 @@ export function AvatarCropDialog({
     if (!processedSrc || !croppedAreaPixels) return;
     setSaving(true);
     try {
-      const blob = await getCroppedBlob(processedSrc, croppedAreaPixels);
-      const file = new File([blob], "cropped.png", { type: "image/png" });
+      // Square crops are avatars (small) — wider crops are hero banners.
+      // Cap dimension + encode WebP so the output never exceeds upload limits.
+      const blob = await getCroppedBlob(processedSrc, croppedAreaPixels, {
+        maxDim: isSquareCrop ? 512 : 1600,
+        mimeType: "image/webp",
+        quality: 0.85,
+      });
+      const file = new File([blob], "cropped.webp", {
+        type: blob.type || "image/webp",
+      });
       onCropDone(file);
     } finally {
       setSaving(false);

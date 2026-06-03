@@ -125,7 +125,7 @@ export default async function OgImage({ params }: Props) {
             letterSpacing: "0.01em",
           }}
         >
-          @{username}
+          {`@${username}`}
         </div>
 
         {/* Bio (truncated) */}
@@ -140,12 +140,11 @@ export default async function OgImage({ params }: Props) {
               maxWidth: "760px",
               textAlign: "center",
               lineHeight: 1.5,
-              display: "-webkit-box",
+              display: "flex",
               overflow: "hidden",
             }}
           >
-            {bio.slice(0, 120)}
-            {bio.length > 120 ? "…" : ""}
+            {bio.slice(0, 120) + (bio.length > 120 ? "…" : "")}
           </div>
         )}
 

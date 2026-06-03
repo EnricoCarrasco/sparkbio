@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import * as Sentry from "@sentry/nextjs";
 import type { Theme } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { useSubscriptionStore } from "@/lib/stores/subscription-store";
@@ -162,34 +163,48 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
     if (file.size > HERO_MAX_SIZE) return null;
     if (!HERO_ACCEPTED_TYPES.includes(file.type)) return null;
 
-    const supabase = createClient();
-    const filePath = `${theme.user_id}/hero`;
+    // Upload via the server route (service_role) — immune to the Storage
+    // user-JWT verification problem; ownership enforced server-side.
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/upload/hero", { method: "POST", body: form });
 
-    const { error: uploadError } = await supabase.storage
-      .from("hero-images")
-      .upload(filePath, file, { upsert: true, contentType: file.type });
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        Sentry.captureMessage("[theme-store] hero upload failed", {
+          level: "error",
+          tags: { area: "storage-upload", bucket: "hero-images" },
+          extra: { status: res.status, body: body.slice(0, 300) },
+        });
+        return null;
+      }
 
-    if (uploadError) {
-      console.error("[theme-store] hero upload failed:", uploadError.message);
+      const { url } = (await res.json()) as { url?: string };
+      if (!url) return null;
+
+      // Only flip the public pointer once the upload truly succeeded.
+      await get().updateTheme({ hero_image_url: url });
+      return url;
+    } catch (err) {
+      Sentry.captureException(err, {
+        tags: { area: "storage-upload", bucket: "hero-images" },
+      });
       return null;
     }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from("hero-images")
-      .getPublicUrl(filePath);
-
-    // Append cache-buster so browser/Next.js don't serve the old image
-    const freshUrl = `${publicUrl}?t=${Date.now()}`;
-    await get().updateTheme({ hero_image_url: freshUrl });
-    return publicUrl;
   },
 
   removeHeroImage: async () => {
     const { theme } = get();
     if (!theme) return;
 
-    const supabase = createClient();
-    await supabase.storage.from("hero-images").remove([`${theme.user_id}/hero`]);
+    try {
+      await fetch("/api/upload/hero", { method: "DELETE" });
+    } catch (err) {
+      Sentry.captureException(err, {
+        tags: { area: "storage-upload", bucket: "hero-images", op: "delete" },
+      });
+    }
     await get().updateTheme({ hero_image_url: null });
   },
 }));

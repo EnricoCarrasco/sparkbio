@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import * as Sentry from "@sentry/nextjs";
 import type { Profile } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { AVATAR_MAX_SIZE, AVATAR_ACCEPTED_TYPES } from "@/lib/constants";
@@ -66,25 +67,36 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     if (file.size > AVATAR_MAX_SIZE) return null;
     if (!AVATAR_ACCEPTED_TYPES.includes(file.type)) return null;
 
-    const supabase = createClient();
-    const extMap: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" };
-    const fileExt = extMap[file.type] ?? "png";
-    const filePath = `${profile.id}/avatar.${fileExt}`;
+    // Upload via the server route (service_role) so we are immune to the
+    // Storage user-JWT verification problem and always enforce ownership.
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/upload/avatar", {
+        method: "POST",
+        body: form,
+      });
 
-    const { error: uploadError } = await supabase.storage
-      .from("avatars")
-      .upload(filePath, file, { upsert: true });
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        Sentry.captureMessage("[profile-store] avatar upload failed", {
+          level: "error",
+          tags: { area: "storage-upload", bucket: "avatars" },
+          extra: { status: res.status, body: body.slice(0, 300) },
+        });
+        return null;
+      }
 
-    if (uploadError) return null;
+      const { url } = (await res.json()) as { url?: string };
+      if (!url) return null;
 
-    const { data: { publicUrl } } = supabase.storage
-      .from("avatars")
-      .getPublicUrl(filePath);
-
-    // Add cache-busting param
-    const avatarUrl = `${publicUrl}?t=${Date.now()}`;
-
-    await get().updateProfile({ avatar_url: avatarUrl });
-    return avatarUrl;
+      await get().updateProfile({ avatar_url: url });
+      return url;
+    } catch (err) {
+      Sentry.captureException(err, {
+        tags: { area: "storage-upload", bucket: "avatars" },
+      });
+      return null;
+    }
   },
 }));

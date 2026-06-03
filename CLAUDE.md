@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git workflow
+
+**Work directly on `main`. Do NOT create a per-fix branch.** The owner prefers committing fixes straight to `main` and pushing. Skip the "branch first" default — only create a branch if the owner explicitly asks for one. Still commit/push only when asked.
+
 ## Project
 
 **Viopage** (formerly Sparkbio) — a link-in-bio SaaS for creators (Linktree clone). Users sign up, add links, customize a theme, and share a public profile at `/{username}`.
