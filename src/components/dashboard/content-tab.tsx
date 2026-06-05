@@ -35,11 +35,12 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
   useSortable,
+  arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { LinkList } from "@/components/dashboard/link-list";
+import { LinkCard } from "@/components/dashboard/link-card";
 import { useLinkStore } from "@/lib/stores/link-store";
 import { useProfileStore } from "@/lib/stores/profile-store";
 import { useSocialStore } from "@/lib/stores/social-store";
@@ -858,14 +859,18 @@ function SocialIconCard({
 // Social icons list section
 // ---------------------------------------------------------------------------
 
-function SocialIconsList() {
+// Unified drag list: social icons + links share ONE DndContext and ONE
+// position sequence, so any item can be reordered into any position and the
+// order is mirrored on the public profile (see profile-page.tsx pillItems).
+function UnifiedContentList() {
   const socialIcons = useSocialStore((s) => s.socialIcons);
-  const reorderSocialIcons = useSocialStore((s) => s.reorderSocialIcons);
-  const tLinks = useTranslations("dashboard.links");
+  const setSocialPositions = useSocialStore((s) => s.setSocialPositions);
+  const links = useLinkStore((s) => s.links);
+  const setLinkPositions = useLinkStore((s) => s.setLinkPositions);
   const { counts } = useLinkClickCounts();
 
   const [insightsOpen, setInsightsOpen] = useState(false);
-  const [selectedIconId, setSelectedIconId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<{ kind: "social" | "link"; id: string } | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -876,64 +881,106 @@ function SocialIconsList() {
     })
   );
 
+  // Merged, position-sorted list of all social icons + links.
+  const merged = useMemo(
+    () =>
+      [
+        ...socialIcons.map((s) => ({
+          kind: "social" as const,
+          id: s.id,
+          position: s.position,
+          social: s,
+        })),
+        ...links.map((l) => ({
+          kind: "link" as const,
+          id: l.id,
+          position: l.position,
+          link: l,
+        })),
+      ].sort((a, b) => a.position - b.position),
+    [socialIcons, links]
+  );
+
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
-    if (over && active.id !== over.id) {
-      reorderSocialIcons(String(active.id), String(over.id));
-    }
+    if (!over || active.id === over.id) return;
+    const oldIndex = merged.findIndex((i) => i.id === active.id);
+    const newIndex = merged.findIndex((i) => i.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const next = arrayMove(merged, oldIndex, newIndex).map((it, idx) => ({
+      ...it,
+      position: idx,
+    }));
+    const socialPos = next
+      .filter((i) => i.kind === "social")
+      .map((i) => ({ id: i.id, position: i.position }));
+    const linkPos = next
+      .filter((i) => i.kind === "link")
+      .map((i) => ({ id: i.id, position: i.position }));
+    if (socialPos.length) setSocialPositions(socialPos);
+    if (linkPos.length) setLinkPositions(linkPos);
   }
 
-  const selectedIcon = selectedIconId
-    ? socialIcons.find((i) => i.id === selectedIconId)
-    : null;
-  const selectedLink: Link | null = selectedIcon
-    ? {
-        id: selectedIcon.id,
-        user_id: selectedIcon.user_id,
-        title: getPlatformLabel(selectedIcon.platform),
-        url: selectedIcon.url,
-        thumbnail_url: null,
-        position: selectedIcon.position,
-        is_active: selectedIcon.is_active,
-        created_at: "",
-        updated_at: "",
-      }
-    : null;
-
-  function handleOpenInsights(iconId: string) {
-    setSelectedIconId(iconId);
+  function openInsights(kind: "social" | "link", id: string) {
+    setSelected({ kind, id });
     setInsightsOpen(true);
   }
 
-  if (socialIcons.length === 0) return null;
+  // Build the Link-shaped object the insights modal expects (for a social icon,
+  // synthesize one from the platform).
+  let selectedLink: Link | null = null;
+  if (selected?.kind === "link") {
+    selectedLink = links.find((l) => l.id === selected.id) ?? null;
+  } else if (selected?.kind === "social") {
+    const si = socialIcons.find((i) => i.id === selected.id);
+    selectedLink = si
+      ? {
+          id: si.id,
+          user_id: si.user_id,
+          title: getPlatformLabel(si.platform),
+          url: si.url,
+          thumbnail_url: null,
+          position: si.position,
+          is_active: si.is_active,
+          created_at: "",
+          updated_at: "",
+        }
+      : null;
+  }
 
-  const sorted = [...socialIcons].sort((a, b) => a.position - b.position);
+  if (merged.length === 0) return null;
 
   return (
     <>
-      <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 10 }}>
-        <SectionHead
-          icon={<Share2 className="size-3.5" />}
-          label={tLinks("socialLinks")}
-        />
+      <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 10 }}>
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={sorted.map((i) => i.id)}
+            items={merged.map((i) => i.id)}
             strategy={verticalListSortingStrategy}
           >
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {sorted.map((icon) => (
-                <SocialIconCard
-                  key={icon.id}
-                  icon={icon}
-                  clickCount={counts[icon.id] ?? 0}
-                  onOpenInsights={handleOpenInsights}
-                />
-              ))}
+              {merged.map((item) =>
+                item.kind === "social" ? (
+                  <SocialIconCard
+                    key={item.id}
+                    icon={item.social}
+                    clickCount={counts[item.id] ?? 0}
+                    onOpenInsights={(id) => openInsights("social", id)}
+                  />
+                ) : (
+                  <LinkCard
+                    key={item.id}
+                    link={item.link}
+                    clickCount={counts[item.id] ?? 0}
+                    onOpenInsights={(id) => openInsights("link", id)}
+                  />
+                )
+              )}
             </div>
           </SortableContext>
         </DndContext>
@@ -1128,11 +1175,8 @@ function ContentTabInner() {
         buttonRef={addButtonRef}
       />
 
-      {/* Social icons management section */}
-      <SocialIconsList />
-
-      {/* Link list (drag-and-drop cards) */}
-      <LinkList />
+      {/* Unified social-icons + links drag list (shared position order) */}
+      <UnifiedContentList />
 
       {/* Share nudge banner */}
       {step === "share-nudge" && <ShareNudgeBanner onDismiss={completeAndDismiss} />}

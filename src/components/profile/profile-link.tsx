@@ -137,13 +137,34 @@ export function ProfileLink({ link, profileId, theme, index, username, referralC
         href={link.url}
         target="_blank"
         rel="noopener noreferrer"
-        style={{ ...styles, paddingRight: "48px" }}
+        style={{
+          ...styles,
+          paddingRight: "48px",
+          paddingLeft: link.thumbnail_url ? "16px" : undefined,
+          gap: link.thumbnail_url ? "12px" : undefined,
+        }}
         onClick={handleClick}
         whileHover={{ scale: 1.015, y: -1 }}
         whileTap={{ scale: 0.98 }}
         transition={{ type: "spring", stiffness: 400, damping: 25 }}
       >
-        {link.title}
+        {link.thumbnail_url && (
+          <span
+            aria-hidden="true"
+            className="shrink-0 overflow-hidden flex items-center justify-center"
+            style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,0.14)" }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={link.thumbnail_url}
+              alt=""
+              width={32}
+              height={32}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          </span>
+        )}
+        <span style={{ flex: 1, textAlign: "center" }}>{link.title}</span>
       </motion.a>
 
       {/* Share ellipsis button */}

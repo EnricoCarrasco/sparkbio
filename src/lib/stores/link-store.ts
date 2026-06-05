@@ -9,11 +9,32 @@ interface LinkState {
   loading: boolean;
   setLinks: (links: Link[]) => void;
   fetchLinks: () => Promise<void>;
-  addLink: (link: { title: string; url: string }) => Promise<void>;
+  addLink: (link: { title: string; url: string; thumbnail_url?: string | null }) => Promise<void>;
   updateLink: (id: string, updates: Partial<Link>) => Promise<void>;
   deleteLink: (id: string) => Promise<void>;
   reorderLinks: (activeId: string, overId: string) => Promise<void>;
   toggleLink: (id: string) => Promise<void>;
+  /** Upload a custom link icon; returns its public URL (or null). */
+  uploadLinkIcon: (file: File) => Promise<string | null>;
+  /** Auto-detect + re-host an icon for a URL; returns its public URL (or null). */
+  fetchLinkIcon: (url: string) => Promise<string | null>;
+  /** Persist a batch of new positions (used by the unified drag list). */
+  setLinkPositions: (positions: { id: string; position: number }[]) => Promise<void>;
+}
+
+// Max position across BOTH links and social_icons, so a newly added item always
+// appends to the end of the unified (links + social-buttons) order. The dynamic
+// import avoids a static circular dependency between the two stores.
+async function combinedMaxPosition(links: Link[]): Promise<number> {
+  let socialPositions: number[] = [];
+  try {
+    const mod = await import("@/lib/stores/social-store");
+    socialPositions = mod.useSocialStore.getState().socialIcons.map((s) => s.position);
+  } catch {
+    /* social store unavailable */
+  }
+  const all = [...links.map((l) => l.position), ...socialPositions];
+  return all.length ? Math.max(...all) : -1;
 }
 
 export const useLinkStore = create<LinkState>((set, get) => ({
@@ -40,18 +61,25 @@ export const useLinkStore = create<LinkState>((set, get) => ({
     set({ links: data || [], loading: false });
   },
 
-  addLink: async ({ title, url }) => {
+  addLink: async ({ title, url, thumbnail_url }) => {
     if (!isSafeUrl(url)) return;
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
     const { links } = get();
-    const position = links.length;
+    const position = (await combinedMaxPosition(links)) + 1;
 
     const { data, error } = await supabase
       .from("links")
-      .insert({ user_id: user.id, title, url, position, is_active: true })
+      .insert({
+        user_id: user.id,
+        title,
+        url,
+        thumbnail_url: thumbnail_url || null,
+        position,
+        is_active: true,
+      })
       .select()
       .single();
 
@@ -129,5 +157,55 @@ export const useLinkStore = create<LinkState>((set, get) => ({
     if (!link) return;
 
     await get().updateLink(id, { is_active: !link.is_active });
+  },
+
+  uploadLinkIcon: async (file) => {
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/upload/link-icon", { method: "POST", body: form });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return typeof data.url === "string" ? data.url : null;
+    } catch {
+      return null;
+    }
+  },
+
+  fetchLinkIcon: async (url) => {
+    try {
+      const res = await fetch("/api/links/fetch-icon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return typeof data.iconUrl === "string" ? data.iconUrl : null;
+    } catch {
+      return null;
+    }
+  },
+
+  setLinkPositions: async (positions) => {
+    const { links } = get();
+    const prev = [...links];
+    const map = new Map(positions.map((p) => [p.id, p.position]));
+    const updated = links
+      .map((l) => (map.has(l.id) ? { ...l, position: map.get(l.id)! } : l))
+      .sort((a, b) => a.position - b.position);
+    set({ links: updated });
+
+    const supabase = createClient();
+    const results = await Promise.all(
+      positions.map((p) =>
+        supabase.from("links").update({ position: p.position }).eq("id", p.id)
+      )
+    );
+    if (results.some((r) => r.error)) {
+      set({ links: prev });
+    } else {
+      triggerRevalidation();
+    }
   },
 }));

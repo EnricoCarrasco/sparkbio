@@ -6,6 +6,8 @@ export const linkSchema = z.object({
   url: z
     .url("Invalid URL")
     .refine(isSafeUrl, { message: "URL scheme not allowed" }),
+  // Optional custom/auto-detected icon stored on links.thumbnail_url.
+  thumbnail_url: z.url().or(z.literal("")).nullish(),
 });
 
 export type LinkInput = z.infer<typeof linkSchema>;

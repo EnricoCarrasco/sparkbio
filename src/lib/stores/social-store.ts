@@ -20,6 +20,23 @@ interface SocialState {
   deleteSocialIcon: (id: string) => Promise<void>;
   toggleSocialIcon: (id: string) => Promise<void>;
   reorderSocialIcons: (activeId: string, overId: string) => Promise<void>;
+  /** Persist a batch of new positions (used by the unified drag list). */
+  setSocialPositions: (positions: { id: string; position: number }[]) => Promise<void>;
+}
+
+// Max position across BOTH social_icons and links, so a newly added item always
+// appends to the end of the unified (links + social-buttons) order. The dynamic
+// import avoids a static circular dependency between the two stores.
+async function combinedMaxPosition(socialIcons: SocialIcon[]): Promise<number> {
+  let linkPositions: number[] = [];
+  try {
+    const mod = await import("@/lib/stores/link-store");
+    linkPositions = mod.useLinkStore.getState().links.map((l) => l.position);
+  } catch {
+    /* link store unavailable */
+  }
+  const all = [...socialIcons.map((s) => s.position), ...linkPositions];
+  return all.length ? Math.max(...all) : -1;
 }
 
 export const useSocialStore = create<SocialState>((set, get) => ({
@@ -60,7 +77,7 @@ export const useSocialStore = create<SocialState>((set, get) => ({
     if (!user) throw new Error("not_authenticated");
 
     const { socialIcons } = get();
-    const position = socialIcons.length;
+    const position = (await combinedMaxPosition(socialIcons)) + 1;
 
     const { data, error } = await supabase
       .from("social_icons")
@@ -168,5 +185,27 @@ export const useSocialStore = create<SocialState>((set, get) => ({
       )
     );
     triggerRevalidation();
+  },
+
+  setSocialPositions: async (positions) => {
+    const { socialIcons } = get();
+    const prev = [...socialIcons];
+    const map = new Map(positions.map((p) => [p.id, p.position]));
+    const updated = socialIcons
+      .map((icon) => (map.has(icon.id) ? { ...icon, position: map.get(icon.id)! } : icon))
+      .sort((a, b) => a.position - b.position);
+    set({ socialIcons: updated });
+
+    const supabase = createClient();
+    const results = await Promise.all(
+      positions.map((p) =>
+        supabase.from("social_icons").update({ position: p.position }).eq("id", p.id)
+      )
+    );
+    if (results.some((r) => r.error)) {
+      set({ socialIcons: prev });
+    } else {
+      triggerRevalidation();
+    }
   },
 }));

@@ -140,8 +140,19 @@ export function LinkCard({ link, clickCount, onOpenInsights }: LinkCardProps) {
           <GripVertical className="size-4" />
         </button>
 
-        {/* Brand dot */}
-        <BrandDot brand={brand} size={38} />
+        {/* Custom icon (thumbnail_url) or brand dot fallback */}
+        {link.thumbnail_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={link.thumbnail_url}
+            alt=""
+            width={38}
+            height={38}
+            style={{ width: 38, height: 38, borderRadius: 9, objectFit: "cover", flexShrink: 0 }}
+          />
+        ) : (
+          <BrandDot brand={brand} size={38} />
+        )}
 
         {/* Title + URL */}
         <div style={{ flex: 1, minWidth: 0 }}>

@@ -110,6 +110,18 @@ export function ProfilePage({ data, preview = false }: ProfilePageProps) {
   const gridIcons = activeSocialIcons.filter((s) => s.display_mode === "grid");
   const buttonIcons = activeSocialIcons.filter((s) => s.display_mode === "button");
 
+  // Unified pill order: button-mode social icons + links share ONE position
+  // sequence, so the order the owner arranges in the dashboard is reflected
+  // here. Array.sort is stable, so legacy data with colliding positions keeps
+  // today's "social buttons then links" order until the first unified reorder.
+  const pillItems: Array<
+    | { kind: "social"; id: string; position: number; si: (typeof buttonIcons)[number] }
+    | { kind: "link"; id: string; position: number; link: (typeof activeLinks)[number] }
+  > = [
+    ...buttonIcons.map((si) => ({ kind: "social" as const, id: si.id, position: si.position, si })),
+    ...activeLinks.map((link) => ({ kind: "link" as const, id: link.id, position: link.position, link })),
+  ].sort((a, b) => a.position - b.position);
+
   // hide_footer is stripped server-side for non-Pro visitors (see
   // lib/pro-fields.ts). The owner preview route passes it through. Either
   // way, reading theme.hide_footer directly here is correct. Internal
@@ -190,39 +202,36 @@ export function ProfilePage({ data, preview = false }: ProfilePageProps) {
             <SocialGrid icons={gridIcons} />
           )}
 
-          {/* Link buttons + button-mode social icons */}
-          {(activeLinks.length > 0 || buttonIcons.length > 0) && (
+          {/* Link buttons + button-mode social icons — unified position order */}
+          {pillItems.length > 0 && (
             <div className={`w-full flex flex-col ${
               theme.link_gap === "compact" ? "gap-2" :
               theme.link_gap === "relaxed" ? "gap-5" :
               "gap-3"
             }`}>
-              {/* Button-mode social icons first */}
-              {buttonIcons
-                .sort((a, b) => a.position - b.position)
-                .map((si, index) => (
+              {pillItems.map((item, index) =>
+                item.kind === "social" ? (
                   <SocialButton
-                    key={si.id}
-                    icon={si}
+                    key={item.id}
+                    icon={item.si}
                     profileId={profile.id}
                     theme={theme}
                     index={index}
                     username={profile.username}
                     referralCode={profile.referral_code}
                   />
-                ))}
-              {/* Regular links */}
-              {activeLinks.map((link, index) => (
-                <ProfileLink
-                  key={link.id}
-                  link={link}
-                  profileId={profile.id}
-                  theme={theme}
-                  index={buttonIcons.length + index}
-                  username={profile.username}
-                  referralCode={profile.referral_code}
-                />
-              ))}
+                ) : (
+                  <ProfileLink
+                    key={item.id}
+                    link={item.link}
+                    profileId={profile.id}
+                    theme={theme}
+                    index={index}
+                    username={profile.username}
+                    referralCode={profile.referral_code}
+                  />
+                )
+              )}
             </div>
           )}
         </div>
