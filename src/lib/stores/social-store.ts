@@ -2,7 +2,7 @@ import { create } from "zustand";
 import type { SocialIcon, SocialPlatform, SocialDisplayMode } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { triggerRevalidation } from "@/lib/utils/revalidate";
-import { isSafeUrl } from "@/lib/validators/url";
+import { isSafeUrl, hasDangerousScheme } from "@/lib/validators/url";
 import { getInputType } from "@/lib/utils/platform-url";
 
 interface SocialState {
@@ -67,7 +67,10 @@ export const useSocialStore = create<SocialState>((set, get) => ({
   },
 
   addSocialIcon: async (platform, url, displayMode = "icon", displayTitle = null) => {
-    if (getInputType(platform) !== "pix_key" && !isSafeUrl(url)) {
+    const isPixKey = getInputType(platform) === "pix_key";
+    // Pix keys skip the full URL whitelist, but must never carry an executable
+    // scheme (defense in depth — the DB CHECK exempts Pix from scheme validation).
+    if (isPixKey ? hasDangerousScheme(url) : !isSafeUrl(url)) {
       throw new Error("invalid_url");
     }
     const supabase = createClient();
@@ -105,7 +108,11 @@ export const useSocialStore = create<SocialState>((set, get) => ({
     const target = socialIcons.find((i) => i.id === id);
     if (typeof updates.url === "string") {
       const platform = (updates.platform as SocialPlatform) ?? target?.platform;
-      if (platform && getInputType(platform) !== "pix_key" && !isSafeUrl(updates.url)) {
+      const isPixKey = platform ? getInputType(platform) === "pix_key" : false;
+      const bad = isPixKey
+        ? hasDangerousScheme(updates.url)
+        : !isSafeUrl(updates.url);
+      if (bad) {
         return;
       }
     }

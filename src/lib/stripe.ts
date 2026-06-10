@@ -1,12 +1,30 @@
 import Stripe from "stripe";
 
 // Server-only: never import from client code.
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-03-25.dahlia",
-  typescript: true,
-  appInfo: {
-    name: "Viopage",
-    version: "1.0.0",
+//
+// Lazily instantiated: constructing `new Stripe(undefined!)` at module-load
+// throws ("Neither apiKey nor config.authenticator provided"), which crashed
+// `next build` page-data collection for any route importing this module when
+// STRIPE_SECRET_KEY wasn't present in the build env. A Proxy defers creation
+// until first property access (i.e. an actual request), so importing the module
+// is always safe and the env var is only required at runtime.
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
+    _stripe = new Stripe(key, {
+      apiVersion: "2026-03-25.dahlia",
+      typescript: true,
+      appInfo: { name: "Viopage", version: "1.0.0" },
+    });
+  }
+  return _stripe;
+}
+
+export const stripe = new Proxy({} as Stripe, {
+  get(_target, prop, receiver) {
+    return Reflect.get(getStripe(), prop, receiver);
   },
 });
 

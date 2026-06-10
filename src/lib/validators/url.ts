@@ -22,3 +22,15 @@ export function isSafeUrl(raw: string): boolean {
     return false;
   }
 }
+
+/**
+ * Schemes that can execute script when placed in an href/src. Pix keys skip the
+ * full URL whitelist (they're raw payment keys, not URLs), but they must still
+ * never carry one of these — a legitimate Pix key never has a URL scheme. This
+ * is the defense-in-depth gate for any value that bypasses isSafeUrl.
+ */
+const DANGEROUS_SCHEME_RE = /^\s*(javascript|data|vbscript|file):/i;
+
+export function hasDangerousScheme(raw: string): boolean {
+  return DANGEROUS_SCHEME_RE.test(raw);
+}

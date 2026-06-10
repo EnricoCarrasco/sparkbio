@@ -82,16 +82,40 @@ async function assertPublicHost(urlStr: string): Promise<URL> {
   return u;
 }
 
+const MAX_REDIRECTS = 5;
+
+// SSRF-safe fetch: follows redirects MANUALLY, re-running the private-IP/host
+// guard on every hop. `fetch(redirect:"follow")` would transparently chase a
+// 30x to http://169.254.169.254/ or http://127.0.0.1/ AFTER the initial host
+// passed validation — so we must re-validate each Location ourselves.
 async function timedFetch(url: string, init?: RequestInit): Promise<Response> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
   try {
-    return await fetch(url, {
-      ...init,
-      signal: ctrl.signal,
-      redirect: "follow",
-      headers: { "User-Agent": UA, ...(init?.headers ?? {}) },
-    });
+    let current = url;
+    for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+      // Google's favicon service is a fixed, trusted host; skip the guard for it
+      // (its hostname is allowlisted by the caller) but still validate any other.
+      if (!current.startsWith("https://www.google.com/s2/favicons")) {
+        await assertPublicHost(current);
+      }
+      const res = await fetch(current, {
+        ...init,
+        signal: ctrl.signal,
+        redirect: "manual",
+        headers: { "User-Agent": UA, ...(init?.headers ?? {}) },
+      });
+      if (res.status >= 300 && res.status < 400) {
+        const loc = res.headers.get("location");
+        if (!loc) return res;
+        const next = absUrl(loc, current);
+        if (!next) throw new Error("blocked_redirect");
+        current = next;
+        continue;
+      }
+      return res;
+    }
+    throw new Error("too_many_redirects");
   } finally {
     clearTimeout(timer);
   }

@@ -1,5 +1,6 @@
 "use server";
 
+import { randomInt } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAdminUser } from "@/lib/admin";
@@ -10,9 +11,12 @@ import { getAdminUser } from "@/lib/admin";
 const CROCKFORD = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
 
 function randomCode(): string {
+  // These codes are bearer tokens worth lifetime Pro + boosted commission, so
+  // they must be unguessable. crypto.randomInt is a CSPRNG; Math.random (xorshift)
+  // is state-recoverable and unsuitable for secrets.
   const chars: string[] = [];
   for (let i = 0; i < 8; i++) {
-    chars.push(CROCKFORD[Math.floor(Math.random() * CROCKFORD.length)]);
+    chars.push(CROCKFORD[randomInt(CROCKFORD.length)]);
   }
   return `AMB-${chars.slice(0, 4).join("")}-${chars.slice(4).join("")}`;
 }

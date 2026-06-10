@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef, lazy, Suspense } from "react";
+import NextLink from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -178,7 +179,7 @@ export function DashboardShell({
             {tabTitle}
           </span>
           <div style={{ flex: 1 }} />
-          <a
+          <NextLink
             href="/earn"
             aria-label="Earn with Viopage"
             style={{
@@ -198,7 +199,7 @@ export function DashboardShell({
           >
             <Gift className="size-4" />
             Earn
-          </a>
+          </NextLink>
         </header>
 
         {activeTab === "content" && <ContentTab />}

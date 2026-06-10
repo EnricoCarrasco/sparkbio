@@ -41,6 +41,17 @@ const PRO_FEATURES = [
 // Floating particle component
 // ---------------------------------------------------------------------------
 function FloatingParticle({ delay, x, size }: { delay: number; x: number; size: number }) {
+  // Randomize animation params once per mount. Calling Math.random() inline in
+  // the render body is impure (breaks the React compiler and risks SSR/CSR
+  // hydration mismatches); useMemo pins the values for this instance.
+  const { rise, duration, repeatDelay } = useMemo(
+    () => ({
+      rise: -120 - Math.random() * 80,
+      duration: 2.5 + Math.random(),
+      repeatDelay: 1 + Math.random() * 2,
+    }),
+    []
+  );
   return (
     <motion.div
       className="absolute rounded-full pointer-events-none"
@@ -53,15 +64,15 @@ function FloatingParticle({ delay, x, size }: { delay: number; x: number; size: 
       }}
       initial={{ y: 0, opacity: 0, scale: 0 }}
       animate={{
-        y: [-10, -120 - Math.random() * 80],
+        y: [-10, rise],
         opacity: [0, 0.7, 0],
         scale: [0, 1, 0.5],
       }}
       transition={{
-        duration: 2.5 + Math.random(),
+        duration,
         delay,
         repeat: Infinity,
-        repeatDelay: 1 + Math.random() * 2,
+        repeatDelay,
         ease: "easeOut",
       }}
     />

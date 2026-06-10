@@ -1,0 +1,14 @@
+{
+  "name": "viopage-verification",
+  "version": "1.0.0",
+  "private": true,
+  "description": "E2E + security regression tests for Viopage (run locally)",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}

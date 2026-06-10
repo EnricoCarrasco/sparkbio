@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useDashboardStore, type DesignSubTab } from "@/lib/stores/dashboard-store";
 import { useThemeStore } from "@/lib/stores/theme-store";
@@ -94,6 +94,20 @@ export function DesignTab() {
   const isPro = useSubscriptionStore((s) => s.isPro);
   const themeLoading = useThemeStore((s) => s.loading);
   const theme = useThemeStore((s) => s.theme);
+  const flushSave = useThemeStore((s) => s.flushSave);
+
+  // Flush any pending debounced theme save when the user navigates away or this
+  // tab unmounts — without it, an edit made <500ms before leaving is lost.
+  useEffect(() => {
+    const onHide = () => {
+      void flushSave();
+    };
+    window.addEventListener("pagehide", onHide);
+    return () => {
+      window.removeEventListener("pagehide", onHide);
+      void flushSave();
+    };
+  }, [flushSave]);
 
   if (themeLoading && !theme) {
     return <DesignSkeleton />;

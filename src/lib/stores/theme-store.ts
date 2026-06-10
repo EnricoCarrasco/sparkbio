@@ -19,6 +19,10 @@ interface ThemeState {
   setTheme: (theme: Theme | null) => void;
   fetchTheme: () => Promise<void>;
   updateTheme: (updates: Partial<Theme>) => Promise<void>;
+  /** Immediately persist any pending debounced theme save. Call on unmount /
+   *  pagehide so a rapid edit isn't dropped if the user navigates away inside
+   *  the 500ms debounce window. */
+  flushSave: () => Promise<void>;
   restorePreProSnapshot: () => Promise<void>;
   uploadHeroImage: (file: File) => Promise<string | null>;
   removeHeroImage: () => Promise<void>;
@@ -114,6 +118,8 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
       }
     });
   },
+
+  flushSave: () => debouncedSave.flush(),
 
   /** Bring the editor back in sync with what the public page shows.
    *

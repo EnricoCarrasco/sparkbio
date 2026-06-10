@@ -7,7 +7,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  // Only allow same-origin relative redirects. Reject absolute URLs and
+  // protocol-relative (`//evil.com`) values to prevent open redirects.
+  const rawNext = searchParams.get("next") ?? "/dashboard";
+  const next =
+    rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/dashboard";
 
   if (code) {
     const cookieStore = await cookies();
@@ -37,6 +41,7 @@ export async function GET(request: Request) {
         // lived cookie carries the lifetime code so we can redeem it post-auth.
         const pendingRedeemCode = cookieStore.get("pending_redeem_code")?.value;
         if (pendingRedeemCode) {
+          let redeemed = false;
           try {
             const { data: rpcData, error: rpcError } = await supabase.rpc(
               "redeem_lifetime_code",
@@ -46,7 +51,8 @@ export async function GET(request: Request) {
               console.error("[auth/callback] redeem RPC error:", rpcError);
             } else {
               const result = rpcData as { ok: boolean } | null;
-              if (result?.ok) {
+              redeemed = result?.ok === true;
+              if (redeemed) {
                 console.log(`[auth/callback] redeemed lifetime code ${pendingRedeemCode} for user ${user.id}`);
               }
             }
@@ -55,10 +61,17 @@ export async function GET(request: Request) {
           }
           // Clear the cookie so the user can't accidentally reuse a stale code.
           cookieStore.set("pending_redeem_code", "", { maxAge: 0, path: "/" });
-          // Override the next URL so the user lands on the welcome celebration.
-          const welcomeUrl = new URL("/dashboard", origin);
-          welcomeUrl.searchParams.set("welcome", "lifetime");
-          return NextResponse.redirect(welcomeUrl);
+          if (redeemed) {
+            // Land on the welcome celebration only when redemption succeeded.
+            const welcomeUrl = new URL("/dashboard", origin);
+            welcomeUrl.searchParams.set("welcome", "lifetime");
+            return NextResponse.redirect(welcomeUrl);
+          }
+          // Redemption failed (already used / revoked / error) — send the user
+          // back to the redeem page with an error instead of faking success.
+          const failUrl = new URL(`/redeem/${pendingRedeemCode}`, origin);
+          failUrl.searchParams.set("error", "redeem_failed");
+          return NextResponse.redirect(failUrl);
         }
 
         // Attribute referral if ref code is present

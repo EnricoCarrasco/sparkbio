@@ -255,11 +255,19 @@ function AccountPanel() {
           return;
         }
 
-        // Persist
-        await updateProfile({
+        // Persist — branch on the real result. A race (someone claimed the
+        // name between the availability check and write) trips the DB UNIQUE
+        // constraint and updateProfile returns false; don't claim success.
+        const ok = await updateProfile({
           username: newUsername,
           has_chosen_username: true,
         });
+        if (!ok) {
+          setError("username", {
+            message: "This username is already taken",
+          });
+          return;
+        }
         toast.success("Username updated successfully");
         reset();
       } catch {

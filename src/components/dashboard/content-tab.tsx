@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect, useMemo } from "react";
+import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 import {
   Plus,
@@ -1128,7 +1129,7 @@ function ContentTabInner() {
             <Eye size={14} />
             Preview
           </a>
-          <a
+          <NextLink
             href="/earn"
             className="dash-btn-ghost"
             style={{
@@ -1139,7 +1140,7 @@ function ContentTabInner() {
           >
             <Gift size={14} />
             {tDesign("earnTab")}
-          </a>
+          </NextLink>
           <button
             type="button"
             onClick={() => setShareOpen(true)}

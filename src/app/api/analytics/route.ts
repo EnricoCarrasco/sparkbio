@@ -42,6 +42,30 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "not_found" }, { status: 400 });
   }
 
+  // --- For link_click, the referenced id must belong to this profile (it may be
+  //     a links row OR a social_icons row — social buttons fire link_click with
+  //     the icon id). A foreign/unknown id is dropped to null rather than
+  //     hard-failing the beacon, so it can't poison another profile's per-link
+  //     stats. ---
+  let resolvedLinkId: string | null = null;
+  if (link_id) {
+    const [{ data: ownLink }, { data: ownIcon }] = await Promise.all([
+      supabase
+        .from("links")
+        .select("id")
+        .eq("id", link_id)
+        .eq("user_id", profile_id)
+        .maybeSingle(),
+      supabase
+        .from("social_icons")
+        .select("id")
+        .eq("id", link_id)
+        .eq("user_id", profile_id)
+        .maybeSingle(),
+    ]);
+    resolvedLinkId = ownLink || ownIcon ? link_id : null;
+  }
+
   // --- Parse user agent ---
   // UAParser v2 is a plain function, not a constructor
   const ua = request.headers.get("user-agent") ?? "";
@@ -64,7 +88,7 @@ export async function POST(request: NextRequest) {
   // --- Insert into Supabase ---
   const { error } = await supabase.from("analytics_events").insert({
     profile_id,
-    link_id: link_id ?? null,
+    link_id: resolvedLinkId,
     event_type,
     referrer: referrer ?? null,
     country,

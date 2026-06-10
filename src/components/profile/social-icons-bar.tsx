@@ -82,7 +82,6 @@ export function SocialIconsBar({ socialIcons, textColor }: SocialIconsBarProps) 
 
         const isPix = icon.platform === "pix";
         const motionProps = {
-          key: icon.id,
           "aria-label": label,
           title: label,
           style: { color: textColor } as React.CSSProperties,
@@ -97,6 +96,7 @@ export function SocialIconsBar({ socialIcons, textColor }: SocialIconsBarProps) 
         if (isPix) {
           return (
             <motion.button
+              key={icon.id}
               type="button"
               {...motionProps}
               onClick={() => navigator.clipboard.writeText(icon.url)}
@@ -108,6 +108,7 @@ export function SocialIconsBar({ socialIcons, textColor }: SocialIconsBarProps) 
 
         return (
           <motion.a
+            key={icon.id}
             href={icon.url}
             target="_blank"
             rel="noopener noreferrer"

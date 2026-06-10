@@ -10,7 +10,10 @@ interface ProfileState {
   loading: boolean;
   setProfile: (profile: Profile | null) => void;
   fetchProfile: () => Promise<void>;
-  updateProfile: (updates: Partial<Profile>) => Promise<void>;
+  /** Returns true when the change persisted, false when it was reverted due to
+   *  an error (e.g. username taken). Callers should branch on this rather than
+   *  assuming success. */
+  updateProfile: (updates: Partial<Profile>) => Promise<boolean>;
   uploadAvatar: (file: File) => Promise<string | null>;
 }
 
@@ -40,7 +43,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
 
   updateProfile: async (updates) => {
     const { profile } = get();
-    if (!profile) return;
+    if (!profile) return false;
 
     // Optimistic update
     set({ profile: { ...profile, ...updates } });
@@ -54,9 +57,10 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     if (error) {
       // Revert on error
       set({ profile });
-    } else {
-      triggerRevalidation();
+      return false;
     }
+    triggerRevalidation();
+    return true;
   },
 
   uploadAvatar: async (file: File) => {

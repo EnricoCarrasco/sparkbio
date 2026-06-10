@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { PLATFORM_BRAND_COLORS } from "@/lib/constants";
@@ -58,14 +59,78 @@ function GridIcon({
   index: number;
   totalCount: number;
 }) {
+  const [copied, setCopied] = useState(false);
   const brand = PLATFORM_BRAND_COLORS[icon.platform];
   const iconPath = getBrandIconPath(icon.platform);
   const label = getPlatformLabel(icon.platform);
   const isInIframe = typeof window !== "undefined" && window.self !== window.top;
+  // Pix "url" is a raw payment key, NOT a navigable URL — it bypasses URL-scheme
+  // validation in the DB, so it must never land in an <a href> (XSS via
+  // javascript:/data:). Render a copy-to-clipboard button instead, like
+  // SocialButton/SocialIconsBar do.
+  const isPix = icon.platform === "pix";
 
   // Icon size scales: fewer icons = bigger icons
   // With 1: icon is ~100px. With 2: ~90px. With 3+: auto-fill the column
   const iconSizeFactor = totalCount <= 2 ? 0.55 : 0.45;
+
+  async function copyPix() {
+    try {
+      await navigator.clipboard.writeText(icon.url);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = icon.url;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  const iconImg = (
+    <Image
+      src={iconPath}
+      alt={label}
+      width={64}
+      height={64}
+      className={`${brand.text === "#fff" ? "brightness-0 invert" : "brightness-0"}`}
+      style={{
+        width: `${iconSizeFactor * 100}%`,
+        height: `${iconSizeFactor * 100}%`,
+        objectFit: "contain",
+      }}
+    />
+  );
+
+  const sharedClassName =
+    "aspect-square rounded-full flex items-center justify-center w-full transition-transform";
+  const sharedMotion = {
+    initial: { opacity: 0, scale: 0.7 },
+    animate: { opacity: 1, scale: 1 },
+    transition: { duration: 0.3, ease: "easeOut", delay: 0.45 + index * 0.05 },
+    whileHover: { scale: 1.08 },
+    whileTap: { scale: 0.95 },
+  } as const;
+
+  if (isPix) {
+    return (
+      <motion.button
+        type="button"
+        onClick={copyPix}
+        aria-label={copied ? "Copied!" : label}
+        title={copied ? "Copied!" : label}
+        className={sharedClassName}
+        style={{ background: brand.bg }}
+        {...sharedMotion}
+      >
+        {iconImg}
+      </motion.button>
+    );
+  }
 
   return (
     <motion.a
@@ -75,30 +140,11 @@ function GridIcon({
       onClick={isInIframe ? (e: React.MouseEvent) => { e.preventDefault(); window.open(icon.url, "_blank", "noopener,noreferrer"); } : undefined}
       aria-label={label}
       title={label}
-      className="aspect-square rounded-full flex items-center justify-center w-full transition-transform"
+      className={sharedClassName}
       style={{ background: brand.bg }}
-      initial={{ opacity: 0, scale: 0.7 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{
-        duration: 0.3,
-        ease: "easeOut",
-        delay: 0.45 + index * 0.05,
-      }}
-      whileHover={{ scale: 1.08 }}
-      whileTap={{ scale: 0.95 }}
+      {...sharedMotion}
     >
-      <Image
-        src={iconPath}
-        alt={label}
-        width={64}
-        height={64}
-        className={`${brand.text === "#fff" ? "brightness-0 invert" : "brightness-0"}`}
-        style={{
-          width: `${iconSizeFactor * 100}%`,
-          height: `${iconSizeFactor * 100}%`,
-          objectFit: "contain",
-        }}
-      />
+      {iconImg}
     </motion.a>
   );
 }
