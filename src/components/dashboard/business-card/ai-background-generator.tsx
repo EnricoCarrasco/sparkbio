@@ -48,23 +48,12 @@ export function AiBackgroundGenerator() {
         throw new Error(data.error || "Generation failed");
       }
 
+      // The route already rehosted the image in our storage (same-CORS-safe
+      // for html-to-image: Supabase storage sends Access-Control-Allow-Origin: *).
       const { imageUrl } = await res.json();
-
-      // Convert to base64 data URL to avoid CORS issues with html-to-image
-      const imgRes = await fetch(imageUrl);
-      if (!imgRes.ok) throw new Error("Failed to fetch generated image");
-      const blob = await imgRes.blob();
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        store.setAiBackgroundUrl(reader.result as string);
-        store.setAiBackgroundLoading(false);
-        toast.success(t("toastBackgroundGenerated"));
-      };
-      reader.onerror = () => {
-        store.setAiBackgroundLoading(false);
-        toast.error(t("toastBgProcessError"));
-      };
-      reader.readAsDataURL(blob);
+      store.setAiBackgroundUrl(imageUrl);
+      store.setAiBackgroundLoading(false);
+      toast.success(t("toastBackgroundGenerated"));
     } catch (error) {
       console.error("Background generation error:", error);
       store.setAiBackgroundLoading(false);

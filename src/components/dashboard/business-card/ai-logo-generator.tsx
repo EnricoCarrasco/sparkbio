@@ -10,26 +10,42 @@ import { SectionHead } from "@/components/dashboard/_dash-primitives";
 export function AiLogoGenerator() {
   const t = useTranslations("dashboard.businessCard");
   const [description, setDescription] = useState("");
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const store = useBusinessCardStore();
 
   const currentLogo = store.aiLogoUrl || store.logoUrl;
 
-  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    e.target.value = "";
 
     if (file.size > 2 * 1024 * 1024) {
       toast.error(t("toastFileSize"));
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      store.setField("logoUrl", reader.result as string);
+    // Upload to storage (never base64 into the profile row — that JSONB is
+    // shipped to every public-page visitor via get_public_profile).
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/upload/card-asset", {
+        method: "POST",
+        body: form,
+      });
+      if (!res.ok) throw new Error("upload failed");
+      const { url } = await res.json();
+      store.setField("logoUrl", url);
       store.setAiLogoUrl(null);
-    };
-    reader.readAsDataURL(file);
+    } catch (error) {
+      console.error("Logo upload error:", error);
+      toast.error(t("toastLogoProcessError"));
+    } finally {
+      setUploading(false);
+    }
   }
 
   async function handleGenerateLogo() {
@@ -51,23 +67,11 @@ export function AiLogoGenerator() {
         throw new Error(data.error || "Generation failed");
       }
 
+      // The route already rehosted the image in our storage.
       const { imageUrl } = await res.json();
-
-      // Convert to base64 data URL
-      const imgRes = await fetch(imageUrl);
-      if (!imgRes.ok) throw new Error("Failed to fetch generated image");
-      const blob = await imgRes.blob();
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        store.setAiLogoUrl(reader.result as string);
-        store.setAiLogoLoading(false);
-        toast.success(t("toastLogoGenerated"));
-      };
-      reader.onerror = () => {
-        store.setAiLogoLoading(false);
-        toast.error(t("toastLogoProcessError"));
-      };
-      reader.readAsDataURL(blob);
+      store.setAiLogoUrl(imageUrl);
+      store.setAiLogoLoading(false);
+      toast.success(t("toastLogoGenerated"));
     } catch (error) {
       console.error("Logo generation error:", error);
       store.setAiLogoLoading(false);
@@ -136,6 +140,7 @@ export function AiLogoGenerator() {
       <button
         type="button"
         onClick={() => fileInputRef.current?.click()}
+        disabled={uploading}
         style={{
           width: "100%",
           display: "flex",
@@ -162,7 +167,11 @@ export function AiLogoGenerator() {
           e.currentTarget.style.color = "var(--dash-muted)";
         }}
       >
-        <Upload style={{ width: 14, height: 14 }} />
+        {uploading ? (
+          <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" />
+        ) : (
+          <Upload style={{ width: 14, height: 14 }} />
+        )}
         {t("uploadLogo")}
       </button>
       <input

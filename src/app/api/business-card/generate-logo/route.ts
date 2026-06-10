@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import Replicate from "replicate";
 import { generateLogoSchema } from "@/lib/validators/business-card";
 import { extractReplicateUrl } from "@/lib/replicate";
+import { rehostCardAsset } from "@/lib/storage/card-assets";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { requireProUser } from "@/lib/auth/require-pro";
 
@@ -46,9 +48,21 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const output = await replicate.run("google/nano-banana", { input: { prompt } });
 
-    const imageUrl = extractReplicateUrl(output);
+    // Rehost in our storage: Replicate URLs expire, and returning a storage
+    // URL keeps base64 out of profiles.business_card_settings.
+    const replicateUrl = extractReplicateUrl(output);
+    const rehosted = await rehostCardAsset(
+      createAdminClient(),
+      user.id,
+      "ai-logo",
+      replicateUrl
+    );
+    if ("error" in rehosted) {
+      console.error("[generate-logo] rehost failed:", rehosted.error);
+      return NextResponse.json({ error: "generation_failed" }, { status: 500 });
+    }
 
-    return NextResponse.json({ imageUrl });
+    return NextResponse.json({ imageUrl: rehosted.url });
   } catch (error) {
     console.error("Replicate logo generation error:", error);
     return NextResponse.json({ error: "generation_failed" }, { status: 500 });
