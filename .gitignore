@@ -81,3 +81,4 @@ skills-lock.json
 # HeyGen session logs
 heygen-video-log.jsonl
 AVATAR-*.md
+.test-runs/
